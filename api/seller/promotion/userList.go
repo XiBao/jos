@@ -53,7 +53,7 @@ func UserList(req *UserListRequest) ([]*PromotionUserList, error) {
 		return nil, errors.New("no result.")
 	}
 
-	var response SellerPromotionUserListResponse
+	var response UserListResponse
 	err = ljson.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err

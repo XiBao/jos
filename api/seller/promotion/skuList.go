@@ -64,7 +64,7 @@ func SkuList(req *SkuListRequest) ([]*PromotionSkuList, error) {
 		return nil, errors.New("no result.")
 	}
 
-	var response SellerPromotionSkuListResponse
+	var response SkuListResponse
 	err = ljson.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
