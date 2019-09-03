@@ -1,0 +1,26 @@
+package user
+
+type UserInfo struct {
+	UserId         int64  `json:"userId,omitempty" codec:"userId,omitempty"`
+	Nickname       string `json:"nickname,omitempty" codec:"nickname,omitempty"`
+	NicknameShow   string `json:"nicknameShow,omitempty" codec:"nicknameShow,omitempty"`
+	UserLevel      int    `json:"userLevel,omitempty" codec:"userLevel,omitempty"`
+	Gendar         uint8  `json:"gendar,omitempty" codec:"gendar,omitempty"`
+	YunBigImageUrl string `json:"yunBigImageUrl,omitempty" codec:"yunBigImageUrl,omitempty"`
+
+	CountryCode string `json:"countryCode,omitempty" codec:"countryCode,omitempty"`
+	County      int64  `json:"county,omitempty" codec:"county,omitempty"`
+	Province    int64  `json:"province,omitempty" codec:"province,omitempty"`
+	City        int64  `json:"city,omitempty" codec:"city,omitempty"`
+
+	Email        string `json:"email,omitempty" codec:"email,omitempty"`
+	Mobile       string `json:"mobile,omitempty" codec:"mobile,omitempty"`
+	IntactMobile string `json:"intactMobile,omitempty" codec:"intactMobile,omitempty"`
+
+	Created     int64 `json:"created,omitempty" codec:"created,omitempty"`
+	Modified    int64 `json:"modified,omitempty" codec:"modified,omitempty"`
+	RegTime     int64 `json:"regTime,omitempty" codec:"regTime,omitempty"`
+	UpgradeTime int64 `json:"upgradeTime,omitempty" codec:"upgradeTime,omitempty"`
+
+	EncryPin string `json:"encry_pin,omitempty" codec:"encry_pin,omitempty"`
+}

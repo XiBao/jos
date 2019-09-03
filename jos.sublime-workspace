@@ -1,0 +1,595 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"Member",
+				"MemberFilter"
+			],
+			[
+				"lotter",
+				"lotterySetting"
+			],
+			[
+				"acti",
+				"activityId"
+			],
+			[
+				"getC",
+				"getCampaignInfo"
+			],
+			[
+				"updateCa",
+				"updateCampaignInfo"
+			],
+			[
+				"defau",
+				"colorBgDefault"
+			],
+			[
+				"pan",
+				"panelSwipeData"
+			],
+			[
+				"border",
+				"border-radius"
+			],
+			[
+				"neare",
+				"nearestPoi"
+			],
+			[
+				"near",
+				"nearestPoi"
+			],
+			[
+				"calu",
+				"caculation_method"
+			],
+			[
+				"cal",
+				"calculationMethod"
+			],
+			[
+				"increment",
+				"increment_fee"
+			],
+			[
+				"get",
+				"getLocationsWithLevel"
+			],
+			[
+				"selected",
+				"selectedAttributes"
+			],
+			[
+				"display",
+				"displayAddAttributeDialog"
+			],
+			[
+				"addAttr",
+				"addAttrValueId"
+			],
+			[
+				"addAt",
+				"addAttrValueId"
+			],
+			[
+				"addA",
+				"addValueForm"
+			],
+			[
+				"getCae",
+				"getCategoriesByPid"
+			],
+			[
+				"getCa",
+				"getCategoriesByPid"
+			],
+			[
+				"descS",
+				"descSectionMoveUp"
+			],
+			[
+				"nav",
+				"navHeaderTitle"
+			],
+			[
+				"vue",
+				"vuetify"
+			],
+			[
+				"countdown",
+				"countdown-overlay"
+			],
+			[
+				"title",
+				"fontWeightTitle"
+			],
+			[
+				"pro",
+				"prototype"
+			],
+			[
+				"Depth",
+				"DepthClusterViewMode"
+			],
+			[
+				"seriz",
+				"serializeChildren"
+			],
+			[
+				"node",
+				"nodeName"
+			],
+			[
+				"selec",
+				"selectedLocation"
+			],
+			[
+				"play",
+				"playing"
+			],
+			[
+				"backg",
+				"background-color"
+			],
+			[
+				"pick",
+				"showPickerView"
+			],
+			[
+				"messageInpu",
+				"messageInputBottom"
+			],
+			[
+				"current",
+				"currentSwiperIndex"
+			],
+			[
+				"bord",
+				"border-radius"
+			],
+			[
+				"link",
+				"colorLink"
+			],
+			[
+				"tap",
+				"tappedSong"
+			],
+			[
+				"auth",
+				"authToken"
+			],
+			[
+				"font",
+				"fontWeightTitle"
+			],
+			[
+				"foundSele",
+				"foundSelectedGroup"
+			],
+			[
+				"openg",
+				"openGidActivityId"
+			],
+			[
+				"seri",
+				"seriesName"
+			],
+			[
+				"tabb",
+				"tabBarSelector"
+			],
+			[
+				"failed",
+				"failedPlays"
+			],
+			[
+				"flex",
+				"flex-direction"
+			],
+			[
+				"back",
+				"background-color"
+			],
+			[
+				"nava",
+				"navigateTo"
+			],
+			[
+				"draw",
+				"drawImage"
+			],
+			[
+				"message",
+				"messages-box"
+			],
+			[
+				"like-",
+				"likes-avatar"
+			],
+			[
+				"poi-swiper",
+				"poi-swiper-item"
+			],
+			[
+				"wi",
+				"windowHeight"
+			],
+			[
+				"no",
+				"noMoreData"
+			],
+			[
+				"time",
+				"formatTime"
+			],
+			[
+				"style",
+				"stylesheet"
+			],
+			[
+				"media",
+				"mediaContent"
+			],
+			[
+				"getEl",
+				"getElementById"
+			],
+			[
+				"ba",
+				"background-image\tproperty"
+			],
+			[
+				"text",
+				"text-align\tproperty"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"packa",
+				"Package Control: Remove Package"
+			],
+			[
+				"pack",
+				"Package Control: Remove Package"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Install Package"
+			],
+			[
+				"package",
+				"Package Control: Install Package"
+			],
+			[
+				"gosublime: fm",
+				"GoSublime: Fmt the current file (without saving it)"
+			],
+			[
+				"pa",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 182.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+	],
+	"file_history":
+	[
+		"/Users/syd/Library/Caches/Transmit/3C867FC8-417A-472C-9545-D60FDEFB2097/223.4.56.171/data/home/syd/afterpay/src/github.com/afterpay/afterpayd/handler/api/user/share.ticket.go",
+		"/Users/syd/Library/Caches/Transmit/CE345132-B2B8-4E5A-8165-E8D715C65FFB/223.4.56.171/data/home/syd/afterpay/src/github.com/afterpay/afterpayd/handler/api/auth/auth.go",
+		"/Users/syd/Library/Caches/Transmit/CECDF659-253A-418F-8E39-EF6DEF526D73/223.4.56.171/data/home/syd/afterpay/src/github.com/afterpay/afterpayd/common/interface.merchant.go",
+		"/Users/syd/Library/Caches/Transmit/AFB9C270-E084-4869-9D6F-19698668642D/223.4.56.171/data/home/syd/afterpay/src/github.com/afterpay/afterpayd/router/api/user.go",
+		"/Users/syd/Library/Caches/Transmit/C7FCF6E6-AE49-433D-AF0D-B4F0C554C12D/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/api/user/formid.go",
+		"/Users/syd/Library/Caches/Transmit/0835B39D-6DD9-4B60-98F3-312FC72079D0/223.4.56.171/data/home/syd/afterpay/src/github.com/afterpay/afterpayd/handler/api/user/fromid.go",
+		"/Users/syd/Library/Caches/Transmit/344FD171-8AF2-4F79-B115-C250E3ACD51B/223.4.56.171/data/home/syd/afterpay/src/github.com/afterpay/afterpayd/handler/api/user/info.go",
+		"/Users/syd/Library/Caches/Transmit/A43D36AD-BD44-4509-8D06-062DAFAD0750/223.4.56.171/data/home/syd/afterpay/src/github.com/afterpay/afterpayd/handler/api/user/invite.go",
+		"/Users/syd/Library/Caches/Transmit/0008B2D7-26D7-4ED5-8F21-C04987E985E7/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/common/interface.activity.go",
+		"/Users/syd/Library/Caches/Transmit/51D30709-56ED-430B-8C6D-6449175BEF5F/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/api/loghub/visit.go",
+		"/Users/syd/Library/Caches/Transmit/B9B62460-D868-4A81-8EC1-700D2ED95B04/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/router/api/loghub.go",
+		"/Users/syd/Library/Caches/Transmit/AA7C96D0-9AC2-4D2E-9932-5EB04FD7650F/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/console/activity/info.go",
+		"/Users/syd/Library/Caches/Transmit/AA23FE69-DBCD-4B98-817C-93CC8F45AE5C/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/router/api/index.go",
+		"/Users/syd/Library/Caches/Transmit/49AFFCFD-43CD-41F3-83BA-CA2968FCB070/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/router/api/app.go",
+		"/Users/syd/Library/Caches/Transmit/71E17F4C-834D-4012-B1F8-A26DAD2BEF21/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/api/auth/auth.go",
+		"/Users/syd/Library/Caches/Transmit/362A775B-8DD5-4930-9508-9C265D9C09DA/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/router/console/activity.go",
+		"/Users/syd/Library/Caches/Transmit/E8311973-94C9-41F0-8A45-01904A50DDBE/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/api/app/homepage.go",
+		"/Users/syd/Library/Caches/Transmit/27B4CE3A-BA52-48C7-8FA2-A05ACA4546D6/223.4.56.171/data/home/syd/octosense-console/src/views/miniapp/settings.vue",
+		"/Users/syd/Library/Caches/Transmit/97757A1D-4DDA-49A0-BAB8-117B48716302/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/console/app/homepage.go",
+		"/Users/syd/Library/Caches/Transmit/B0CD0E5F-E949-47C9-85D9-1A24E7339ED4/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/console/app/homepage.go",
+		"/Users/syd/Library/Caches/Transmit/B1BCC9AB-63BC-4DAC-9383-7EC92299FDCE/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/router/api/index.go",
+		"/Users/syd/Library/Caches/Transmit/9C735B31-7F5E-441D-A1B4-43B6B7DEAFF7/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/router/api/loghub.go",
+		"/Users/syd/Library/Caches/Transmit/55A94C78-8CFA-40EA-A23F-D1FB3CB350EE/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/router/api/app.go",
+		"/Users/syd/Library/Caches/Transmit/4DB768D8-C7A9-498A-87D2-B17CDB8340C9/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/router/console/app.go",
+		"/Users/syd/Library/Caches/Transmit/395DE557-0C63-4238-A546-0059772DE31F/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/console/app/info.go",
+		"/Users/syd/Library/Caches/Transmit/472D6249-F4F7-4E6D-9D2A-D764326D026B/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/console/auth/auth.go",
+		"/Users/syd/Library/Caches/Transmit/0AF9B0A4-F4EC-4034-89F9-E4831F3B323D/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/interface.go",
+		"/Users/syd/Library/Caches/Transmit/FA334D56-4A34-4FFB-A5FB-1E75CC426AD1/223.4.56.171/data/home/syd/octosense-console/src/router/miniapp/index.js",
+		"/Users/syd/Library/Caches/Transmit/789DB024-4F19-4B15-B750-E471416C0696/223.4.56.171/data/home/syd/octosense-console/src/views/auth/token.vue",
+		"/Users/syd/Library/Caches/Transmit/8B861889-239E-4E67-AC83-C1E7E20D64DA/223.4.56.171/data/home/syd/octosense-console/src/views/auth/login.vue",
+		"/Users/syd/Library/Caches/Transmit/425A13FB-A2C7-41E9-8222-70BDA816C423/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/router/console/auth.go",
+		"/Users/syd/Library/Caches/Transmit/754BBBD1-B753-4D7F-8260-0C04D7BD6A98/223.4.56.171/data/home/syd/octosense-console/src/router/miniapp/index.js",
+		"/Users/syd/Library/Caches/Transmit/9EC7E2A2-EF74-47D8-B7C8-96841007497E/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/console/auth/component/callback.go",
+		"/Users/syd/Library/Caches/Transmit/0E692A49-B09B-4DD1-A32C-9EB41F57E993/223.4.56.171/data/home/syd/octosense-console/src/router/auth/index.js",
+		"/Users/syd/Library/Caches/Transmit/CCB5F6C4-3247-4BA1-9238-FA7A1AF94E3D/223.4.56.171/data/home/syd/octosense-console/src/store/auth/index.js",
+		"/Users/syd/Library/Caches/Transmit/36489356-4C59-4E4D-9C56-DF8C8E8694B1/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/common/interface.config.go",
+		"/Users/syd/Library/Caches/Transmit/A22A566F-3711-4E10-B0E1-B5468B6EED93/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/config.toml",
+		"/Users/syd/Library/Caches/Transmit/7CBCFD2B-3DF9-42C7-8E58-187C0668DCF2/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/services/wxapp/service.go",
+		"/Users/syd/Library/Caches/Transmit/ED3DB534-EDA5-4EF9-ADCC-EAE0D00B77FE/223.4.56.171/data/home/syd/octosense-console/src/router/index.js",
+		"/Users/syd/Library/Caches/Transmit/FAC9C668-C1B7-4316-A8F9-31E5AAAAB552/223.4.56.171/data/home/syd/octosense-console/src/store/auth/index.js",
+		"/Users/syd/Library/Caches/Transmit/D7382D93-9C24-425B-B2B4-0B8B48F40219/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/cmd/login.go",
+		"/Users/syd/Library/Caches/Transmit/4A53B9CF-903A-40E8-8039-53D6BA42D475/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/middlewares/merchant/jwt.go",
+		"/Users/syd/Library/Caches/Transmit/35341779-5C57-4102-A201-69302B2D1A0F/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/console/auth/component/callback.go",
+		"/Users/syd/Library/Caches/Transmit/BD106FDE-49D2-43FF-91E8-1ECBACB3EBA7/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/console/auth/component.go",
+		"/Users/syd/Library/Caches/Transmit/04EF3C64-3013-44E9-9DB5-FAF294362053/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/console/auth/msg.go",
+		"/Users/syd/Library/Caches/Transmit/FFA4357C-EADC-418B-92D4-EAC3DE0D3A08/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/console/auth/auth.go",
+		"/Users/syd/Library/Caches/Transmit/642A36E7-1E59-4C6D-B832-8B072B7AE8E2/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/cmd/login.go",
+		"/Users/syd/Library/Caches/Transmit/45CAF24D-534F-4837-BE63-D92E584FC462/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/console/auth/component/callback.go",
+		"/Users/syd/Library/Caches/Transmit/354F82A7-F54E-46F2-BE81-AA79068818FA/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/console/auth/component.callback.go",
+		"/Users/syd/Library/Caches/Transmit/5E242577-74E0-48AF-B3E1-739779CF1CD2/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/console/auth/token/refresh.go",
+		"/Users/syd/Library/Caches/Transmit/E7ECF524-14E8-4668-8723-09410441236D/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/console/auth/component.go",
+		"/Users/syd/Library/Caches/Transmit/12DD2BA2-06E1-452A-94DD-3447D9598D55/223.4.56.171/data/home/syd/octosense-console/src/store/auth/index.js",
+		"/Users/syd/Library/Caches/Transmit/283C13EC-BC27-4921-A84F-551CB17CE262/223.4.56.171/data/home/syd/octosense-console/src/api/auth.js",
+		"/Users/syd/Library/Caches/Transmit/59A26248-483E-4CD8-AE84-F07DE392E507/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/cmd/util.go",
+		"/Users/syd/Library/Caches/Transmit/A46929C1-809F-4679-886D-7C05C1E4645F/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/common/interface.service.go",
+		"/Users/syd/Documents/GitHub/wechat/miniapp/wxa/template.go",
+		"/Users/syd/Library/Caches/Transmit/31F54E31-D247-4E58-928A-35058E05EE44/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/common/consts.go",
+		"/Users/syd/Library/Caches/Transmit/C6711B87-2E30-437A-B2B3-3E3E7EDC0A00/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/middlewares/jwt/auth_jwt.go",
+		"/Users/syd/Documents/GitHub/wechat/miniapp/wxa/extConfig.go",
+		"/Users/syd/Library/Caches/Transmit/16F09D07-15FE-4181-BF2E-F9FD1B2CECF2/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/cmd/login.go",
+		"/Users/syd/Documents/GitHub/wechat/miniapp/wxa/commit.go",
+		"/Users/syd/Library/Caches/Transmit/7E1F16B6-921C-44EE-BA92-16EB978C3BE3/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/cmd/del.component.template.go",
+		"/Users/syd/Library/Caches/Transmit/5C8F8001-3584-48F0-AEC4-8860BB06E068/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/cmd/get.component.drafts.go",
+		"/Users/syd/Library/Caches/Transmit/E0CD735A-0E0E-4188-BD3C-F5F095F0EAE6/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/cmd/add.component.template.go",
+		"/Users/syd/Library/Caches/Transmit/E3C34483-5656-4F73-99CF-2154AB31D35D/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/cmd/util.go",
+		"/Users/syd/Library/Caches/Transmit/62822EE4-04FE-48F8-B212-1DAEF237D475/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/cmd/get.component.templates.go",
+		"/Users/syd/Library/Caches/Transmit/2F2D2F1B-B6B0-4E96-9CA2-A38EC257F9DE/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/cmd/get.component.experiencer.go",
+		"/Users/syd/Library/Caches/Transmit/639EF611-EEDD-4D0F-ADFF-D017BC4EE1C2/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/cmd/get.component.drafts.go",
+		"/Users/syd/Documents/GitHub/wechat/miniapp/wxa/getTemplateDraftList.go",
+		"/Users/syd/Library/Caches/Transmit/87059AD0-886B-46D9-8585-373A2E52C0FB/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/cmd/register.go",
+		"/Users/syd/Library/Caches/Transmit/01E2E471-B4BE-43A1-A64C-796B43B49CBF/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/cmd/login.go",
+		"/Users/syd/Library/Caches/Transmit/139E41B5-7C0A-4505-A97B-EBDE14A31E13/223.4.56.171/data/home/syd/octosense-console/src/assets/styles/common.styl",
+		"/Users/syd/Library/Caches/Transmit/947948EB-31E4-46FE-9504-02D2E981327B/223.4.56.171/data/home/syd/octosense-console/src/views/lotteries/add.vue",
+		"/Users/syd/Library/Caches/Transmit/90EFF562-0F60-4845-9C66-30A4B005D163/223.4.56.171/data/home/syd/octosense-console/src/components/member/filter.vue",
+		"/Users/syd/Library/Caches/Transmit/DF658ABF-F2C3-497C-AD78-45A273E85EBF/223.4.56.171/data/home/syd/octosense-console/src/views/member/crowds.vue",
+		"/Users/syd/Library/Caches/Transmit/306960BE-41A4-4092-8D4B-D7E18CA96F46/223.4.56.171/data/home/syd/octosense-console/src/components/member/CrowdCell.vue",
+		"/Users/syd/Library/Caches/Transmit/AAE31A8E-601E-4973-91C4-0ED795887518/223.4.56.171/data/home/syd/octosense-console/src/views/member/list.vue",
+		"/Users/syd/Library/Caches/Transmit/781E8584-4DD4-4FAF-80C4-F73A567CB9F3/223.4.56.171/data/home/syd/octosense-console/src/components/member/list.vue",
+		"/Users/syd/Library/Caches/Transmit/6C73FE10-96AD-4463-8863-F4CAEE36F07F/223.4.56.171/data/home/syd/octosense-console/src/components/activity/ActivityCell.vue",
+		"/Users/syd/Library/Caches/Transmit/83F43EA8-6F9D-47D2-8969-243CFB0E94E5/223.4.56.171/data/home/syd/octosense-console/src/components/lottery/PrizeCell.vue",
+		"/Users/syd/Library/Caches/Transmit/AE4B283B-115B-47CB-BE08-39956EC6A07C/223.4.56.171/data/home/syd/octosense-console/src/components/global/SideBar/main.vue",
+		"/Users/syd/Library/Caches/Transmit/73EAA173-6477-4157-82BF-622F84A45664/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/api/loghub/send.go",
+		"/Users/syd/Library/Caches/Transmit/BB12AEA9-5525-49A0-BA19-1067751FFA91/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/common/interface.loghub.go",
+		"/Users/syd/Library/Caches/Transmit/33D2AEAE-92DE-4032-8302-5A5569D84C76/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/router/api/index.go",
+		"/Users/syd/Library/Caches/Transmit/317C6739-6BDD-47C6-A534-EF42EED3B050/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/router/api/loghub.go",
+		"/Users/syd/Library/Caches/Transmit/97C0FBD5-F169-48B2-B81A-DDD4242959E9/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/router/api/loghub.go",
+		"/Users/syd/Library/Caches/Transmit/799F96B4-4E25-4EFF-BBCC-794F9F963356/223.4.56.171/data/home/syd/afterpay/src/github.com/afterpay/afterpayd/router/api/loghub.go",
+		"/Users/syd/Library/Caches/Transmit/3BDA2A07-3E20-4F6A-B51A-4F2239632B7C/223.4.56.171/data/home/syd/afterpay/src/github.com/afterpay/afterpayd/common/consts.go",
+		"/Users/syd/Library/Caches/Transmit/9B87A45A-4480-4C36-8E77-4B8F7536CBA5/223.4.56.171/data/home/syd/afterpay/src/github.com/afterpay/afterpayd/common/interface.loghub.go",
+		"/Users/syd/Library/Caches/Transmit/3C0E2C8F-3802-4A8C-B68A-6D6A47935532/223.4.56.171/data/home/syd/afterpay/src/github.com/afterpay/afterpayd/handler/api/loghub/send.go",
+		"/Users/syd/Library/Caches/Transmit/856E0E35-7DB2-49FC-97AA-A963899989DD/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/common/interface.service.go",
+		"/Users/syd/Library/Caches/Transmit/B569685A-B43C-4291-84AF-05C162254DD8/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/common/consts.go",
+		"/Users/syd/Library/Caches/Transmit/A493C1BB-0700-4A88-AB4B-72A259C0FB9D/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/config.toml",
+		"/Users/syd/Library/Caches/Transmit/39AC1CB3-59E9-4CC6-B248-B6A51AE92CEE/223.4.56.171/data/home/syd/octosense-console/src/components/lottery/LotteryCell.vue",
+		"/Users/syd/Library/Caches/Transmit/F2440867-0B9E-4AA5-9F05-957268A5700D/223.4.56.171/data/home/syd/octosense-console/src/components/member/list.vue",
+		"/Users/syd/Library/Caches/Transmit/FA2274C6-872A-4378-AA0C-4C39116229BD/223.4.56.171/data/home/syd/octosense-console/src/router/member/index.js",
+		"/Users/syd/Library/Caches/Transmit/B32DBEEF-8850-4BDA-A75B-035043C83F9C/223.4.56.171/data/home/syd/octosense-console/src/router/member/index.js",
+		"/Users/syd/Library/Caches/Transmit/6A5C8A30-1EF4-416E-AABF-57E3624BC228/223.4.56.171/data/home/syd/octosense-console/src/components/activity/ActivityList.vue",
+		"/Users/syd/Library/Caches/Transmit/B9FAFBBC-0C1A-4F0C-9153-EA0F3B2A593B/223.4.56.171/data/home/syd/octosense-console/src/components/activity/MemberList.vue",
+		"/Users/syd/Library/Caches/Transmit/5A6D04BF-B26D-43B5-BAEA-71AB883C2BD8/223.4.56.171/data/home/syd/octosense-console/src/views/activity/list.vue",
+		"/Users/syd/Library/Caches/Transmit/43B5AED9-ACBF-4FF0-8ECA-02F9398A3B16/223.4.56.171/data/home/syd/octosense-console/src/router/member/index.js",
+		"/Users/syd/Library/Caches/Transmit/78C6810F-FFF8-4960-B502-085709DAAF85/223.4.56.171/data/home/syd/octosense-console/src/components/activity/BonusSetting.vue",
+		"/Users/syd/Library/Caches/Transmit/7394890A-AE7A-4F21-AB7D-6D9C8FE4646F/223.4.56.171/data/home/syd/octosense-console/src/components/activity/MemberCell.vue",
+		"/Users/syd/Library/Caches/Transmit/16A09CCA-69E1-4B8D-B215-5DFCCFB7A3C9/223.4.56.171/data/home/syd/octosense-console/src/components/activity/ActivityList.vue",
+		"/Users/syd/Library/Caches/Transmit/18474337-1D28-4EF2-AB4F-5AD95CEE819B/223.4.56.171/data/home/syd/octosense-console/src/components/global/SideBar/main.vue",
+		"/Users/syd/Library/Caches/Transmit/19992F79-54F8-45A8-9553-62FD02470751/223.4.56.171/data/home/syd/octosense-console/src/components/global/SideBar/main.vue",
+		"/Users/syd/Library/Caches/Transmit/E5AAA463-4695-4944-AA22-2700648A9CEE/223.4.56.171/data/home/syd/octosense-console/src/components/lottery/NewPrize.vue",
+		"/Users/syd/Library/Caches/Transmit/A2C62306-9E25-4937-97B4-F0A52909BEFF/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/common/interface.activity.go",
+		"/Users/syd/Library/Caches/Transmit/67EDBB26-33D2-4060-96B5-304A74C2FB3E/223.4.56.171/data/home/syd/octosense-console/src/components/lottery/PrizeList.vue",
+		"/Users/syd/Library/Caches/Transmit/AEAC7288-3AB4-4E73-80E0-118F87080B94/223.4.56.171/data/home/syd/octosense-console/src/components/global/NavHeader/main.vue",
+		"/Users/syd/Library/Caches/Transmit/50087A9E-877D-4833-9C11-313ECBA24959/223.4.56.171/data/home/syd/octosense-console/src/components/lottery/setting.vue",
+		"/Users/syd/Library/Caches/Transmit/B699E645-5FC7-4D8F-8F34-ACDEDF678A1C/223.4.56.171/data/home/syd/octosense-console/src/mixins/activity.js",
+		"/Users/syd/Library/Caches/Transmit/B41E3C98-5EFD-451C-90E7-A7D8F61C05CF/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/console/activity/templates.go",
+		"/Users/syd/Library/Caches/Transmit/CCA9F3F5-8102-47BA-9D35-F9492F3F1485/223.4.56.171/data/home/syd/octosense-console/src/router/lottery/index.js",
+		"/Users/syd/Library/Caches/Transmit/7E2CC460-F505-47E6-82D7-440F013B3FF8/223.4.56.171/data/home/syd/octosense-console/src/mixins/common.js",
+		"/Users/syd/Library/Caches/Transmit/95BC6A5F-2949-4497-B0AE-63B3FCE607E2/223.4.56.171/data/home/syd/octosense-console/src/views/lottery/list.vue",
+		"/Users/syd/Library/Caches/Transmit/583645C7-0882-4978-A760-271FBA9F22DD/223.4.56.171/data/home/syd/octosense-console/src/components/activity/ActivityList.vue",
+		"/Users/syd/Library/Caches/Transmit/F795A068-0E5C-4F39-BD20-47DC111C7D47/223.4.56.171/data/home/syd/octosense-console/src/components/lottery/LotteryCell.vue",
+		"/Users/syd/Library/Caches/Transmit/4FAE6908-1A3F-445C-B664-670C28A6420F/223.4.56.171/data/home/syd/octosense-console/src/components/activity/ActivityList.vue",
+		"/Users/syd/Library/Caches/Transmit/724BE7BB-00A2-426C-847F-E60295537468/223.4.56.171/data/home/syd/octosense-console/src/components/rebate/RebateCell.vue",
+		"/Users/syd/Library/Caches/Transmit/EF098258-FCBB-4436-B907-31D9B2444870/223.4.56.171/data/home/syd/octosense-console/src/views/activity/list.vue",
+		"/Users/syd/Library/Caches/Transmit/C88C71DF-41D4-495D-8ED5-2FF8823CB5C5/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/router/console/activity.go",
+		"/Users/syd/Library/Caches/Transmit/920C9F3A-0938-44B4-95E5-29F8E3258DB6/223.4.56.171/data/home/syd/octosense-console/src/api/activity.js",
+		"/Users/syd/Library/Caches/Transmit/9CF19C5F-924D-4E49-90DB-3205E7DACB17/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/console/activity/prize.update.go",
+		"/Users/syd/Library/Caches/Transmit/F123F5DD-FBAE-4D85-8940-5F0CA113F4B2/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/common/interface.activity.go",
+		"/Users/syd/Library/Caches/Transmit/802C5C2A-B28C-4301-B932-6154E1024482/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/console/activity/prize.add.go",
+		"/Users/syd/Library/Caches/Transmit/1030619B-9221-4F36-AB6B-3652D5F84B05/223.4.56.171/data/home/syd/octosense/src/github.com/octosense/server/handler/console/activity/prize.remove.go",
+		"/Users/syd/Library/Caches/Transmit/A1E00E00-D260-43F4-AF7F-4540EF680C7F/223.4.56.171/data/home/syd/octosense-console/src/components/lottery/PrizeCell.vue"
+	],
+	"find":
+	{
+		"height": 32.0
+	},
+	"find_in_files":
+	{
+		"height": 112.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 32.0
+	},
+	"input":
+	{
+		"height": 41.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.9o:///Users/syd/Library/Caches/Transmit/A0F82EF0-0C6A-40B4-BF55-BEA02502C86A/ec2-54-238-177-45.ap-northeast-1.compute.amazonaws.com/opt/go/src/github.com/tokenme/tmm/handler/redeem":
+	{
+		"height": 146.0
+	},
+	"output.9o:///Users/syd/Library/Caches/Transmit/A124D518-70B2-46C8-B598-4CC9C5591D32/ec2-54-238-177-45.ap-northeast-1.compute.amazonaws.com/opt/go/src/github.com/tokenme/tmm/common":
+	{
+		"height": 146.0
+	},
+	"output.9o:///Users/syd/Library/Caches/Transmit/A8A80217-A894-4053-852D-01C25E709EC2/ec2-54-238-177-45.ap-northeast-1.compute.amazonaws.com/opt/go/src/github.com/tokenme/tmm/tools/tokenprofile":
+	{
+		"height": 146.0
+	},
+	"output.9o:///Users/syd/Library/Caches/Transmit/CCA73E93-2DBE-4DFF-9929-3D348ABB2130/ec2-54-238-177-45.ap-northeast-1.compute.amazonaws.com/opt/go/src/github.com/tokenme/tmm/handler/task":
+	{
+		"height": 146.0
+	},
+	"output.GoSublime-main-output":
+	{
+		"height": 146.0
+	},
+	"output.GoSublime-output":
+	{
+		"height": 146.0
+	},
+	"output.MarGo-output":
+	{
+		"height": 146.0
+	},
+	"output.exec":
+	{
+		"height": 152.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "jos.sublime-project",
+	"replace":
+	{
+		"height": 60.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 223.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
