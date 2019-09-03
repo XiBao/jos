@@ -6,7 +6,7 @@ import (
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/user"
 	"github.com/XiBao/jos/sdk"
-	"github.com/XiBao/jos/sdk/request"
+	"github.com/XiBao/jos/sdk/request/jm"
 	"github.com/daviddengcn/ljson"
 )
 

@@ -1,4 +1,4 @@
-package request
+package jm
 
 import (
 	"github.com/XiBao/jos/sdk"
