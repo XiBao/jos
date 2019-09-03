@@ -54,7 +54,7 @@ func TokenToPin(req *TokenToPinRequest) (string, error) {
 		return "", response.ErrorResp
 	}
 	if response.Data.Code != "0" {
-		return "", errors.New("%v", response.Data.ErrorDesc)
+		return "", errors.New(response.Data.ErrorDesc)
 	}
 	if response.Data.Result == nil {
 		return "", errors.New("No pin.")
