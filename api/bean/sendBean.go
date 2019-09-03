@@ -25,8 +25,8 @@ type SendBeanRequest struct {
 }
 
 type SendBeanResponse struct {
-	ErrorResp *ErrorResponnse `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *SendBeanData   `json:"jingdong_pop_bean_sendBean_responce,omitempty" codec:"jingdong_pop_bean_sendBean_responce,omitempty"`
+	ErrorResp *api.ErrorResponnse `json:"error_response,omitempty" codec:"error_response,omitempty"`
+	Data      *SendBeanData       `json:"jingdong_pop_bean_sendBean_responce,omitempty" codec:"jingdong_pop_bean_sendBean_responce,omitempty"`
 }
 
 type SendBeanData struct {
