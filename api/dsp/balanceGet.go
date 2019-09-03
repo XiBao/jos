@@ -16,29 +16,29 @@ type BalanceGetRequest struct {
 
 type BalanceGetResponse struct {
 	ErrorResp *api.ErrorResponnse `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *BalanceData        `json:"jingdong_dsp_balance_get_responce,omitempty" codec:"jingdong_dsp_balance_get_responce,omitempty"`
+	Data      *BalanceGetData     `json:"jingdong_dsp_balance_get_responce,omitempty" codec:"jingdong_dsp_balance_get_responce,omitempty"`
 }
 
-type BalanceData struct {
-	Code      string         `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string         `json:"error_description,omitempty" codec:"error_description,omitempty"`
-	Result    *BalanceResult `json:"getaccountbalance_result,omitempty" codec:"getaccountbalance_result,omitempty"`
+type BalanceGetData struct {
+	Code      string            `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc string            `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	Result    *BalanceGetResult `json:"getaccountbalance_result,omitempty" codec:"getaccountbalance_result,omitempty"`
 }
 
-type BalanceResult struct {
-	Data       *BalanceResultData `json:"value,omitempty" codec:"value,omitempty"`
-	ResultCode string             `json:"resultCode,omitempty" codec:"resultCode,omitempty"`
-	ErrorMsg   string             `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
-	Success    bool               `json:"success" codec:"success"`
+type BalanceGetResult struct {
+	Data       *BalanceGetResultData `json:"value,omitempty" codec:"value,omitempty"`
+	ResultCode string                `json:"resultCode,omitempty" codec:"resultCode,omitempty"`
+	ErrorMsg   string                `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
+	Success    bool                  `json:"success" codec:"success"`
 }
 
-type BalanceResultData struct {
+type BalanceGetResultData struct {
 	TotalAmount     float64 `json:"totalAmount" codec:"totalAmount"`
 	AvailableAmount float64 `json:"availableAmount" codec:"availableAmount"`
 	FreezeAmount    float64 `json:"freezeAmount" codec:"freezeAmount"`
 }
 
-func BalanceGet(req *BalanceRequest) (*BalanceResultData, error) {
+func BalanceGet(req *BalanceGetRequest) (*BalanceGetResultData, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := dsp.NewBalanceGetRequest()
@@ -49,7 +49,7 @@ func BalanceGet(req *BalanceRequest) (*BalanceResultData, error) {
 	}
 	result = util.RemoveJsonSpace(result)
 
-	var response DspBalanceResponse
+	var response BalanceGetResponse
 	err = ljson.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
