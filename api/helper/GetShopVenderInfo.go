@@ -14,7 +14,7 @@ type GetShopVenderInfoRequest struct {
 
 func GetShopVenderInfo(req *GetShopVenderInfoRequest) (*vender.ShopInfo, error) {
 	shop, err := vender.ShopQuery(&vender.ShopQueryRequest{
-		api.BaseRequest: BaseRequest{
+		BaseRequest: api.BaseRequest{
 			Session:  req.Session,
 			AnApiKey: req.AnApiKey,
 			Debug:    req.Debug,
@@ -24,7 +24,7 @@ func GetShopVenderInfo(req *GetShopVenderInfoRequest) (*vender.ShopInfo, error) 
 		return nil, err
 	}
 	venderInfo, err := sellerVender.InfoGet(&sellerVender.InfoGetRequest{
-		BaseRequest: BaseRequest{
+		BaseRequest: api.BaseRequest{
 			Session:  req.Session,
 			AnApiKey: req.AnApiKey,
 			Debug:    req.Debug,
