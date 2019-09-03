@@ -43,8 +43,8 @@ type FullCreateRequest struct {
 }
 
 type FullCreateResponse struct {
-	ErrorResp *api.ErrorResponnse      `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *FulllCreateResponseData `json:"jingdong_seller_promotion_create_responce,omitempty" codec:"jingdong_seller_promotion_create_responce,omitempty"`
+	ErrorResp *api.ErrorResponnse     `json:"error_response,omitempty" codec:"error_response,omitempty"`
+	Data      *FullCreateResponseData `json:"jingdong_seller_promotion_create_responce,omitempty" codec:"jingdong_seller_promotion_create_responce,omitempty"`
 }
 
 type FullCreateResponseData struct {
