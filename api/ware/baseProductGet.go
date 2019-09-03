@@ -33,7 +33,7 @@ func WareBaseProductGet(req *WareBaseProductGetRequest) ([]*ProductsBase, error)
 	client.Debug = req.Debug
 	r := ware.NewWareBaseproductGetRequest()
 	var ids []string
-	for k, v := range req.Ids {
+	for _, v := range req.Ids {
 		ids = append(ids, strconv.FormatUint(v, 10))
 	}
 	r.SetIds(strings.Join(ids, ","))
