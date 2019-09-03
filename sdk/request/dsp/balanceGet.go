@@ -9,9 +9,9 @@ type BalanceGetRequest struct {
 }
 
 // create new request
-func NewBalanceGetRequest() (req *DspBalanceRequest) {
+func NewBalanceGetRequest() (req *BalanceGetRequest) {
 	request := sdk.Request{MethodName: "jingdong.dsp.balance.get", Params: nil}
-	req = &DspBalanceRequest{
+	req = &BalanceGetRequest{
 		Request: &request,
 	}
 	return
