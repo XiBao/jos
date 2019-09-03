@@ -32,7 +32,7 @@ type GetGradesResult struct {
 	NextGradeName     string `json:"next_grade_name,omitempty" codec:"next_grade_name,omitempty"`
 }
 
-func GetGrades(req *GetGradesRequest) ([]*GetCrmGradesResult, error) {
+func GetGrades(req *GetGradesRequest) ([]*GetGradesResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewGetGradesRequest()
