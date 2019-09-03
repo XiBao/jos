@@ -2,6 +2,7 @@ package points
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/XiBao/jos/api"
