@@ -21,7 +21,7 @@ type DaybudgetUpdateResponse struct {
 }
 
 type DaybudgetUpdateData struct {
-	Result *api.DaybudgetUpdateResult `json:"updatecampaigndaybudget_result"`
+	Result *DaybudgetUpdateResult `json:"updatecampaigndaybudget_result"`
 }
 
 type DaybudgetUpdateResult struct {
