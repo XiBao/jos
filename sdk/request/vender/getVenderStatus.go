@@ -1,11 +1,10 @@
-package request
+package vender
 
 import "github.com/XiBao/jos/sdk"
 
-type GetVenderStatusRequest struct{
+type GetVenderStatusRequest struct {
 	Request *sdk.Request
 }
-
 
 // create new request
 func NewGetVenderStatusRequest() (req *GetVenderStatusRequest) {
