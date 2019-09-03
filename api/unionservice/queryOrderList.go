@@ -45,7 +45,7 @@ func QueryOrderList(req *QueryOrderListRequest) (*ware.Sku, error) {
 	if len(result) == 0 {
 		return nil, errors.New("No sku info.")
 	}
-	var response UnionQueryOrderListResponse
+	var response QueryOrderListResponse
 	err = ljson.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
