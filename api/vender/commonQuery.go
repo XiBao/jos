@@ -71,7 +71,7 @@ func CommonQuery(req *CommonQueryRequest) ([]*CommonQueryResult, error) {
 		return nil, errors.New("No query info.")
 	}
 
-	var response VenderCommonQueryResponse
+	var response CommonQueryResponse
 	err = ljson.Unmarshal([]byte(result), &response)
 	if err != nil {
 		return nil, err
