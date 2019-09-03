@@ -21,11 +21,11 @@ type AppendPromoUsersRequest struct {
 }
 
 type AppendPromoUsersResponse struct {
-	ErrorResp *api.ErrorResponnse       `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *AppendPromoUsersResponse `json:"jingdong_seller_promotion_appendPromoUsers_responce,omitempty" codec:"jingdong_seller_promotion_appendPromoUsers_responce,omitempty"`
+	ErrorResp *api.ErrorResponnse           `json:"error_response,omitempty" codec:"error_response,omitempty"`
+	Data      *AppendPromoUsersResponseData `json:"jingdong_seller_promotion_appendPromoUsers_responce,omitempty" codec:"jingdong_seller_promotion_appendPromoUsers_responce,omitempty"`
 }
 
-type AppendPromoUsersResponse struct {
+type AppendPromoUsersResponseData struct {
 	Code      string      `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string      `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    interface{} `json:"result,omitempty" codec:"result,omitempty"`
