@@ -7,9 +7,9 @@ type GetPointsRuleRequest struct {
 }
 
 // create new request
-func NewGetPointsRuleRequest() (req *GetUserBaseInfoByPinRequest) {
+func NewGetPointsRuleRequest() (req *GetPointsRuleRequest) {
 	request := sdk.Request{MethodName: "jingdong.points.jos.getPointsRule", Params: nil}
-	req = &GetUserBaseInfoByPinRequest{
+	req = &GetPointsRuleRequest{
 		Request: &request,
 	}
 	return
