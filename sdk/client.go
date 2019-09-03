@@ -109,7 +109,6 @@ func (c *Client) Execute(req *Request, token string) (result []byte, err error) 
 	sysParams["v"] = API_VERSION
 	rawSign := c.GenerateRawSign(sysParams)
 	sysParams["sign"] = c.GenerateSign(rawSign)
-	debug.DebugPrintPostJSONRequest(gwURL, Json(sysParams))
 	values := url.Values{}
 	for k, v := range sysParams {
 		values.Add(k, v)
@@ -118,6 +117,7 @@ func (c *Client) Execute(req *Request, token string) (result []byte, err error) 
 	if req.IsLogGW {
 		gwURL = LOG_GATEWAY_URL
 	}
+	debug.DebugPrintPostJSONRequest(gwURL, Json(sysParams))
 	gatewayUrl := fmt.Sprintf(`%s?%s`, gwURL, values.Encode())
 	debug.DebugPrintGetRequest(gatewayUrl)
 	var (
