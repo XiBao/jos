@@ -8,7 +8,7 @@ type GetMemeberDiscountRequest struct {
 
 // create new request
 func NewGetMemeberDiscountRequest() (req *GetMemeberDiscountRequest) {
-	request := sdk.Request{MethodName: "jingdong.pop.crm.getMemeberDiscount", Params: nil)}
+	request := sdk.Request{MethodName: "jingdong.pop.crm.getMemeberDiscount", Params: nil}
 	req = &GetMemeberDiscountRequest{
 		Request: &request,
 	}
