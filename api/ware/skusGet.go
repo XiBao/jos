@@ -42,7 +42,7 @@ func SkusGet(req *SkusGetRequest) ([]*Sku2, error) {
 		return nil, errors.New("No sku info.")
 	}
 
-	var response WareSkusGetResponse
+	var response SkusGetResponse
 	err = ljson.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
