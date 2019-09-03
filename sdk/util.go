@@ -10,5 +10,5 @@ func Json(obj interface{}) []byte {
 	enc := json.NewEncoder(&buf)
 	enc.Encode(obj)
 
-	return buf.Byte()
+	return buf.Bytes()
 }
