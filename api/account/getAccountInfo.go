@@ -51,7 +51,7 @@ func GetAccountInfo(req *GetAccountInfoRequest) (*AccountInfo, error) {
 		return nil, response.ErrorResp
 	}
 	if response.Data.Code != "0" {
-		return nil, errors(response.Data.ErrorDesc)
+		return nil, errors.New(response.Data.ErrorDesc)
 	}
 	if response.Data.Result == nil {
 		return nil, errors.New("No bean account info.")
