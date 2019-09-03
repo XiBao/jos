@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/XiBao/jos/internal/debug"
+	"github.com/XiBao/jos/sdk/internal/debug"
 )
 
 type Request struct {
