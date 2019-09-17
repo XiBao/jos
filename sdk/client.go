@@ -97,6 +97,8 @@ func (c *Client) Execute(req *Request, token string) (result []byte, err error) 
 	sysParams := make(map[string]string, 7)
 	if paramJson, e := json.Marshal(req.Params); e != nil {
 		return nil, e
+	} else if req.IsUnionGW {
+		sysParams["param_json"] = string(paramJson)
 	} else {
 		sysParams["360buy_param_json"] = string(paramJson)
 	}
@@ -107,7 +109,11 @@ func (c *Client) Execute(req *Request, token string) (result []byte, err error) 
 	sysParams["app_key"] = c.AppKey
 	sysParams["timestamp"] = time.Now().Local().Format("2006-01-02 15:04:05")
 	sysParams["format"] = "json"
-	sysParams["v"] = API_VERSION
+	if req.IsUnionGW {
+		sysParams["v"] = "1.0"
+	} else {
+		sysParams["v"] = API_VERSION
+	}
 	rawSign := c.GenerateRawSign(sysParams)
 	sysParams["sign"] = c.GenerateSign(rawSign)
 	values := url.Values{}
