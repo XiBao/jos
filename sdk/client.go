@@ -117,7 +117,7 @@ func (c *Client) Execute(req *Request, token string) (result []byte, err error) 
 	gwURL := GATEWAY_URL
 	if req.IsLogGW {
 		gwURL = LOG_GATEWAY_URL
-	} else if req.IsUnionGw {
+	} else if req.IsUnionGW {
 		gwURL = UNION_GATEWAY_URL
 	}
 	debug.DebugPrintPostJSONRequest(gwURL, Json(sysParams))

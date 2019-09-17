@@ -19,7 +19,7 @@ type UnionOrderQueryRequest struct {
 
 // create new request
 func NewUnionOrderQueryRequest() (req *UnionOrderQueryRequest) {
-	request := sdk.Request{MethodName: "jd.union.open.order.query", IsUnionGw: true, Params: make(map[string]interface{}, 1)}
+	request := sdk.Request{MethodName: "jd.union.open.order.query", IsUnionGW: true, Params: make(map[string]interface{}, 1)}
 	req = &UnionOrderQueryRequest{
 		Request: &request,
 	}
