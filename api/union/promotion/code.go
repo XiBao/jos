@@ -1,6 +1,8 @@
-package unionservice
+package promotion
 
 import (
+	"strconv"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/promotion"
