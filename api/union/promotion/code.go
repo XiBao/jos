@@ -1,8 +1,6 @@
 package unionservice
 
 import (
-	"errors"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/promotion"
@@ -57,8 +55,8 @@ func UnionPromotionCodeGet(req *UnionPromotionCodeRequest) (string, error) {
 	}
 
 	if response.Code != 200 {
-		return "", &api.ErrorResponnse{Code: response.Code, ZhDesc: response.Message}
+		return "", &api.ErrorResponnse{Code: strconv.FormatInt(int64(response.Code), 10), ZhDesc: response.Message}
 	}
 
-	return response.Data.ClickUrl, nil
+	return response.Data.ClickURL, nil
 }
