@@ -20,7 +20,7 @@ type UnionPromotionCodeRequest struct {
 
 // create new request
 func NewUnionPromotionCodeRequest() (req *UnionPromotionCodeRequest) {
-	request := sdk.Request{MethodName: "jd.union.open.promotion.common.get", Params: make(map[string]interface{}, 1)}
+	request := sdk.Request{MethodName: "jd.union.open.promotion.common.get", IsUnionGw: true, Params: make(map[string]interface{}, 1)}
 	req = &UnionPromotionCodeRequest{
 		Request: &request,
 	}

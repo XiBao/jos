@@ -19,7 +19,8 @@ import (
 type Request struct {
 	MethodName string
 	Params     map[string]interface{}
-	IsLogGW    bool `json:",omitempty" codec:",omitempty"`
+	IsLogGW    bool `json:"-"`
+	IsUnionGW  bool `json:"-"`
 }
 
 type Response struct {
@@ -116,6 +117,8 @@ func (c *Client) Execute(req *Request, token string) (result []byte, err error) 
 	gwURL := GATEWAY_URL
 	if req.IsLogGW {
 		gwURL = LOG_GATEWAY_URL
+	} else if req.IsUnionGw {
+		gwURL = UNION_GATEWAY_URL
 	}
 	debug.DebugPrintPostJSONRequest(gwURL, Json(sysParams))
 	gatewayUrl := fmt.Sprintf(`%s?%s`, gwURL, values.Encode())
