@@ -88,7 +88,7 @@ type SkuInfo struct {
 func UnionOrderQuery(req *UnionOrderQueryRequest) (bool, []OrderResp, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
-	r := promotion.NewUnionOrderQueryRequest()
+	r := order.NewUnionOrderQueryRequest()
 	orderReq := &order.OrderReq{
 		PageNo:       req.PageNo,
 		PageSize:     req.PageSize,
@@ -97,7 +97,7 @@ func UnionOrderQuery(req *UnionOrderQueryRequest) (bool, []OrderResp, error) {
 		ChildUnionId: req.ChildUnionId,
 		Key:          req.Key,
 	}
-	r.SetOrderReq(codeReq)
+	r.SetOrderReq(orderReq)
 
 	result, err := client.Execute(r.Request, req.Session)
 	if err != nil {
