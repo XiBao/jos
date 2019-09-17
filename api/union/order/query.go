@@ -41,7 +41,6 @@ type OrderResp struct {
 	OrderEmt   uint      `json:"orderEmt"`
 	OrderId    uint64    `json:"orderId"`
 	ParentId   uint64    `json:"ParentId"`
-	PayMonth   string    `json:"payMonth"`
 	Plus       uint      `json:"plus"`
 	PopId      uint64    `json:"popId"`
 	UnionId    uint64    `json:"unionId"`
@@ -77,7 +76,6 @@ type SkuInfo struct {
 	ValidCode         int     `json:"validCode,omitempty"`
 	SubUnionId        string  `json:"subUnionId,omitempty"`
 	TraceType         int     `json:"traceType,omitempty"`
-	PayMonth          string  `json:"payMonth,omitempty"`
 	PopId             uint64  `json:"popId,omitempty"`
 	Ext1              string  `json:"ext1,omitempty"`
 	CpActId           uint64  `json:"cpActId,omitempty"`
