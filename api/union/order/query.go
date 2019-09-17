@@ -29,9 +29,10 @@ type UnionOrderQueryResponseData struct {
 }
 
 type UnionOrderQueryResult struct {
-	Code    int        `json:"code,omitempty"`
-	Message string     `json:"message,omitempty"`
-	Data    *OrderResp `json:"data,omitempty"`
+	Code    int         `json:"code,omitempty"`
+	Message string      `json:"message,omitempty"`
+	Data    []OrderResp `json:"data,omitempty"`
+	HasMore bool        `json:"hasMore,omitempty"`
 }
 
 type OrderResp struct {
@@ -46,14 +47,13 @@ type OrderResp struct {
 	UnionId    uint64    `json:"unionId"`
 	Ext1       string    `json:"ext1,omitempty"`
 	ValidCode  int       `json:"validCode,omitempty"`
-	HasMore    bool      `json:"hasMore,omitempty"`
 	SkuList    []SkuInfo `json:"skuList"`
 }
 
 type SkuInfo struct {
 	ActualCosPrice    float64 `json:"actualCosPrice,omitempty"`
 	ActualFee         float64 `json:"actualFee,omitempty"`
-	CommissionRate    float63 `json:"commissionRate,omitempty"`
+	CommissionRate    float64 `json:"commissionRate,omitempty"`
 	EstimateCosPrice  float64 `json:"estimateCosPrice,omitempty"`
 	EstimateFee       float64 `json:"estimateFee,omitempty"`
 	FinalRate         float64 `json:"finalRate,omitempty"`
@@ -85,7 +85,7 @@ type SkuInfo struct {
 }
 
 // 订单查询接口
-func UnionOrderQuery(req *UnionOrderQueryRequest) (*OrderResp, error) {
+func UnionOrderQuery(req *UnionOrderQueryRequest) (bool, []OrderResp, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewUnionOrderQueryRequest()
@@ -101,23 +101,23 @@ func UnionOrderQuery(req *UnionOrderQueryRequest) (*OrderResp, error) {
 
 	result, err := client.Execute(r.Request, req.Session)
 	if err != nil {
-		return nil, err
+		return false, nil, err
 	}
 	var response UnionOrderQueryResponse
 	err = ljson.Unmarshal(result, &response)
 	if err != nil {
-		return nil, err
+		return false, nil, err
 	}
 
 	var ret UnionOrderQueryResult
 	err = ljson.Unmarshal([]byte(response.Data.Result), &ret)
 	if err != nil {
-		return nil, err
+		return false, nil, err
 	}
 
 	if ret.Code != 200 {
-		return nil, &api.ErrorResponnse{Code: strconv.FormatInt(int64(ret.Code), 10), ZhDesc: ret.Message}
+		return false, nil, &api.ErrorResponnse{Code: strconv.FormatInt(int64(ret.Code), 10), ZhDesc: ret.Message}
 	}
 
-	return ret.Data, nil
+	return ret.HasMore, ret.Data, nil
 }
