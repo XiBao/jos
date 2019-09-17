@@ -66,7 +66,7 @@ func UnionPromotionCodeGet(req *UnionPromotionCodeRequest) (string, error) {
 	}
 
 	var ret UnionPromotioncodeResult
-	err = ljson.Unmarshal(response.Data.Result, &ret)
+	err = ljson.Unmarshal([]byte(response.Data.Result), &ret)
 	if err != nil {
 		return "", err
 	}
