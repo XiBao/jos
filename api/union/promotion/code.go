@@ -21,6 +21,15 @@ type UnionPromotionCodeRequest struct {
 }
 
 type UnionPromotionCodeResponse struct {
+	ErrorResp *api.ErrorResponnse             `json:"error_response,omitempty"`
+	Data      *UnionPromotionCodeResponseData `json:"jd_union_open_promotion_common_get_response,omitempty"`
+}
+
+type UnionPromotionCodeResponseData struct {
+	Result string `json:"result,omitempty"`
+}
+
+type UnionPromotioncodeResult struct {
 	Code    int                `json:"code,omitempty"`
 	Message string             `json:"message,omitempty"`
 	Data    *PromotionCodeResp `json:"data,omitempty"`
@@ -56,9 +65,15 @@ func UnionPromotionCodeGet(req *UnionPromotionCodeRequest) (string, error) {
 		return "", err
 	}
 
-	if response.Code != 200 {
-		return "", &api.ErrorResponnse{Code: strconv.FormatInt(int64(response.Code), 10), ZhDesc: response.Message}
+	var ret UnionPromotioncodeResult
+	err = ljson.Unmarshal(response.Data.Result, &ret)
+	if err != nil {
+		return "", err
 	}
 
-	return response.Data.ClickURL, nil
+	if ret.Code != 200 {
+		return "", &api.ErrorResponnse{Code: strconv.FormatInt(int64(ret.Code), 10), ZhDesc: ret.Message}
+	}
+
+	return ret.Data.ClickURL, nil
 }
