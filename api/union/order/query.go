@@ -106,7 +106,9 @@ func UnionOrderQuery(req *UnionOrderQueryRequest) (bool, []OrderResp, error) {
 	if err != nil {
 		return false, nil, err
 	}
-
+	if response.Data == nil {
+		return false, nil, nil
+	}
 	var ret UnionOrderQueryResult
 	err = ljson.Unmarshal([]byte(response.Data.Result), &ret)
 	if err != nil {

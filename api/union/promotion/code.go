@@ -1,6 +1,7 @@
 package promotion
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/XiBao/jos/api"
@@ -65,6 +66,9 @@ func UnionPromotionCodeGet(req *UnionPromotionCodeRequest) (string, error) {
 		return "", err
 	}
 
+	if response.Data == nil {
+		return "", errors.New("no data")
+	}
 	var ret UnionPromotioncodeResult
 	err = ljson.Unmarshal([]byte(response.Data.Result), &ret)
 	if err != nil {
