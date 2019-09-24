@@ -1,6 +1,7 @@
 package promotion
 
 import (
+	"encoding/json"
 	"errors"
 	"strconv"
 
@@ -31,9 +32,9 @@ type UnionPromotionCodeResponseData struct {
 }
 
 type UnionPromotioncodeResult struct {
-	Code    int                `json:"code,omitempty"`
-	Message string             `json:"message,omitempty"`
-	Data    *PromotionCodeResp `json:"data,omitempty"`
+	Code    int             `json:"code,omitempty"`
+	Message string          `json:"message,omitempty"`
+	Data    json.RawMessage `json:"data,omitempty"`
 }
 
 type PromotionCodeResp struct {
@@ -79,5 +80,10 @@ func UnionPromotionCodeGet(req *UnionPromotionCodeRequest) (string, error) {
 		return "", &api.ErrorResponnse{Code: strconv.FormatInt(int64(ret.Code), 10), ZhDesc: ret.Message}
 	}
 
-	return ret.Data.ClickURL, nil
+	var codeResp PromotionCodeResp
+	err = json.Unmarshal(ret.Data, &codeResp)
+	if err != nil {
+		return "", err
+	}
+	return codeResp.ClickURL, nil
 }
