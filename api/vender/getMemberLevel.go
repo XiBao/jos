@@ -24,9 +24,9 @@ type GetMemberLevelData struct {
 }
 
 type MemberLevelReturnType struct {
-	Desc string              `json:"desc,omitempty" codec:"desc,omitempty"`
-	Code string              `json:"code,omitempty" codec:"code,omitempty"`
-	List []*ShopLevelRuleDTO `json:"shopLevelRuleDTOList,omitempty" codec:"shopLevelRuleDTOList,omitempty"`
+	Desc string           `json:"desc,omitempty" codec:"desc,omitempty"`
+	Code string           `json:"code,omitempty" codec:"code,omitempty"`
+	Info *MemberLevelInfo `json:"memberLevelInfo,omitempty" codec:"memberLevelInfo,omitempty"`
 }
 
 type MemberLevelInfo struct {
@@ -48,7 +48,7 @@ type MemberLevelInfo struct {
 }
 
 //TODO 查询会员等级及会员信息  交易数据 T+1 更新
-func GetMemberLevel(req *GetMemberLevelRequest) ([]*ShopLevelRuleDTO, error) {
+func GetMemberLevel(req *GetMemberLevelRequest) (*MemberLevelInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := vender.NewVenderGetMemberLevelRequest()
@@ -78,5 +78,5 @@ func GetMemberLevel(req *GetMemberLevelRequest) ([]*ShopLevelRuleDTO, error) {
 		return nil, errors.New(response.Data.ReturnType.Desc)
 	}
 
-	return response.Data.ReturnType.List, nil
+	return response.Data.ReturnType.Info, nil
 }
