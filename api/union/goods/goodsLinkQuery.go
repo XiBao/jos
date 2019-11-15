@@ -1,6 +1,7 @@
 package goods
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/XiBao/jos/api"
@@ -11,7 +12,8 @@ import (
 
 type GoodsLinkQueryRequest struct {
 	api.BaseRequest
-	SkuIds []uint64 `json:"skuIds` // skuId集合
+	Url        string `json:"url`         // 链接
+	SubUnionId string `json:"subUnionId"` // 子联盟ID（需要联系运营开通权限才能拿到数据）
 }
 
 type GoodsLinkQueryResponse struct {
@@ -56,19 +58,19 @@ func GoodsLinkQuery(req *PromotionGoodsInfoQueryRequest) ([]LinkGoodsResp, error
 
 	result, err := client.Execute(r.Request, req.Session)
 	if err != nil {
-		return false, nil, err
+		return nil, err
 	}
 	var response GoodsLinkQueryResponse
 	err = ljson.Unmarshal(result, &response)
 	if err != nil {
-		return false, nil, err
+		return nil, err
 	}
 	if response.Data == nil {
-		return false, nil, nil
+		return nil, errors.New("no result")
 	}
 
 	if response.Data.Result.Code != 200 {
-		return false, nil, &api.ErrorResponnse{Code: response.Data.Result.Code, ZhDesc: response.Data.Result.Message}
+		return nil, &api.ErrorResponnse{Code: strconv.FormatInt(response.Data.Result.Code, 10), ZhDesc: response.Data.Result.Message}
 	}
 
 	return response.Data.Result.Data, nil
