@@ -82,7 +82,7 @@ func PromotionGoodsInfoQuery(req *PromotionGoodsInfoQueryRequest) ([]PromotionGo
 	}
 
 	var ret PromotionQueryResult
-	err = json.Unmarshal(response.Data.Result, &ret)
+	err = ljson.Unmarshal([]byte(response.Data.Result), &ret)
 	if err != nil {
 		return nil, err
 	}
