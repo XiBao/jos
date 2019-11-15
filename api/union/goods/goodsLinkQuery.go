@@ -46,7 +46,7 @@ type LinkGoodsResp struct {
 }
 
 // 链接商品查询接口
-func GoodsLinkQuery(req *PromotionGoodsInfoQueryRequest) ([]LinkGoodsResp, error) {
+func GoodsLinkQuery(req *GoodsLinkQueryRequest) ([]LinkGoodsResp, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := goods.NewGoodsLinkQueryRequest()

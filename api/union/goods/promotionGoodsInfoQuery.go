@@ -1,6 +1,7 @@
 package goods
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/XiBao/jos/api"
@@ -68,19 +69,19 @@ func PromotionGoodsInfoQuery(req *PromotionGoodsInfoQueryRequest) ([]PromotionGo
 
 	result, err := client.Execute(r.Request, req.Session)
 	if err != nil {
-		return false, nil, err
+		return nil, err
 	}
 	var response PromotionGoodsInfoQueryResponse
 	err = ljson.Unmarshal(result, &response)
 	if err != nil {
-		return false, nil, err
+		return nil, err
 	}
 	if response.Data == nil {
-		return false, nil, nil
+		return nil, errors.New("no result")
 	}
 
 	if response.Data.Result.Code != 200 {
-		return false, nil, &api.ErrorResponnse{Code: response.Data.Result.Code, ZhDesc: response.Data.Result.Message}
+		return nil, &api.ErrorResponnse{Code: strconv.FormatInt(response.Data.Result.Code, 10), ZhDesc: response.Data.Result.Message}
 	}
 
 	return response.Data.Result.Data, nil
