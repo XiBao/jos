@@ -51,7 +51,7 @@ type PromotionGoodsResp struct {
 	Cid3              uint64  `json:"cid3,omitempty"`              // 三级类目ID
 	Cid3Name          string  `json:"cid3Name,omitempty"`          // 三级类目名称
 	WlUnitPrice       float64 `json:"wlUnitPrice,omitempty"`       // 商品无线京东价（单价为-1表示未查询到该商品单价）
-	inOrderCount      uint    `json:"inOrderCount,omitempty"`      // 30天引单数量
+	InOrderCount      uint    `json:"inOrderCount,omitempty"`      // 30天引单数量
 	GoodsName         string  `json:"goodsName,omitempty"`         // 商品名称
 	EndDate           int64   `json:"endDate,omitempty"`           // 推广结束日期(时间戳，毫秒)
 	StartDate         int64   `json:"startDate,omitempty"`         // 推广开始日期（时间戳，毫秒）
