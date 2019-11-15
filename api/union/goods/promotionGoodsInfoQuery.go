@@ -65,7 +65,7 @@ func PromotionGoodsInfoQuery(req *PromotionGoodsInfoQueryRequest) ([]PromotionGo
 	for _, i := range req.SkuIds {
 		skuIds = append(skuIds, strconv.FormatUint(i, 10))
 	}
-	r.SetSkuIds(skuIds)
+	r.SetSkuIds(strings.Join(skuIds, ","))
 
 	result, err := client.Execute(r.Request, req.Session)
 	if err != nil {
