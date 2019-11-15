@@ -2,7 +2,6 @@ package goods
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -23,7 +22,7 @@ type PromotionGoodsInfoQueryResponse struct {
 }
 
 type PromotionGoodsInfoQueryResponseData struct {
-	Result PromotionQueryResult `json:"queryResult,omitempty"`
+	Result string `json:"queryResult,omitempty"`
 }
 
 type PromotionQueryResult struct {
@@ -73,7 +72,6 @@ func PromotionGoodsInfoQuery(req *PromotionGoodsInfoQueryRequest) ([]PromotionGo
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(string(result))
 	var response PromotionGoodsInfoQueryResponse
 	err = ljson.Unmarshal(result, &response)
 	if err != nil {
@@ -83,9 +81,15 @@ func PromotionGoodsInfoQuery(req *PromotionGoodsInfoQueryRequest) ([]PromotionGo
 		return nil, errors.New("no result")
 	}
 
-	if response.Data.Result.Code != 200 {
-		return nil, &api.ErrorResponnse{Code: strconv.FormatInt(response.Data.Result.Code, 10), ZhDesc: response.Data.Result.Message}
+	var ret PromotionQueryResult
+	err = json.Unmarshal(response.Data.Result, &ret)
+	if err != nil {
+		return nil, err
 	}
 
-	return response.Data.Result.Data, nil
+	if ret.Code != 200 {
+		return nil, &api.ErrorResponnse{Code: strconv.FormatInt(ret.Code, 10), ZhDesc: ret.Message}
+	}
+
+	return ret.Data, nil
 }
