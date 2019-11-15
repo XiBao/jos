@@ -2,6 +2,7 @@ package goods
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -72,6 +73,7 @@ func PromotionGoodsInfoQuery(req *PromotionGoodsInfoQueryRequest) ([]PromotionGo
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(string(result))
 	var response PromotionGoodsInfoQueryResponse
 	err = ljson.Unmarshal(result, &response)
 	if err != nil {
