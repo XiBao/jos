@@ -3,6 +3,7 @@ package goods
 import (
 	"errors"
 	"strconv"
+	"strings"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
