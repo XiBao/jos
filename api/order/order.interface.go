@@ -48,27 +48,34 @@ type OrderInfo struct {
 }
 
 type InvoiceEasyInfo struct {
-	InvoiceType           string `json:"invoiceType,omitempty" codec:"invoiceType,omitempty"`                     // 发票类型，0=不开发票、1=普通发票、2=增值税发票、3=电子发票
-	InvoiceTitle          string `json:"invoiceTitle,omitempty" codec:"invoiceTitle,omitempty"`                   // 发票抬头。个人/公司名称
-	InvoiceContentId      string `json:"invoiceContentId,omitempty" codec:"invoiceContentId,omitempty"`           // 	发票内容
-	InvoiceConsigneeEmail string `json:"invoiceConsigneeEmail,omitempty" codec:"invoiceConsigneeEmail,omitempty"` // 电子发票联系人邮箱
-	InvoiceConsigneePhone string `json:"invoiceConsigneePhone,omitempty" codec:"invoiceConsigneePhone,omitempty"` // 电子发票联系人手机号
-	InvoiceCode           string `json:"invoiceCode,omitempty" codec:"invoiceCode,omitempty"`                     // 发票纳税人识别号
+	InvoiceType                  string `json:"invoiceType,omitempty" codec:"invoiceType,omitempty"`                                     // 发票类型，0=不开发票、1=普通发票、2=增值税发票、3=电子发票
+	InvoiceTitle                 string `json:"invoiceTitle,omitempty" codec:"invoiceTitle,omitempty"`                                   // 发票抬头。个人/公司名称
+	InvoiceContentId             string `json:"invoiceContentId,omitempty" codec:"invoiceContentId,omitempty"`                           // 	发票内容
+	InvoiceConsigneeEmail        string `json:"invoiceConsigneeEmail,omitempty" codec:"invoiceConsigneeEmail,omitempty"`                 // 电子发票联系人邮箱
+	InvoiceConsigneePhone        string `json:"invoiceConsigneePhone,omitempty" codec:"invoiceConsigneePhone,omitempty"`                 // 电子发票联系人手机号
+	InvoiceCode                  string `json:"invoiceCode,omitempty" codec:"invoiceCode,omitempty"`                                     // 发票纳税人识别号
+	EncryptInvoiceTitle          string `json:"encrypt_invoiceTitle,omitempty" codec:"encrypt_invoiceTitle,omitempty"`                   // 发票抬头。个人/公司名称
+	EncryptInvoiceConsigneeEmail string `json:"encrypt_invoiceConsigneeEmail,omitempty" codec:"encrypt_invoiceConsigneeEmail,omitempty"` // 电子发票联系人邮箱
+	EncryptInvoiceConsigneePhone string `json:"encrypt_invoiceConsigneePhone,omitempty" codec:"invoiceConsigneePhone,omitempty"`         // 电子发票联系人手机号
 }
 
 type ConsigneeInfo struct {
-	Fullname    string `json:"fullname,omitempty" codec:"fullname,omitempty"`       // 姓名
-	Telephone   string `json:"telephone,omitempty" codec:"telephone,omitempty"`     // 固定电话
-	Mobile      string `json:"mobile,omitempty" codec:"mobile,omitempty"`           // 手机
-	FullAddress string `json:"fullAddress,omitempty" codec:"fullAddress,omitempty"` // 地址
-	Province    string `json:"province,omitempty" codec:"province,omitempty"`
-	City        string `json:"city,omitempty" codec:"city,omitempty"`
-	County      string `json:"county,omitempty" codec:"county,omitempty"`
-	Town        string `json:"town,omitempty" codec:"town,omitempty"`
-	ProvinceId  string `json:"provinceId,omitempty" codec:"provinceId,omitempty"`
-	CityId      string `json:"cityId,omitempty" codec:"cityId,omitempty"`
-	CountyId    string `json:"countyId,omitempty" codec:"countyId,omitempty"`
-	TownId      string `json:"townId,omitempty" codec:"townId,omitempty"`
+	Fullname           string `json:"fullname,omitempty" codec:"fullname,omitempty"`       // 姓名
+	Telephone          string `json:"telephone,omitempty" codec:"telephone,omitempty"`     // 固定电话
+	Mobile             string `json:"mobile,omitempty" codec:"mobile,omitempty"`           // 手机
+	FullAddress        string `json:"fullAddress,omitempty" codec:"fullAddress,omitempty"` // 地址
+	Province           string `json:"province,omitempty" codec:"province,omitempty"`
+	City               string `json:"city,omitempty" codec:"city,omitempty"`
+	County             string `json:"county,omitempty" codec:"county,omitempty"`
+	Town               string `json:"town,omitempty" codec:"town,omitempty"`
+	ProvinceId         string `json:"provinceId,omitempty" codec:"provinceId,omitempty"`
+	CityId             string `json:"cityId,omitempty" codec:"cityId,omitempty"`
+	CountyId           string `json:"countyId,omitempty" codec:"countyId,omitempty"`
+	TownId             string `json:"townId,omitempty" codec:"townId,omitempty"`
+	EncryptFullname    string `json:"encrypt_fullname,omitempty" codec:"encrypt_fullname,omitempty"`       // 姓名
+	EncryptTelephone   string `json:"encrypt_telephone,omitempty" codec:"encrypt_telephone,omitempty"`     // 固定电话
+	EncryptMobile      string `json:"encrypt_mobile,omitempty" codec:"encrypt_mobile,omitempty"`           // 手机
+	EncryptFullAddress string `json:"encrypt_fullAddress,omitempty" codec:"encrypt_fullAddress,omitempty"` // 地址
 }
 
 type ItemInfo struct {
@@ -98,12 +105,16 @@ type CouponDetail struct {
 }
 
 type VatInfo struct {
-	VatNo             string `json:"vatNo,omitempty" codec:"vatNo,omitempty"`                         // 纳税人识别号
-	AddressRegIstered string `json:"addressRegIstered,omitempty" codec:"addressRegIstered,omitempty"` // 	注册地址
-	PhoneRegIstered   string `json:"phoneRegIstered,omitempty" codec:"phoneRegIstered,omitempty"`     // 注册电话
-	DepositBank       string `json:"depositBank,omitempty" codec:"depositBank,omitempty"`             // 	开户银行
-	BankAccount       string `json:"bankAccount,omitempty" codec:"bankAccount,omitempty"`             // 	银行账户
-	UserAddress       string `json:"userAddress,omitempty" codec:"userAddress,omitempty"`             // 收票人地址
-	UserName          string `json:"userName,omitempty" codec:"userName,omitempty"`                   // 	收票人姓名
-	UserPhone         string `json:"userPhone,omitempty" codec:"userPhone,omitempty"`                 // 	收票人电话
+	VatNo              string `json:"vatNo,omitempty" codec:"vatNo,omitempty"`                             // 纳税人识别号
+	AddressRegIstered  string `json:"addressRegIstered,omitempty" codec:"addressRegIstered,omitempty"`     // 	注册地址
+	PhoneRegIstered    string `json:"phoneRegIstered,omitempty" codec:"phoneRegIstered,omitempty"`         // 注册电话
+	DepositBank        string `json:"depositBank,omitempty" codec:"depositBank,omitempty"`                 // 	开户银行
+	BankAccount        string `json:"bankAccount,omitempty" codec:"bankAccount,omitempty"`                 // 	银行账户
+	UserAddress        string `json:"userAddress,omitempty" codec:"userAddress,omitempty"`                 // 收票人地址
+	UserName           string `json:"userName,omitempty" codec:"userName,omitempty"`                       // 	收票人姓名
+	UserPhone          string `json:"userPhone,omitempty" codec:"userPhone,omitempty"`                     // 	收票人电话
+	EncryptBankAccount string `json:"encrypt_bankAccount,omitempty" codec:"encrypt_bankAccount,omitempty"` //    银行账户
+	EncryptUserAddress string `json:"encrypt_userAddress,omitempty" codec:"encrypt_userAddress,omitempty"` // 收票人地址
+	EncryptUserName    string `json:"encrypt_userName,omitempty" codec:"encrypt_userName,omitempty"`       //    收票人姓名
+	EncryptUserPhone   string `json:"encrypt_userPhone,omitempty" codec:"encrypt_userPhone,omitempty"`     //    收票人电话
 }

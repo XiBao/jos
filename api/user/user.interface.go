@@ -17,6 +17,10 @@ type UserInfo struct {
 	Mobile       string `json:"mobile,omitempty" codec:"mobile,omitempty"`
 	IntactMobile string `json:"intactMobile,omitempty" codec:"intactMobile,omitempty"`
 
+	EncryptEmail        string `json:"encrypt_email,omitempty" codec:"encrypt_email,omitempty"`
+	EncryptMobile       string `json:"encrypt_mobile,omitempty" codec:"encrypt_mobile,omitempty"`
+	EncryptIntactMobile string `json:"encrypt_intactMobile,omitempty" codec:"encrypt_intactMobile,omitempty"`
+
 	Created     int64 `json:"created,omitempty" codec:"created,omitempty"`
 	Modified    int64 `json:"modified,omitempty" codec:"modified,omitempty"`
 	RegTime     int64 `json:"regTime,omitempty" codec:"regTime,omitempty"`

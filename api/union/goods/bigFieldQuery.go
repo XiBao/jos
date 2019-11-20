@@ -22,7 +22,7 @@ type BidFieldQueryResponse struct {
 }
 
 type BidFieldQueryResponseData struct {
-	Result BidFieldQueryResult `json:"queryResult,omitempty"`
+	Result string `json:"queryResult,omitempty"`
 }
 
 type BidFieldQueryResult struct {
@@ -118,9 +118,15 @@ func BidFieldQuery(req *BidFieldQueryRequest) ([]BidFieldQueryResp, error) {
 		return nil, errors.New("no result")
 	}
 
-	if response.Data.Result.Code != 200 {
-		return nil, &api.ErrorResponnse{Code: strconv.FormatInt(response.Data.Result.Code, 10), ZhDesc: response.Data.Result.Message}
+	var ret BidFieldQueryResult
+	err = ljson.Unmarshal([]byte(response.Data.Result), &ret)
+	if err != nil {
+		return nil, err
 	}
 
-	return response.Data.Result.Data, nil
+	if ret.Code != 200 {
+		return nil, &api.ErrorResponnse{Code: strconv.FormatInt(ret.Code, 10), ZhDesc: ret.Message}
+	}
+
+	return ret.Data, nil
 }
