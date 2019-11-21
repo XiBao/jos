@@ -20,11 +20,25 @@ func PKCS5Padding(ciphertext []byte, blockSize int) []byte {
 	return append(ciphertext, padtext...)
 }
 
+func getKeyBytes(key []byte) []byte {
+	l := len(key)
+	keyBytes := make([]byte, l)
+	copy(keyBytes, key)
+	switch {
+	case l < aes.BlockSize:
+		keyBytes = append(keyBytes, make([]byte, aes.BlockSize-l)...)
+	case l > aes.BlockSize:
+		keyBytes = key[:aes.BlockSize]
+	}
+	return keyBytes
+}
+
 func AESCBCEncrypt(key []byte, encodeStr string) ([]byte, error) {
 	plaintext := []byte(encodeStr)
 	plaintext = PKCS5Padding(plaintext, aes.BlockSize)
 	//根据key 生成密文
-	block, err := aes.NewCipher(key)
+	keyBytes := getKeyBytes(key)
+	block, err := aes.NewCipher(keyBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -43,12 +57,14 @@ func AESCBCEncrypt(key []byte, encodeStr string) ([]byte, error) {
 
 // AESCBCDecrypt from base64 to decrypted string
 func AESCBCDecrypt(key []byte, decodeBytes []byte) (string, error) {
-	block, err := aes.NewCipher(key)
+	keyBytes := getKeyBytes(key)
+	block, err := aes.NewCipher(keyBytes)
 	if err != nil {
 		return "", err
 	}
-	iv := decodeBytes[:aes.BlockSize]
-	ciphertext := decodeBytes[aes.BlockSize:]
+	blockSize := block.BlockSize()
+	iv := decodeBytes[:blockSize]
+	ciphertext := decodeBytes[blockSize:]
 	origData := make([]byte, len(ciphertext))
 	mode := cipher.NewCBCDecrypter(block, iv)
 	mode.CryptBlocks(origData, ciphertext)

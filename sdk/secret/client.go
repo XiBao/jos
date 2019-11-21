@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/XiBao/jos/api"
@@ -81,15 +80,15 @@ func (this *Client) GetMasterKey(tid string, voucherKey string) (keyStore *crypt
 func (this *Client) RefreshKeyStore() (*crypto.KeyStore, error) {
 	voucher, err := this.GetVoucher()
 	if err != nil {
-		//this.Report(voucher.Service, EXCEPTION, EXCEPTION_TYPE, "200", "SDK generic exception error.", err.Error())
+		this.Report(voucher.Service, EXCEPTION, EXCEPTION_TYPE, "200", "SDK generic exception error.", err.Error())
 		return nil, err
 	}
 	keyStore, err := this.GetMasterKey(voucher.Id, voucher.Key)
 	if err != nil {
-		//this.Report(voucher.Service, EXCEPTION, EXCEPTION_TYPE, "207", "SDK cannot reach KMS server.", err.Error())
+		this.Report(voucher.Service, EXCEPTION, EXCEPTION_TYPE, "207", "SDK cannot reach KMS server.", err.Error())
 		return nil, err
 	}
-	//this.Report(voucher.Service, INIT, INIT_TYPE, "0", "", "")
+	this.Report(voucher.Service, INIT, INIT_TYPE, "0", "", "")
 	return keyStore, nil
 }
 
@@ -142,6 +141,7 @@ func (this *Client) Decrypt(encryptedStr string, usePrivateEncrypt bool) (string
 	if err != nil {
 		return "", err
 	}
+
 	data := encryptedData[ivStart:len(encryptedData)]
 	if usePrivateEncrypt {
 		keyData = crypto.Sha256([]byte(this.AppKey))
@@ -228,6 +228,5 @@ func (this *Client) Report(service string, reportText ReportText, reportType Rep
 		Attribute:  string(buf),
 		ServerUrl:  DefaultServerUrl,
 	}
-	fmt.Printf("%+v", req)
 	return secret.SecretApiReportGet(req)
 }

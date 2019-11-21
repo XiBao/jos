@@ -77,14 +77,14 @@ func (req *SecretApiReportGetRequest) GetServerUrl() string {
 	return ""
 }
 
-func (req *SecretApiReportGetRequest) SetCustomerUserId(customerUserId uint64) {
+func (req *SecretApiReportGetRequest) SetCustomerUserId(customerUserId string) {
 	req.Request.Params["customer_user_id"] = customerUserId
 }
 
-func (req *SecretApiReportGetRequest) GetCustomerUserId() uint64 {
+func (req *SecretApiReportGetRequest) GetCustomerUserId() string {
 	customerUserId, found := req.Request.Params["customer_user_id"]
 	if found {
-		return customerUserId.(uint64)
+		return customerUserId.(string)
 	}
-	return 0
+	return ""
 }

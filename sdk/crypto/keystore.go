@@ -8,14 +8,14 @@ type KeyStore struct {
 }
 
 type Key struct {
-	Id           string `json:"id"`             //密钥id
-	KeyExp       int64  `json:"key_exp"`        //ignore，unix timestamp，密钥过期时间
-	KeyEffective int64  `json: "key_effective"` //ignore，unix timestamp，密钥生效日期
-	KeyString    string `json:"key_string"`     //密钥base64编码
-	Version      uint   `json:"version"`        //密钥版本号(从0开始)
-	KeyType      string `json:"key_type"`       //ignore，密钥种类
-	KeyStatus    int    `json:"key_status"`     //ignore，密钥状态, 0为可用
-	KeyDigest    string `"key_digest"`          //密钥digest(SHA256)，客户端可以校验密钥完整性
+	Id           string `json:"id"`            //密钥id
+	KeyExp       int64  `json:"key_exp"`       //ignore，unix timestamp，密钥过期时间
+	KeyEffective int64  `json:"key_effective"` //ignore，unix timestamp，密钥生效日期
+	KeyString    string `json:"key_string"`    //密钥base64编码
+	Version      uint   `json:"version"`       //密钥版本号(从0开始)
+	KeyType      string `json:"key_type"`      //ignore，密钥种类
+	KeyStatus    int    `json:"key_status"`    //ignore，密钥状态, 0为可用
+	KeyDigest    string `json:"key_digest"`    //密钥digest(SHA256)，客户端可以校验密钥完整性
 }
 
 func (this *KeyStore) GetKey(keyId string) (Key, bool) {

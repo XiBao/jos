@@ -2,7 +2,6 @@ package secret
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -13,7 +12,7 @@ import (
 type SecretApiReportGetRequest struct {
 	api.BaseRequest
 	AccessToken    string `json:"access_token,omitempty" codec:"access_token,omitempty"`
-	CustomerUserId uint64 `json:"customer_user_id,omitempty" codec:"customer_user_id,omitempty"`
+	CustomerUserId string `json:"customer_user_id,omitempty" codec:"customer_user_id,omitempty"`
 	BusinessId     string `json:"businessId,omitempty" codec:"businessId,omitempty"`
 	Text           string `json:"text,omitempty" codec:"text,omitempty"`
 	Attribute      string `json:"attribute,omitempty" codec:"attribute,omitempty"`
@@ -57,7 +56,6 @@ func SecretApiReportGet(req *SecretApiReportGetRequest) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(result))
 	if response.ErrorResp != nil {
 		return response.ErrorResp
 	}
