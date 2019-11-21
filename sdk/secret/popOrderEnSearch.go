@@ -16,7 +16,7 @@ type PopOrderEnSearchRequest struct {
 	DateType       uint8    `json:"date_type,omitempty" codec:"date_type,omitempty"`
 }
 
-func (this *Client) PopOrderEnSearch(searchReq *PopOrderEnSearchRequest) ([]*order.OrderInfo, int, error) {
+func (this *Client) PopOrderEnSearch(searchReq *PopOrderEnSearchRequest, decrypt bool) ([]*order.OrderInfo, int, error) {
 	req := &order.PopOrderEnSearchRequest{
 		BaseRequest: api.BaseRequest{
 			AnApiKey: &api.ApiKey{
@@ -38,61 +38,54 @@ func (this *Client) PopOrderEnSearch(searchReq *PopOrderEnSearchRequest) ([]*ord
 	if err != nil {
 		return nil, 0, err
 	}
+	if !decrpyt {
+		return orders, total, nil
+	}
 	for _, orderInfo := range orders {
 		if orderInfo.VatInfo != nil {
-			if orderInfo.VatInfo.EncryptBankAccount != "" {
-				if orderInfo.VatInfo.BankAccount, err = this.Decrypt(orderInfo.VatInfo.EncryptBankAccount, false); err != nil {
-					return nil, 0, err
-				}
+			orderInfo.VatInfo.EncryptBankAccount = orderInfo.VatInfo.BankAccount
+			if orderInfo.VatInfo.BankAccount, err = this.Decrypt(orderInfo.VatInfo.EncryptBankAccount, false); err != nil {
+				return nil, err
 			}
-			if orderInfo.VatInfo.EncryptUserAddress != "" {
-				if orderInfo.VatInfo.UserAddress, err = this.Decrypt(orderInfo.VatInfo.EncryptUserAddress, false); err != nil {
-					return nil, 0, err
-				}
+			orderInfo.VatInfo.EncryptUserAddress = orderInfo.VatInfo.UserAddress
+			if orderInfo.VatInfo.UserAddress, err = this.Decrypt(orderInfo.VatInfo.EncryptUserAddress, false); err != nil {
+				return nil, err
 			}
-			if orderInfo.VatInfo.EncryptUserName != "" {
-				if orderInfo.VatInfo.UserName, err = this.Decrypt(orderInfo.VatInfo.EncryptUserName, false); err != nil {
-					return nil, 0, err
-				}
+			orderInfo.VatInfo.EncryptUserName = orderInfo.VatInfo.UserName
+			if orderInfo.VatInfo.UserName, err = this.Decrypt(orderInfo.VatInfo.EncryptUserName, false); err != nil {
+				return nil, err
 			}
 		}
 		if orderInfo.InvoiceEasyInfo != nil {
-			if orderInfo.InvoiceEasyInfo.EncryptInvoiceTitle != "" {
-				if orderInfo.InvoiceEasyInfo.InvoiceTitle, err = this.Decrypt(orderInfo.InvoiceEasyInfo.EncryptInvoiceTitle, false); err != nil {
-					return nil, 0, err
-				}
+			orderInfo.InvoiceEasyInfo.EncryptInvoiceTitle = orderInfo.InvoiceEasyInfo.InvoiceTitle
+			if orderInfo.InvoiceEasyInfo.InvoiceTitle, err = this.Decrypt(orderInfo.InvoiceEasyInfo.EncryptInvoiceTitle, false); err != nil {
+				return nil, err
 			}
-			if orderInfo.InvoiceEasyInfo.EncryptInvoiceConsigneeEmail != "" {
-				if orderInfo.InvoiceEasyInfo.InvoiceConsigneeEmail, err = this.Decrypt(orderInfo.InvoiceEasyInfo.EncryptInvoiceConsigneeEmail, false); err != nil {
-					return nil, 0, err
-				}
+			orderInfo.InvoiceEasyInfo.EncryptInvoiceConsigneeEmail = orderInfo.InvoiceEasyInfo.InvoiceConsigneeEmail
+			if orderInfo.InvoiceEasyInfo.InvoiceConsigneeEmail, err = this.Decrypt(orderInfo.InvoiceEasyInfo.EncryptInvoiceConsigneeEmail, false); err != nil {
+				return nil, err
 			}
-			if orderInfo.InvoiceEasyInfo.EncryptInvoiceConsigneePhone != "" {
-				if orderInfo.InvoiceEasyInfo.InvoiceConsigneePhone, err = this.Decrypt(orderInfo.InvoiceEasyInfo.EncryptInvoiceConsigneePhone, false); err != nil {
-					return nil, 0, err
-				}
+			orderInfo.InvoiceEasyInfo.EncryptInvoiceConsigneePhone = orderInfo.InvoiceEasyInfo.InvoiceConsigneePhone
+			if orderInfo.InvoiceEasyInfo.InvoiceConsigneePhone, err = this.Decrypt(orderInfo.InvoiceEasyInfo.EncryptInvoiceConsigneePhone, false); err != nil {
+				return nil, err
 			}
 		}
 		if orderInfo.ConsigneeInfo != nil {
-			if orderInfo.ConsigneeInfo.EncryptFullname != "" {
-				if orderInfo.ConsigneeInfo.Fullname, err = this.Decrypt(orderInfo.ConsigneeInfo.EncryptFullname, false); err != nil {
-					return nil, 0, err
-				}
+			orderInfo.ConsigneeInfo.EncryptFullname = orderInfo.ConsigneeInfo.Fullname
+			if orderInfo.ConsigneeInfo.Fullname, err = this.Decrypt(orderInfo.ConsigneeInfo.EncryptFullname, false); err != nil {
+				return nil, err
 			}
-			if orderInfo.ConsigneeInfo.EncryptTelephone != "" {
-				if orderInfo.ConsigneeInfo.Telephone, err = this.Decrypt(orderInfo.ConsigneeInfo.EncryptTelephone, false); err != nil {
-					return nil, 0, err
-				}
+			orderInfo.ConsigneeInfo.EncryptTelephone = orderInfo.ConsigneeInfo.Telephone
+			if orderInfo.ConsigneeInfo.Telephone, err = this.Decrypt(orderInfo.ConsigneeInfo.EncryptTelephone, false); err != nil {
+				return nil, err
 			}
-			if orderInfo.ConsigneeInfo.EncryptMobile != "" {
-				if orderInfo.ConsigneeInfo.Mobile, err = this.Decrypt(orderInfo.ConsigneeInfo.EncryptMobile, false); err != nil {
-					return nil, 0, err
-				}
+			orderInfo.ConsigneeInfo.EncryptMobile = orderInfo.ConsigneeInfo.Mobile
+			if orderInfo.ConsigneeInfo.Mobile, err = this.Decrypt(orderInfo.ConsigneeInfo.EncryptMobile, false); err != nil {
+				return nil, err
 			}
-			if orderInfo.ConsigneeInfo.EncryptFullAddress != "" {
-				if orderInfo.ConsigneeInfo.FullAddress, err = this.Decrypt(orderInfo.ConsigneeInfo.EncryptFullAddress, false); err != nil {
-					return nil, 0, err
-				}
+			orderInfo.ConsigneeInfo.EncryptFullAddress = orderInfo.ConsigneeInfo.FullAddress
+			if orderInfo.ConsigneeInfo.FullAddress, err = this.Decrypt(orderInfo.ConsigneeInfo.EncryptFullAddress, false); err != nil {
+				return nil, err
 			}
 		}
 	}

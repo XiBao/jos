@@ -3,8 +3,8 @@ package crypto
 type KeyStore struct {
 	CurrentKeyVersion uint   `json:"current_key_version"` //最新密钥版本号
 	Service           string `json:"service"`             //服务识别码
-	GrantUsage        string `"grant_usage"`              //ignore，密钥权限，E为加密，D为解密
-	Keys              []Key  `json:"keys`                 //加解密密钥，可能是多个
+	GrantUsage        string `json:"grant_usage"`         //ignore，密钥权限，E为加密，D为解密
+	Keys              []Key  `json:"keys"`                //加解密密钥，可能是多个
 }
 
 type Key struct {
