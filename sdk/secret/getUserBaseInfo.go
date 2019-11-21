@@ -22,20 +22,44 @@ func (this *Client) GetUserBaseInfo(pin string, loadType int, decrypt bool) (*us
 		return nil, err
 	}
 	if !decrypt {
-		return userInfo, nil
+		err = this.DecryptUserInfo(userInfo, false)
+		if err != nil {
+			return nil, err
+		}
 	}
+
+	return userInfo, nil
+}
+
+func (this *Client) DecryptUserInfo(userInfo *user.UserInfo, usePrivateKey bool) error {
 	userInfo.EncryptEmail = userInfo.Email
-	if userInfo.Email, err = this.Decrypt(userInfo.EncryptEmail, false); err != nil {
-		return nil, err
+	if userInfo.Email, err = this.Decrypt(userInfo.EncryptEmail, usePrivateKey); err != nil {
+		return err
 	}
 	userInfo.EncryptMobile = userInfo.Mobile
-	if userInfo.Mobile, err = this.Decrypt(userInfo.EncryptMobile, false); err != nil {
-		return nil, err
+	if userInfo.Mobile, err = this.Decrypt(userInfo.EncryptMobile, usePrivateKey); err != nil {
+		return err
 	}
 
 	userInfo.EncryptIntactMobile = userInfo.IntactMobile
-	if userInfo.IntactMobile, err = this.Decrypt(userInfo.EncryptIntactMobile, false); err != nil {
-		return nil, err
+	if userInfo.IntactMobile, err = this.Decrypt(userInfo.EncryptIntactMobile, usePrivateKey); err != nil {
+		return err
 	}
-	return userInfo, nil
+
+	return nil
+}
+
+func (this *Client) EncryptUserInfo(userInfo *user.UserInfo, usePrivateKey bool) error {
+	if userInfo.EncryptEmail, err = this.Decrypt(userInfo.Email, usePrivateKey); err != nil {
+		return err
+	}
+	if userInfo.EncryptMobile, err = this.Decrypt(userInfo.Mobile, usePrivateKey); err != nil {
+		return err
+	}
+
+	if userInfo.EncryptIntactMobile, err = this.Decrypt(userInfo.IntactMobile, usePrivateKey); err != nil {
+		return err
+	}
+
+	return nil
 }
