@@ -31,7 +31,7 @@ func (this *Client) GetUserBaseInfo(pin string, loadType int, decrypt bool) (*us
 	return userInfo, nil
 }
 
-func (this *Client) DecryptUserInfo(userInfo *user.UserInfo, usePrivateKey bool) error {
+func (this *Client) DecryptUserInfo(userInfo *user.UserInfo, usePrivateKey bool) (err error) {
 	userInfo.EncryptEmail = userInfo.Email
 	if userInfo.Email, err = this.Decrypt(userInfo.EncryptEmail, usePrivateKey); err != nil {
 		return err
@@ -49,7 +49,7 @@ func (this *Client) DecryptUserInfo(userInfo *user.UserInfo, usePrivateKey bool)
 	return nil
 }
 
-func (this *Client) EncryptUserInfo(userInfo *user.UserInfo, usePrivateKey bool) error {
+func (this *Client) EncryptUserInfo(userInfo *user.UserInfo, usePrivateKey bool) (err error) {
 	if userInfo.EncryptEmail, err = this.Decrypt(userInfo.Email, usePrivateKey); err != nil {
 		return err
 	}

@@ -38,7 +38,7 @@ func (this *Client) PopOrderEnSearch(searchReq *PopOrderEnSearchRequest, decrypt
 	if err != nil {
 		return nil, 0, err
 	}
-	if decrpyt {
+	if decrypt {
 		for _, orderInfo := range orders {
 			err = this.DecryptOrderInfo(orderInfo, false)
 			if err != nil {

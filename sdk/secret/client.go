@@ -135,6 +135,9 @@ func (this *Client) GetCurrentKey() (key crypto.Key, err error) {
 }
 
 func (this *Client) Decrypt(encryptedStr string, usePrivateEncrypt bool) (string, error) {
+	if encryptedStr == "" {
+		return "", nil
+	}
 	var keyData []byte
 	ivStart := aes.BlockSize + CIPHER_LEN
 	encryptedData, err := base64.StdEncoding.DecodeString(encryptedStr)
@@ -164,6 +167,9 @@ func (this *Client) Decrypt(encryptedStr string, usePrivateEncrypt bool) (string
 }
 
 func (this *Client) Encrypt(str string, usePrivateEncrypt bool) (string, error) {
+	if str == "" {
+		return "", nil
+	}
 	var (
 		keyData   []byte
 		keyIdData []byte

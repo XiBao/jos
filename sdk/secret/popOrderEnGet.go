@@ -5,7 +5,7 @@ import (
 	"github.com/XiBao/jos/api/order"
 )
 
-func (this *Client) PopOrderEnGet(orderId uint64, orderState []string, optionalFields []string, decrpyt bool) (*order.OrderInfo, error) {
+func (this *Client) PopOrderEnGet(orderId uint64, orderState []string, optionalFields []string, decrypt bool) (*order.OrderInfo, error) {
 	req := &order.PopOrderEnGetRequest{
 		BaseRequest: api.BaseRequest{
 			AnApiKey: &api.ApiKey{
@@ -32,7 +32,7 @@ func (this *Client) PopOrderEnGet(orderId uint64, orderState []string, optionalF
 	return orderInfo, nil
 }
 
-func (this *Client) DecryptOrderInfo(orderInfo *order.OrderInfo, usePrivateKey bool) error {
+func (this *Client) DecryptOrderInfo(orderInfo *order.OrderInfo, usePrivateKey bool) (err error) {
 	if orderInfo.VatInfo != nil {
 		orderInfo.VatInfo.EncryptBankAccount = orderInfo.VatInfo.BankAccount
 		if orderInfo.VatInfo.BankAccount, err = this.Decrypt(orderInfo.VatInfo.EncryptBankAccount, usePrivateKey); err != nil {
@@ -82,7 +82,7 @@ func (this *Client) DecryptOrderInfo(orderInfo *order.OrderInfo, usePrivateKey b
 	return nil
 }
 
-func (this *Client) EncryptOrderInfo(orderInfo *order.OrderInfo, usePrivateKey bool) error {
+func (this *Client) EncryptOrderInfo(orderInfo *order.OrderInfo, usePrivateKey bool) (err error) {
 	if orderInfo.VatInfo != nil {
 		if orderInfo.VatInfo.EncryptBankAccount, err = this.Encrypt(orderInfo.VatInfo.BankAccount, usePrivateKey); err != nil {
 			return err
