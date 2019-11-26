@@ -32,7 +32,7 @@ type PromotionQueryResult struct {
 }
 
 type PromotionGoodsResp struct {
-	SkuId             int64   `json:"skuId,omitempty"`             // skuId
+	SkuId             uint64  `json:"skuId,omitempty"`             // skuId
 	UnitPrice         float64 `json:"unitPrice,omitempty"`         // 商品单价即京东价
 	MaterialUrl       string  `json:"materialUrl,omitempty"`       // 商品落地页
 	IsFreeFreightRisk uint    `json:"isFreeFreightRisk,omitempty"` // 是否支持运费险(1:是,0:否)
