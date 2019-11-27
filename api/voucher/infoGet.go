@@ -15,7 +15,6 @@ import (
 
 type VoucherInfoGetRequest struct {
 	api.BaseRequest
-	AccessToken    string `json:"access_token,omitempty" codec:"access_token,omitempty"`
 	CustomerUserId string `json:"customer_user_id,omitempty" codec:"customer_user_id,omitempty"`
 }
 
@@ -63,7 +62,6 @@ func VoucherInfoGet(req *VoucherInfoGetRequest) (voucherData VoucherData, err er
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := voucher.NewVoucherInfoGet()
-	r.SetAccessToken(req.AccessToken)
 	r.SetCustomerUserId(req.CustomerUserId)
 
 	result, err := client.Execute(r.Request, req.Session)

@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"sync"
 	"time"
 
 	"github.com/XiBao/jos/api"
@@ -23,16 +24,23 @@ type Client struct {
 	Host        string
 	Env         string
 	KeyStore    *crypto.KeyStore
+	Enccnt      uint
+	Deccnt      uint
+	Encerrcnt   uint
+	Decerrcnt   uint
 	Debug       bool
+	sync.RWMutex
 }
 
 func NewClient(appKey string, appSecret, accessToken string) *Client {
-	return &Client{
+	client := &Client{
 		AppKey:      appKey,
 		AppSecret:   appSecret,
 		AccessToken: accessToken,
 		SdkVer:      2,
 	}
+	go client.StartReport()
+	return client
 }
 
 func (this *Client) SetHost(host string) {
@@ -41,6 +49,16 @@ func (this *Client) SetHost(host string) {
 
 func (this *Client) SetEnv(env string) {
 	this.Env = env
+}
+
+func (this *Client) StartReport() {
+	hourlyTicker := time.NewTicker(1 * time.Hour)
+	for {
+		select {
+		case <-hourlyTicker.C:
+			this.ReportStatitics()
+		}
+	}
 }
 
 func (this *Client) GetVoucher() (voucherData voucher.VoucherData, err error) {
@@ -52,7 +70,6 @@ func (this *Client) GetVoucher() (voucherData voucher.VoucherData, err error) {
 			},
 			Session: this.AccessToken,
 		},
-		AccessToken: this.AccessToken,
 	}
 	return voucher.VoucherInfoGet(req)
 }
@@ -73,19 +90,19 @@ func (this *Client) GetMasterKey(tid string, voucherKey string) (keyStore *crypt
 	if err != nil {
 		return nil, err
 	}
+	this.Lock()
 	this.KeyStore = keyStore
+	this.Unlock()
 	return
 }
 
 func (this *Client) RefreshKeyStore() (*crypto.KeyStore, error) {
 	voucher, err := this.GetVoucher()
 	if err != nil {
-		this.Report(voucher.Service, EXCEPTION, EXCEPTION_TYPE, "200", "SDK generic exception error.", err.Error())
 		return nil, err
 	}
 	keyStore, err := this.GetMasterKey(voucher.Id, voucher.Key)
 	if err != nil {
-		this.Report(voucher.Service, EXCEPTION, EXCEPTION_TYPE, "207", "SDK cannot reach KMS server.", err.Error())
 		return nil, err
 	}
 	this.Report(voucher.Service, INIT, INIT_TYPE, "0", "", "")
@@ -94,11 +111,13 @@ func (this *Client) RefreshKeyStore() (*crypto.KeyStore, error) {
 
 func (this *Client) GetKey(keyId string) (key crypto.Key, err error) {
 	var found bool
+	this.RLock()
 	if this.KeyStore == nil {
 		found = false
 	} else {
 		key, found = this.KeyStore.GetKey(keyId)
 	}
+	this.RUnlock()
 	if found {
 		return key, nil
 	}
@@ -115,11 +134,13 @@ func (this *Client) GetKey(keyId string) (key crypto.Key, err error) {
 
 func (this *Client) GetCurrentKey() (key crypto.Key, err error) {
 	var found bool
+	this.RLock()
 	if this.KeyStore == nil {
 		found = false
 	} else {
 		key, found = this.KeyStore.GetCurrentKey()
 	}
+	this.RUnlock()
 	if found {
 		return key, nil
 	}
@@ -142,6 +163,9 @@ func (this *Client) Decrypt(encryptedStr string, usePrivateEncrypt bool) (string
 	ivStart := aes.BlockSize + CIPHER_LEN
 	encryptedData, err := base64.StdEncoding.DecodeString(encryptedStr)
 	if err != nil {
+		this.Lock()
+		this.Decerrcnt += 1
+		this.Unlock()
 		return "", err
 	}
 
@@ -152,17 +176,29 @@ func (this *Client) Decrypt(encryptedStr string, usePrivateEncrypt bool) (string
 		keyId := base64.StdEncoding.EncodeToString(encryptedData[CIPHER_LEN:ivStart])
 		key, err := this.GetKey(keyId)
 		if err != nil {
+			this.Lock()
+			this.Decerrcnt += 1
+			this.Unlock()
 			return "", err
 		}
 		keyData, err = base64.StdEncoding.DecodeString(key.KeyString)
 		if err != nil {
+			this.Lock()
+			this.Decerrcnt += 1
+			this.Unlock()
 			return "", err
 		}
 	}
 	origData, err := crypto.AESCBCDecrypt(keyData, data)
 	if err != nil {
+		this.Lock()
+		this.Decerrcnt += 1
+		this.Unlock()
 		return "", err
 	}
+	this.Lock()
+	this.Deccnt += 1
+	this.Unlock()
 	return origData, nil
 }
 
@@ -180,19 +216,31 @@ func (this *Client) Encrypt(str string, usePrivateEncrypt bool) (string, error) 
 	} else {
 		key, err := this.GetCurrentKey()
 		if err != nil {
+			this.Lock()
+			this.Encerrcnt += 1
+			this.Unlock()
 			return "", err
 		}
 		keyData, err = base64.StdEncoding.DecodeString(key.KeyString)
 		if err != nil {
+			this.Lock()
+			this.Encerrcnt += 1
+			this.Unlock()
 			return "", err
 		}
 		keyIdData, err = base64.StdEncoding.DecodeString(key.Id)
 		if err != nil {
+			this.Lock()
+			this.Encerrcnt += 1
+			this.Unlock()
 			return "", err
 		}
 	}
 	encrypted, err := crypto.AESCBCEncrypt(keyData, str)
 	if err != nil {
+		this.Lock()
+		this.Encerrcnt += 1
+		this.Unlock()
 		return "", err
 	}
 	data := make([]byte, 0, CIPHER_LEN+len(keyIdData)+len(encrypted))
@@ -200,6 +248,9 @@ func (this *Client) Encrypt(str string, usePrivateEncrypt bool) (string, error) 
 	buf.Write([]byte{0, 4})
 	buf.Write(keyIdData)
 	buf.Write(encrypted)
+	this.Lock()
+	this.Enccnt += 1
+	this.Unlock()
 	return base64.StdEncoding.EncodeToString(buf.Bytes()), nil
 }
 
@@ -231,6 +282,47 @@ func (this *Client) Report(service string, reportText ReportText, reportType Rep
 		},
 		BusinessId: NewBusinessId(),
 		Text:       reportText,
+		Attribute:  string(buf),
+		ServerUrl:  DefaultServerUrl,
+	}
+	return secret.SecretApiReportGet(req)
+}
+
+func (this *Client) ReportStatitics() error {
+	this.Lock()
+	if this.KeyStore == nil {
+		this.Unlock()
+		return nil
+	}
+	attr := ReportStatistcAttribute{
+		Type:      STATISTIC_TYPE,
+		Host:      this.Host,
+		Level:     INFO_LEVEL,
+		Service:   this.KeyStore.Service,
+		SdkVer:    this.SdkVer,
+		Env:       this.Env,
+		Ts:        time.Now().UnixNano() / 1000000,
+		Enccnt:    this.Enccnt,
+		Deccnt:    this.Deccnt,
+		Encerrcnt: this.Encerrcnt,
+		Decerrcnt: this.Decerrcnt,
+	}
+	this.Enccnt = 0
+	this.Deccnt = 0
+	this.Encerrcnt = 0
+	this.Decerrcnt = 0
+	this.Unlock()
+	buf, _ := json.Marshal(attr)
+	req := &secret.SecretApiReportGetRequest{
+		BaseRequest: api.BaseRequest{
+			AnApiKey: &api.ApiKey{
+				Key:    this.AppKey,
+				Secret: this.AppSecret,
+			},
+			Session: this.AccessToken,
+		},
+		BusinessId: NewBusinessId(),
+		Text:       STATISTIC,
 		Attribute:  string(buf),
 		ServerUrl:  DefaultServerUrl,
 	}
