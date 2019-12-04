@@ -27,6 +27,15 @@ func (this *KeyStore) GetKey(keyId string) (Key, bool) {
 	return Key{}, false
 }
 
+func (this *KeyStore) GetFirstKey() (Key, bool) {
+	for _, key := range this.Keys {
+		if key.Version == 0 {
+			return key, true
+		}
+	}
+	return Key{}, false
+}
+
 func (this *KeyStore) GetCurrentKey() (Key, bool) {
 	for _, key := range this.Keys {
 		if key.Version == this.CurrentKeyVersion {

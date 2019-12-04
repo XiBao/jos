@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/aes"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"sync"
@@ -153,6 +154,56 @@ func (this *Client) GetCurrentKey() (key crypto.Key, err error) {
 		return key, errors.New("not found key")
 	}
 	return key, nil
+}
+
+func (this *Client) GetFirstKey() (key crypto.Key, err error) {
+	var found bool
+	this.RLock()
+	if this.KeyStore == nil {
+		found = false
+	} else {
+		key, found = this.KeyStore.GetFirstKey()
+	}
+	this.RUnlock()
+	if found {
+		return key, nil
+	}
+	keyStore, err := this.RefreshKeyStore()
+	if err != nil {
+		return key, err
+	}
+	key, found = keyStore.GetCurrentKey()
+	if !found {
+		return key, errors.New("not found key")
+	}
+	return key, nil
+}
+
+func (this *Client) Salt(usePrivateEncrypt bool) ([]byte, error) {
+	var keyData []byte
+	if usePrivateEncrypt {
+		keyData = crypto.Sha256([]byte(this.AppKey))
+	} else {
+		key, err := this.GetFirstKey()
+		if err != nil {
+			return nil, err
+		}
+		keyData, err = base64.StdEncoding.DecodeString(key.KeyString)
+	}
+	return crypto.AESCBCEncryptZeroIV(keyData)
+}
+
+func (this *Client) Hash(oriData string, usePrivateEncrypt bool) (string, error) {
+	salt, err := this.Salt(usePrivateEncrypt)
+	if err != nil {
+		return "", err
+	}
+	oriDataBytes := []byte(oriData)
+	data := make([]byte, 0, len(oriDataBytes)+len(salt))
+	buf := bytes.NewBuffer(data)
+	buf.Write(oriDataBytes)
+	buf.Write(salt)
+	return hex.EncodeToString(crypto.Sha256(buf.Bytes())), nil
 }
 
 func (this *Client) Decrypt(encryptedStr string, usePrivateEncrypt bool) (string, error) {

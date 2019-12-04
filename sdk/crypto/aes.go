@@ -71,3 +71,25 @@ func AESCBCDecrypt(key []byte, decodeBytes []byte) (string, error) {
 	origData = PKCS5UnPadding(origData)
 	return string(origData), nil
 }
+
+func AESCBCEncryptZeroIV(plaintext []byte) ([]byte, error) {
+	//plaintext = PKCS5Padding(plaintext, aes.BlockSize)
+	//根据key 生成密文
+	key := bytes.Repeat([]byte{0x0}, aes.BlockSize)
+	keyBytes := getKeyBytes(key)
+	block, err := aes.NewCipher(keyBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	ciphertext := make([]byte, aes.BlockSize+len(plaintext))
+	iv := ciphertext[:aes.BlockSize]
+	for idx, _ := range iv {
+		iv[idx] = 0x00
+	}
+
+	mode := cipher.NewCBCEncrypter(block, iv)
+	mode.CryptBlocks(ciphertext[aes.BlockSize:], plaintext)
+
+	return ciphertext, nil
+}
