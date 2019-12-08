@@ -100,7 +100,7 @@ type JFCouponList struct {
 
 type JFCoupon struct {
 	BindType     uint    `json:"bindType,omitempty"`     // 券种类 (优惠券种类：0 - 全品类，1 - 限品类（自营商品），2 - 限店铺，3 - 店铺限商品券)
-	Discount     float64 `jfon:"discount,omitempty"`     // 券面额
+	Discount     float64 `json:"discount,omitempty"`     // 券面额
 	Link         string  `json:"link,omitempty"`         // 券链接
 	PlatformType uint    `json:"platformType,omitempty"` // 券使用平台 (平台类型：0 - 全平台券，1 - 限平台券)
 	GetStartTime int64   `json:"getStartTime,omitempty"` // 领取开始时间(时间戳，毫秒)
