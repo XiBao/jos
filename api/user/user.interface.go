@@ -28,3 +28,11 @@ type UserInfo struct {
 
 	EncryPin string `json:"encry_pin,omitempty" codec:"encry_pin,omitempty"`
 }
+
+type SocialInfo struct {
+	Birthday       string `json:"birthday,omitempty"`
+	Gender         int    `json:"gender,omitempty"`
+	YunBigImageUrl string `json:"yunBigImageUrl,omitempty" codec:"yunBigImageUrl,omitempty"`
+	Nickname       string `json:"nickname,omitempty" codec:"nickname,omitempty"`
+	EncryPin       string `json:"encry_pin,omitempty" codec:"encry_pin,omitempty"`
+}
