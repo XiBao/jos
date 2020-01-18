@@ -12,7 +12,7 @@ import (
 )
 
 // 获取通用推广链接
-func UnionPromotionBySubUnionIdGet(req *UnionPromotionCodeRequest) (string, string, serror) {
+func UnionPromotionBySubUnionIdGet(req *UnionPromotionCodeRequest) (string, string, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewUnionPromotionBySubUnionIdRequest()

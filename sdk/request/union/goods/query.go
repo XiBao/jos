@@ -39,7 +39,7 @@ type QueryRequest struct {
 // create new request
 func NewQueryRequest() (req *QueryRequest) {
 	request := sdk.Request{MethodName: "jd.union.open.goods.query", IsUnionGW: true, Params: make(map[string]interface{}, 1)}
-	req = &JingfenQueryRequest{
+	req = &QueryRequest{
 		Request: &request,
 	}
 	return
