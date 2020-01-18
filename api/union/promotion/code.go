@@ -19,6 +19,7 @@ type UnionPromotionCodeRequest struct {
 	SubUnionId string `json:"subUnionId,omitempty"` // 子联盟ID（需要联系运营开通权限才能拿到数据）
 	Ext1       string `json:"ext1,omitempty"`       // 推客生成推广链接时传入的扩展字段（查看订单对应字段信息，需要联系运营开放白名单才能看到）
 	Pid        string `json:"pid,omitempty"`        // 联盟子站长身份标识，格式：子站长ID_子站长网站ID_子站长推广位ID
+	ChainType  uint   `json:"chainType,omitempty"`  // 转链类型，1：长链， 2 ：短链 ，3： 长链+短链，默认短链
 	CouponUrl  string `json:"couponUrl,omitempty"`  // 优惠券领取链接，在使用优惠券、商品二合一功能时入参，且materialId须为商品详情页链接
 }
 
@@ -39,6 +40,7 @@ type UnionPromotioncodeResult struct {
 
 type PromotionCodeResp struct {
 	ClickURL string `json:"clickURL,omitempty"`
+	ShortURL string `json:"shortURL,omitempty"`
 }
 
 // 获取通用推广链接

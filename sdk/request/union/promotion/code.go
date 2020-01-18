@@ -11,6 +11,7 @@ type PromotionCodeReq struct {
 	SubUnionId string `json:"subUnionId,omitempty"`
 	Ext1       string `json:"ext1,omitempty"`
 	Pid        string `json:"pid,omitempty"`
+	ChainType  uint   `json:"chainType,omitempty"`
 	CouponUrl  string `json:"couponUrl,omitempty"`
 }
 

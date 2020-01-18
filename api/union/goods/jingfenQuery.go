@@ -55,6 +55,7 @@ type JFGoodsResp struct {
 	BrandName             string        `json:"brandName,omitempty"`    // 品牌名
 	Owner                 string        `json:"owner,omitempty"`        // g=自营，p=pop
 	Pingou                *JFPingou     `json:"pinGouInfo,omitempty"`   // 拼购信息
+	Video                 *JFVideoList  `json:"videoInfo,omitempty"`    // 视频信息
 	Resource              *JFResource   `json:"resourceInfo,omitempty"` // 资源信息
 	Seckill               *JFSeckill    `json:"seckillInfo,omitempty"`  // 秒杀信息
 }
@@ -71,8 +72,22 @@ type JFResource struct {
 	EliteName string `json:"eliteName,omitempty"` // 频道名称
 }
 
+type JFVideoList struct {
+	List []JFVideo `json:"videoList,omitempty"`
+}
+
+type JFVideo struct {
+	Width     uint   `json:"width,omitempty"`     // 宽
+	Height    uint   `json:"height,omitempty"`    // 高
+	ImageUrl  string `json:"imageUrl,omitempty"`  // 视频图片地址
+	VideoType uint   `json:"videoType,omitempty"` // 1:主图，2：商详
+	PlayUrl   string `json:"playUrl,omitempty"`   // 播放地址
+	playType  string `json:"playType,omitempty"`  // low：标清，high：高清
+}
+
 type JFPingou struct {
 	Price     float64 `json:"pingouPrice,omitempty"`     // 拼购价格
+	PingouUrl string  `json:"pingouUrl,omitempty"`       // 拼购落地页url
 	TmCount   uint    `json:"pingouTmCount,omitempty"`   // 拼购成团所需人数
 	StartTime int64   `json:"pingouStartTime,omitempty"` // 拼购开始时间(时间戳，毫秒)
 	EndTime   int64   `json:"pingouEndTime,omitempty"`   // 拼购结束时间(时间戳，毫秒)
@@ -83,7 +98,10 @@ type JFShop struct {
 	Id   uint64 `json:"shopId,omitempty"`   // 店铺Id
 }
 type JFPrice struct {
-	Price float64 `json:"price"`
+	Price             float64 `json:"price"`
+	LowestPrice       float64 `json:"lowestPrice,omitempty"`       // 最低价格
+	LowestPriceType   float64 `json:"lowestPriceType,omitempty"`   // 最低价格类型，1：无线价格；2：拼购价格； 3：秒杀价格
+	LowestCouponPrice float64 `json:"lowestCouponPrice,omitempty"` // 最低价后的优惠券价
 }
 
 type JFImageList struct {
@@ -103,6 +121,7 @@ type JFCoupon struct {
 	Discount     float64 `json:"discount,omitempty"`     // 券面额
 	Link         string  `json:"link,omitempty"`         // 券链接
 	PlatformType uint    `json:"platformType,omitempty"` // 券使用平台 (平台类型：0 - 全平台券，1 - 限平台券)
+	Quota        float64 `json:"quota,omitempty"`        // 券消费限额
 	GetStartTime int64   `json:"getStartTime,omitempty"` // 领取开始时间(时间戳，毫秒)
 	GetEndTime   int64   `json:"getEndTime,omitempty"`   // 券领取结束时间(时间戳，毫秒)
 	UseStartTime int64   `json:"useStartTime,omitempty"` // 券有效使用开始时间(时间戳，毫秒)
@@ -111,8 +130,9 @@ type JFCoupon struct {
 }
 
 type JFCommission struct {
-	Commission float64 `json:"commission,omitempty"`      //佣金
-	Rate       float64 `json:"commissionShare,omitempty"` // 佣金比例
+	Commission       float64 `json:"commission,omitempty"`       //佣金
+	Rate             float64 `json:"commissionShare,omitempty"`  // 佣金比例
+	CouponCommission float64 `json:"couponCommission,omitempty"` // 券后佣金
 }
 
 type JFCategory struct {
