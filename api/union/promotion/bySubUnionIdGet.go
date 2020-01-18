@@ -12,7 +12,7 @@ import (
 )
 
 // 获取通用推广链接
-func UnionPromotionBySubUnionIdGet(req *UnionPromotionCodeRequest) (string, string, error) {
+func UnionPromotionBySubUnionIdGet(req *UnionPromotionCodeRequest) (*PromotionCodeResp, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewUnionPromotionBySubUnionIdRequest()
@@ -30,31 +30,31 @@ func UnionPromotionBySubUnionIdGet(req *UnionPromotionCodeRequest) (string, stri
 
 	result, err := client.Execute(r.Request, req.Session)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	var response UnionPromotionCodeResponse
 	err = ljson.Unmarshal(result, &response)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if response.Data == nil {
-		return "", errors.New("no data")
+		return nil, errors.New("no data")
 	}
 	var ret UnionPromotioncodeResult
 	err = ljson.Unmarshal([]byte(response.Data.Result), &ret)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if ret.Code != 200 {
-		return "", &api.ErrorResponnse{Code: strconv.FormatInt(int64(ret.Code), 10), ZhDesc: ret.Message}
+		return nil, &api.ErrorResponnse{Code: strconv.FormatInt(int64(ret.Code), 10), ZhDesc: ret.Message}
 	}
 
-	var codeResp PromotionCodeResp
-	err = json.Unmarshal(ret.Data, &codeResp)
+	codeResp := &PromotionCodeResp{}
+	err = json.Unmarshal(ret.Data, codeResp)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return codeResp.ClickURL, codeResp.ShortURL, nil
+	return codeResp, nil
 }

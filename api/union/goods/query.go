@@ -54,7 +54,7 @@ func Query(req *QueryRequest) (*JingfenQueryResult, error) {
 		Cid2:                 req.Cid2,
 		Cid3:                 req.Cid3,
 		SkuIds:               req.SkuIds,
-		keyword:              req.keyword,
+		Keyword:              req.keyword,
 		PriceFrom:            req.PriceFrom,
 		PriceTo:              req.PriceTo,
 		CommissionShareStart: req.CommissionShareStart,
