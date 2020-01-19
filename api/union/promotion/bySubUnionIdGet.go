@@ -11,6 +11,11 @@ import (
 	"github.com/daviddengcn/ljson"
 )
 
+type UnionPromotionBySubUnionIdGetResponse struct {
+	ErrorResp *api.ErrorResponnse             `json:"error_response,omitempty"`
+	Data      *UnionPromotionCodeResponseData `json:"jd_union_open_promotion_bysubunionid_get_response,omitempty"`
+}
+
 // 获取通用推广链接
 func UnionPromotionBySubUnionIdGet(req *UnionPromotionCodeRequest) (*PromotionCodeResp, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
@@ -32,7 +37,7 @@ func UnionPromotionBySubUnionIdGet(req *UnionPromotionCodeRequest) (*PromotionCo
 	if err != nil {
 		return nil, err
 	}
-	var response UnionPromotionCodeResponse
+	var response UnionPromotionBySubUnionIdGetResponse
 	err = ljson.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
