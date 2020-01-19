@@ -16,7 +16,7 @@ type QueryRequest struct {
 	Cid2                 uint64   `json:"cid2,omitempty"`                 // 二级类目id
 	Cid3                 uint64   `json:"cid3,omitempty"`                 // 三级类目id
 	SkuIds               []uint64 `json:"skuIds,omitempty"`               // skuid集合(一次最多支持查询100个sku)，数组类型开发时记得加[]
-	keyword              string   `json:"keyword,omitempty"`              // 关键词，字数同京东商品名称一致，目前未限制
+	Keyword              string   `json:"keyword,omitempty"`              // 关键词，字数同京东商品名称一致，目前未限制
 	PriceFrom            float64  `json:"pricefrom,omitempty"`            // 商品价格下限
 	PriceTo              float64  `json:"priceto,omitempty"`              // 商品价格上限
 	CommissionShareStart uint     `json:"commissionShareStart,omitempty"` // 佣金比例区间开始
@@ -54,7 +54,7 @@ func Query(req *QueryRequest) (*JingfenQueryResult, error) {
 		Cid2:                 req.Cid2,
 		Cid3:                 req.Cid3,
 		SkuIds:               req.SkuIds,
-		Keyword:              req.keyword,
+		Keyword:              req.Keyword,
 		PriceFrom:            req.PriceFrom,
 		PriceTo:              req.PriceTo,
 		CommissionShareStart: req.CommissionShareStart,
