@@ -18,7 +18,7 @@ type GoodsGetRequest struct {
 
 type GoodsGetResponse struct {
 	ErrorResp *api.ErrorResponnse   `json:"error_response,omitempty"`
-	Data      *GoodsGetResponseData `json:"jd_union_open_category_goods_get_responce,omitempty"`
+	Data      *GoodsGetResponseData `json:"jd_union_open_category_goods_get_response,omitempty"`
 }
 
 type GoodsGetResponseData struct {
