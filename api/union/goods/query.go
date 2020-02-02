@@ -35,7 +35,7 @@ type QueryRequest struct {
 	Fields               string   `json:"fields,omitempty"`               // 支持出参数据筛选，逗号','分隔，目前可用：videoInfo
 	PageIndex            uint     `json:"pageIndex,omitempty"`            // 页码，默认1
 	PageSize             uint     `json:"pageSize,omitempty"`             // 每页数量，默认20，上限50
-	SortName             string   `json:"sortName,omitempty"`             // 排序字段(price：单价, commissionShare：佣金比例, commission：佣金， inOrderCount30DaysSku：sku维度30天引单量，comments：评论数，goodComments：好评数)
+	SortName             string   `json:"sortName,omitempty"`             // 排序字段(price：单价, commissionShare：佣金比例, commission：佣金， inOrderCount30Days：30天引单量， inOrderComm30Days：30天支出佣金)
 	Sort                 string   `json:"sort,omitempty"`                 // asc,desc升降序,默认降序
 }
 
