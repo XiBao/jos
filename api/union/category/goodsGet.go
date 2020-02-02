@@ -22,7 +22,7 @@ type GoodsGetResponse struct {
 }
 
 type GoodsGetResponseData struct {
-	Result GoodsGetResult `json:"getResult,omitempty"`
+	Result string `json:"getResult,omitempty"`
 }
 
 type GoodsGetResult struct {
@@ -58,13 +58,17 @@ func GoodsGet(req *GoodsGetRequest) ([]CategoryResp, error) {
 	if err != nil {
 		return nil, err
 	}
-	if response.Data == nil {
+	if response.Data == nil || response.Data.Result == "" {
 		return nil, errors.New("no result")
 	}
-
-	if response.Data.Result.Code != 200 {
-		return nil, &api.ErrorResponnse{Code: strconv.FormatInt(response.Data.Result.Code, 10), ZhDesc: response.Data.Result.Message}
+	var resp GoodsGetResult
+	err = ljson.Unmarshal([]byte(response.Data.Result), &resp)
+	if err != nil {
+		return nil, err
+	}
+	if resp.Code != 200 {
+		return nil, &api.ErrorResponnse{Code: strconv.FormatInt(resp.Code, 10), ZhDesc: resp.Message}
 	}
 
-	return response.Data.Result.Data, nil
+	return resp.Data, nil
 }
