@@ -22,7 +22,7 @@ type GoodsGetResponse struct {
 }
 
 type GoodsGetResponseData struct {
-	Result string `json:"getResult,omitempty"`
+	Result string `json:"result,omitempty"`
 }
 
 type GoodsGetResult struct {
