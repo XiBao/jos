@@ -39,7 +39,7 @@ type CategoryResp struct {
 }
 
 //  商品类目查询
-func GoodsGetQuery(req *GoodsGetRequest) ([]CategoryResp, error) {
+func GoodsGet(req *GoodsGetRequest) ([]CategoryResp, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := category.NewGoodsGetRequest()

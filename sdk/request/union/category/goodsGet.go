@@ -22,11 +22,11 @@ func NewGoodsGetRequest() (req *GoodsGetRequest) {
 	return
 }
 
-func (req *GoodsLinkQueryRequest) SetReq(goodsReq *GoodsGetReq) {
+func (req *GoodsGetRequest) SetReq(goodsReq *GoodsGetReq) {
 	req.Request.Params["req"] = goodsReq
 }
 
-func (req *GoodsLinkQueryRequest) GetGoodsReq() *GoodsGetReq {
+func (req *GoodsGetRequest) GetGoodsReq() *GoodsGetReq {
 	goodsReq, found := req.Request.Params["req"]
 	if found {
 		return goodsReq.(*GoodsGetReq)
