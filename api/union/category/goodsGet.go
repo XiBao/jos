@@ -12,8 +12,8 @@ import (
 
 type GoodsGetRequest struct {
 	api.BaseRequest
-	ParentId uint64 `json:"parentId"`   // 父类目id(一级父类目为0)
-	Grade    uint   `json:"subUnionId"` // 类目级别(类目级别 0，1，2 代表一、二、三级类目)
+	ParentId uint64 `json:"parentId"` // 父类目id(一级父类目为0)
+	Grade    uint   `json:"grade"`    // 类目级别(类目级别 0，1，2 代表一、二、三级类目)
 }
 
 type GoodsGetResponse struct {
