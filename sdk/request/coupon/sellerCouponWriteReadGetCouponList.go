@@ -10,7 +10,7 @@ type SellerCouponReadGetCouponListRequest struct {
 
 // create new request
 func NewSellerCouponReadGetCouponListRequest() (req *SellerCouponReadGetCouponListRequest) {
-	request := sdk.Request{MethodName: "jingdong.seller.coupon.read.getCouponList", Params: make(map[string]interface{}, 13)}
+	request := sdk.Request{MethodName: "jingdong.seller.coupon.read.getCouponList", Params: make(map[string]interface{}, 18)}
 	req = &SellerCouponReadGetCouponListRequest{
 		Request: &request,
 	}
@@ -65,38 +65,38 @@ func (req *SellerCouponReadGetCouponListRequest) GetType() string {
 	return ""
 }
 
-func (req *SellerCouponReadGetCouponListRequest) SetGrantType(grantType uint) {
+func (req *SellerCouponReadGetCouponListRequest) SetGrantType(grantType uint8) {
 	req.Request.Params["grantType"] = grantType
 }
 
-func (req *SellerCouponReadGetCouponListRequest) GetGrantType() uint {
+func (req *SellerCouponReadGetCouponListRequest) GetGrantType() uint8 {
 	grantType, found := req.Request.Params["grantType"]
 	if found {
-		return grantType.(uint)
+		return grantType.(uint8)
 	}
 	return 0
 }
 
-func (req *SellerCouponReadGetCouponListRequest) SetGrantWay(grantWay uint) {
-	req.Request.Params["grantWay"] = grantWay
-}
-
-func (req *SellerCouponReadGetCouponListRequest) GetGrantWay() uint {
-	grantWay, found := req.Request.Params["grantWay"]
-	if found {
-		return grantWay.(uint)
-	}
-	return 0
-}
-
-func (req *SellerCouponReadGetCouponListRequest) SetBindType(bindType uint) {
+func (req *SellerCouponReadGetCouponListRequest) SetBindType(bindType uint8) {
 	req.Request.Params["bindType"] = bindType
 }
 
-func (req *SellerCouponReadGetCouponListRequest) GetBindType() uint {
+func (req *SellerCouponReadGetCouponListRequest) GetBindType() uint8 {
 	bindType, found := req.Request.Params["bindType"]
 	if found {
-		return bindType.(uint)
+		return bindType.(uint8)
+	}
+	return 0
+}
+
+func (req *SellerCouponReadGetCouponListRequest) SetGrantWay(grantWay uint8) {
+	req.Request.Params["grantWay"] = grantWay
+}
+
+func (req *SellerCouponReadGetCouponListRequest) GetGrantWay() uint8 {
+	grantWay, found := req.Request.Params["grantWay"]
+	if found {
+		return grantWay.(uint8)
 	}
 	return 0
 }
@@ -161,14 +161,14 @@ func (req *SellerCouponReadGetCouponListRequest) GetPage() uint {
 	return 0
 }
 
-func (req *SellerCouponReadGetCouponListRequest) SetPageSize(pageSize uint) {
+func (req *SellerCouponReadGetCouponListRequest) SetPageSize(pageSize uint8) {
 	req.Request.Params["pageSize"] = pageSize
 }
 
-func (req *SellerCouponReadGetCouponListRequest) GetPageSize() uint {
+func (req *SellerCouponReadGetCouponListRequest) GetPageSize() uint8 {
 	pageSize, found := req.Request.Params["pageSize"]
 	if found {
-		return pageSize.(uint)
+		return pageSize.(uint8)
 	}
 	return 0
 }

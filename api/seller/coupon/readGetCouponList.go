@@ -15,24 +15,24 @@ type CouponReadGetCouponListRequest struct {
 	Port        string `json:"port,omitempty" codec:"port,omitempty"`
 	CouponId    uint64 `json:"couponId,omitempty" codec:"couponId,omitempty"`       // 优惠券编号
 	Name        string `json:"name,omitempty" codec:"name,omitempty"`               // 优惠券名称（长度小于30）
-	Type        uint   `json:"type,omitempty" codec:"type,omitempty"`               // 优惠券类型 0京券 1东券
+	Type        string `json:"type,omitempty" codec:"type,omitempty"`               // 优惠券类型 0京券 1东券
 	BindType    uint   `json:"bindType,omitempty" codec:"bindType,omitempty"`       // 绑定类型 1全店参加 2指定sku参加
 	GrantType   uint   `json:"grantType,omitempty" codec:"grantType,omitempty"`     // 发放类型 3免费领取 5互动平台 【仅允许这两种】
 	GrantWay    uint   `json:"grantWay,omitempty" codec:"grantWay,omitempty"`       // 推广方式 1卖家发放 2买家领取
 	CreateMonth string `json:"createMonth,omitempty" codec:"createMonth,omitempty"` // 优惠券创建月份
-	CreatorType uint   `json:"creatorType,omitempty" codec:"creatorType,omitempty"` // 优惠券创建者 0优惠券shop端 2促销发券等，实际调用100为忽略
-	Closed      uint   `json:"closed,omitempty" codec:"closed,omitempty"`           // 店铺券状态 0未关闭 1关闭，实际调用100为忽略
+	CreatorType string `json:"creatorType,omitempty" codec:"creatorType,omitempty"` // 优惠券创建者 0优惠券shop端 2促销发券等，实际调用100为忽略
+	Closed      string `json:"closed,omitempty" codec:"closed,omitempty"`           // 店铺券状态 0未关闭 1关闭，实际调用100为忽略
 	Page        uint   `json:"page,omitempty" codec:"page,omitempty"`
 	PageSize    uint   `json:"pageSize,omitempty" codec:"pageSize,omitempty"` // 页面大小 取值范围[1,20]
 }
 
 type CouponReadGetCouponListResponse struct {
 	ErrorResp *api.ErrorResponnse                  `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *CouponReadGetCouponListResponseData `json:"jingdong_seller_coupon_read_getCouponList_response,omitempty" codec:"jingdong_seller_coupon_read_getCouponList_response,omitempty"`
+	Data      *CouponReadGetCouponListResponseData `json:"jingdong_seller_coupon_read_getCouponList_responce,omitempty" codec:"jingdong_seller_coupon_read_getCouponList_responce,omitempty"`
 }
 
 type CouponReadGetCouponListResponseData struct {
-	List []Coupon `json:"couponList,omitempty" codec:"couponList,omitempty"`
+	List []*Coupon `json:"couponList,omitempty" codec:"couponList,omitempty"`
 }
 
 type Coupon struct {
@@ -65,7 +65,7 @@ type Coupon struct {
 	Deleted       bool              `json:"deleted,omitempty"`       // 关闭状态 0未关闭 1已关闭
 	Display       uint              `json:"display,omitempty"`       // 是否公开 1不公开 3公开
 	Created       int64             `json:"created,omitempty"`       // 优惠券创建时间
-	PlatformType  uint              `json:"platformType,omitempty"`  // 使用平台 1全平台 3限平台
+	PlatformType  int               `json:"platformType,omitempty"`  // 使用平台 1全平台 3限平台
 	Platform      string            `json:"platform,omitempty"`      // 优惠券使用平台 0主站专享 1手机专享 3M版京东 4手Q专享 5微信专享 7京致衣橱
 	ImgUrl        string            `json:"imgUrl,omitempty"`        // 京豆换券，图片地址
 	BoundStatus   uint              `json:"boundStatus,omitempty"`   // 京豆换券
@@ -75,13 +75,17 @@ type Coupon struct {
 	Ext           map[string]string `json:"extMapInfo,omitempty"`    // 券扩展信息Map(当前key有：putKey，encLink，encMobileLink等,key与value均为String类型)
 }
 
-func CouponReadGetCouponList(req *CouponReadGetCouponListRequest) ([]Coupon, error) {
+func CouponReadGetCouponList(req *CouponReadGetCouponListRequest) ([]*Coupon, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
-	r := promotion.NewSellerCouponReadGetCouponListRequest()
+	r := coupon.NewSellerCouponReadGetCouponListRequest()
 	r.SetIp(req.Ip)
 	r.SetPort(req.Port)
-	if req.Type == 0 || req.Type == 1 {
+	if req.CouponId > 0 {
+		r.SetCouponId(req.CouponId)
+	}
+
+	if req.Type == "0" || req.Type == "1" {
 		r.SetType(req.Type)
 	}
 
@@ -105,11 +109,11 @@ func CouponReadGetCouponList(req *CouponReadGetCouponListRequest) ([]Coupon, err
 		r.SetCreateMonth(req.CreateMonth)
 	}
 
-	if req.CreatorType == 0 || req.CreatorType == 2 {
+	if req.CreatorType == "0" || req.CreatorType == "2" {
 		r.SetCreatorType(req.CreatorType)
 	}
 
-	if req.Closed == 0 || req.Closed == 1 {
+	if req.Closed == "0" || req.Closed == "1" {
 		r.SetClosed(req.Closed)
 	}
 
@@ -118,19 +122,19 @@ func CouponReadGetCouponList(req *CouponReadGetCouponListRequest) ([]Coupon, err
 
 	result, err := client.Execute(r.Request, req.Session)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	if len(result) == 0 {
-		return 0, errors.New("no result.")
+		return nil, errors.New("no result.")
 	}
 
 	var response CouponReadGetCouponListResponse
 	err = ljson.Unmarshal(result, &response)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	if response.ErrorResp != nil {
-		return 0, response.ErrorResp
+		return nil, response.ErrorResp
 	}
 
 	return response.Data.List, nil
