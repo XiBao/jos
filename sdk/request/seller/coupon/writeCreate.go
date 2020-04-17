@@ -10,7 +10,7 @@ type SellerCouponWriteCreateRequest struct {
 
 // create new request
 func NewSellerCouponWriteCreateRequest() (req *SellerCouponWriteCreateRequest) {
-	request := sdk.Request{MethodName: "jingdong.seller.coupon.write.create", Params: make(map[string]interface{}, 18)}
+	request := sdk.Request{MethodName: "jingdong.seller.coupon.write.create", Params: make(map[string]interface{}, 29)}
 	req = &SellerCouponWriteCreateRequest{
 		Request: &request,
 	}
@@ -209,6 +209,18 @@ func (req *SellerCouponWriteCreateRequest) GetMember() uint {
 	return 0
 }
 
+func (req *SellerCouponWriteCreateRequest) SetPaidMembers(paidMembers string) {
+	req.Request.Params["paidMembers"] = paidMembers
+}
+
+func (req *SellerCouponWriteCreateRequest) GetPaidMembers() string {
+	paidMembers, found := req.Request.Params["paidMembers"]
+	if found {
+		return paidMembers.(string)
+	}
+	return ""
+}
+
 func (req *SellerCouponWriteCreateRequest) SetTakeBeginTime(takeBeginTime uint64) {
 	req.Request.Params["takeBeginTime"] = takeBeginTime
 }
@@ -269,28 +281,28 @@ func (req *SellerCouponWriteCreateRequest) GetDisplay() uint8 {
 	return 0
 }
 
-func (req *SellerCouponWriteCreateRequest) SetPlatformType(platformType uint8) {
+func (req *SellerCouponWriteCreateRequest) SetPlatformType(platformType int8) {
 	req.Request.Params["platformType"] = platformType
 }
 
-func (req *SellerCouponWriteCreateRequest) GetPlatformType() uint8 {
+func (req *SellerCouponWriteCreateRequest) GetPlatformType() int8 {
 	platformType, found := req.Request.Params["platformType"]
 	if found {
-		return platformType.(uint8)
+		return platformType.(int8)
 	}
 	return 0
 }
 
-func (req *SellerCouponWriteCreateRequest) SetPlatform(platform uint8) {
+func (req *SellerCouponWriteCreateRequest) SetPlatform(platform string) {
 	req.Request.Params["platform"] = platform
 }
 
-func (req *SellerCouponWriteCreateRequest) GetPlatform() uint8 {
+func (req *SellerCouponWriteCreateRequest) GetPlatform() string {
 	platform, found := req.Request.Params["platform"]
 	if found {
-		return platform.(uint8)
+		return platform.(string)
 	}
-	return 0
+	return ""
 }
 
 func (req *SellerCouponWriteCreateRequest) SetImgUrl(imgUrl string) {
@@ -353,14 +365,38 @@ func (req *SellerCouponWriteCreateRequest) GetShareType() uint8 {
 	return 0
 }
 
-func (req *SellerCouponWriteCreateRequest) SetSkuId(skuId string) {
+func (req *SellerCouponWriteCreateRequest) SetSkuId(skuId []uint64) {
 	req.Request.Params["skuId"] = skuId
 }
 
-func (req *SellerCouponWriteCreateRequest) GetSkuId() string {
+func (req *SellerCouponWriteCreateRequest) GetSkuId() []uint64 {
 	skuId, found := req.Request.Params["skuId"]
 	if found {
-		return skuId.(string)
+		return skuId.([]uint64)
+	}
+	return nil
+}
+
+func (req *SellerCouponWriteCreateRequest) SetUserClass(userClass int) {
+	req.Request.Params["userClass"] = userClass
+}
+
+func (req *SellerCouponWriteCreateRequest) GetUserClass() int {
+	userClass, found := req.Request.Params["userClass"]
+	if found {
+		return userClass.(int)
+	}
+	return 0
+}
+
+func (req *SellerCouponWriteCreateRequest) SetActivityLink(activityLink string) {
+	req.Request.Params["activityLink"] = activityLink
+}
+
+func (req *SellerCouponWriteCreateRequest) GetActivityLink() string {
+	activityLink, found := req.Request.Params["activityLink"]
+	if found {
+		return activityLink.(string)
 	}
 	return ""
 }

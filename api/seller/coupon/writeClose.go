@@ -13,7 +13,7 @@ import (
 type CouponWriteCloseRequest struct {
 	api.BaseRequest
 	Ip       string `json:"ip,omitempty" codec:"ip,omitempty"`             // 调用方IP
-	Port     string `json:"string,omitempty" codec:"string,omitempty"`     // 调用方端口
+	Port     string `json:"port,omitempty" codec:"port,omitempty"`         // 调用方端口
 	CouponId uint64 `json:"couponId,omitempty" codec:"couponId,omitempty"` // 优惠券编号
 }
 

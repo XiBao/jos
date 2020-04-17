@@ -11,6 +11,8 @@ import (
 
 type ListRequest struct {
 	api.BaseRequest
+	Ip        string `json:"ip" codec:"ip"`
+	Port      string `json:"port" codec:"port"`
 	PromoId   uint64 `json:"promo_id" codec:"promo_id"`
 	PType     int    `json:"type" codec:"type"`
 	Page      int    `json:"page,omitempty" codec:"page,omitempty"`
@@ -34,6 +36,8 @@ func List(req *ListRequest) ([]*PromotionList, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionListRequest()
+	r.SetIp(req.Ip)
+	r.SetPort(req.Port)
 	if req.PageSize > 0 {
 		r.SetPageSize(req.PageSize)
 	} else {

@@ -40,7 +40,7 @@ type Coupon struct {
 	VenderId      uint64            `json:"venderId,omitempty"`      // 商家ID
 	LockType      uint              `json:"lockType,omitempty"`      // 优惠券锁定状态 4已锁定 1未锁定
 	Name          string            `json:"name,omitempty"`          // 优惠券名称
-	Type          uint              `json:"type,omitempty"`          // 优惠券类型 0京券 1东券
+	Type          uint              `json:"type"`                    // 优惠券类型 0京券 1东券
 	BindType      uint              `json:"bindType,omitempty"`      // 绑定类型 1全店参加 2指定sku参加
 	GrantType     uint              `json:"grantType,omitempty"`     // 发放类型 1促销绑定 2推送 3免费领取 4京豆换券 5互动平台
 	Num           uint              `json:"num,omitempty"`           // 优惠券数量
@@ -62,11 +62,11 @@ type Coupon struct {
 	ActivityLink  string            `json:"activityLink,omitempty"`  // 活动链接
 	UsedNum       uint              `json:"usedNum,omitempty"`       // 已使用数量
 	SendNum       uint              `json:"sendNum,omitempty"`       // 已发放数量
-	Deleted       bool              `json:"deleted,omitempty"`       // 关闭状态 0未关闭 1已关闭
+	Deleted       bool              `json:"deleted"`                 // 关闭状态 0未关闭 1已关闭
 	Display       uint              `json:"display,omitempty"`       // 是否公开 1不公开 3公开
 	Created       int64             `json:"created,omitempty"`       // 优惠券创建时间
 	PlatformType  int               `json:"platformType,omitempty"`  // 使用平台 1全平台 3限平台
-	Platform      string            `json:"platform,omitempty"`      // 优惠券使用平台 0主站专享 1手机专享 3M版京东 4手Q专享 5微信专享 7京致衣橱
+	Platform      string            `json:"platform"`                // 优惠券使用平台 0主站专享 1手机专享 3M版京东 4手Q专享 5微信专享 7京致衣橱
 	ImgUrl        string            `json:"imgUrl,omitempty"`        // 京豆换券，图片地址
 	BoundStatus   uint              `json:"boundStatus,omitempty"`   // 京豆换券
 	JdItem        uint              `json:"jdItem,omitempty"`        // 京豆数

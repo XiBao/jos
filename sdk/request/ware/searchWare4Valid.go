@@ -53,16 +53,16 @@ func (req *SearchWare4ValidRequest) GetPageSize() int {
 	return 0
 }
 
-func (req *SearchWare4ValidRequest) SetWareId(wareId []uint64) {
+func (req *SearchWare4ValidRequest) SetWareId(wareId string) {
 	req.Request.Params["wareId"] = wareId
 }
 
-func (req *SearchWare4ValidRequest) GetWareId() []uint64 {
+func (req *SearchWare4ValidRequest) GetWareId() string {
 	wareId, found := req.Request.Params["wareId"]
 	if found {
-		return wareId.([]uint64)
+		return wareId.(string)
 	}
-	return nil
+	return ""
 }
 
 func (req *SearchWare4ValidRequest) SetField(field string) {
@@ -89,16 +89,16 @@ func (req *SearchWare4ValidRequest) GetSearchKey() string {
 	return ""
 }
 
-func (req *SearchWare4ValidRequest) SetSearchField(searchField []string) {
+func (req *SearchWare4ValidRequest) SetSearchField(searchField string) {
 	req.Request.Params["searchField"] = searchField
 }
 
-func (req *SearchWare4ValidRequest) GetSearchField() []string {
+func (req *SearchWare4ValidRequest) GetSearchField() string {
 	searchField, found := req.Request.Params["searchField"]
 	if found {
-		return searchField.([]string)
+		return searchField.(string)
 	}
-	return nil
+	return ""
 }
 
 func (req *SearchWare4ValidRequest) SetOrderField(orderField []string) {

@@ -11,6 +11,8 @@ import (
 
 type SkuListRequest struct {
 	api.BaseRequest
+	Ip        string `json:"ip" codec:"ip"`
+	Port      string `json:"port" codec:"port"`
 	PromoId   uint64 `json:"promo_id" codec:"promo_id"`
 	PromoType int    `json:"promo_type" codec:"promo_type"`
 	Page      int    `json:"page,omitempty" codec:"page,omitempty"`

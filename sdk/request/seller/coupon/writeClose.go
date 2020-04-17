@@ -10,7 +10,7 @@ type SellerCouponWriteCloseRequest struct {
 
 // create new request
 func NewSellerCouponWriteCloseRequest() (req *SellerCouponWriteCloseRequest) {
-	request := sdk.Request{MethodName: "jingdong.seller.coupon.write.close", Params: make(map[string]interface{}, 18)}
+	request := sdk.Request{MethodName: "jingdong.seller.coupon.write.close", Params: make(map[string]interface{}, 3)}
 	req = &SellerCouponWriteCloseRequest{
 		Request: &request,
 	}

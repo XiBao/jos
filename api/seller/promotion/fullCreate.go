@@ -2,6 +2,7 @@ package promotion
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -11,49 +12,49 @@ import (
 
 type FullCreateRequest struct {
 	api.BaseRequest
-	Ip                    string `json:"ip"`                       //调用方IP
-	Port                  string `json:"port"`                     //	调用方端口
-	RequestId             string `json:"request_id"`               //防重码。业务唯一值
-	PromoName             string `json:"promo_name"`               //促销名称。最大长度20个字符
-	BeginTime             string `json:"begin_time"`               //	促销开始时间。格式：yyyy-MM-dd HH:mm:ss
-	EndTime               string `json:"end_time"`                 //	促销结束时间。格式：yyyy-MM-dd HH:mm:ss
-	Slogan                string `json:"slogan"`                   //	促销宣传语。最大长度70个字符
-	Comment               string `json:"comment"`                  //	促销备注信息。最大长度100个字符
-	Link                  string `json:"link"`                     //	活动链接
-	PlusMember            int64  `json:"plusMember"`               //	plus会员级别（0 非plus会员,1 付费及试用用户）
-	AllowOthersOperate    bool   `json:"allow_others_operate"`     //	是否允许其他来源操作该促销
-	AllowOthersCheck      bool   `json:"allow_others_check"`       //	是否允许其他来源审核该促销
-	AllowOtherUserOperate bool   `json:"allow_other_user_operate"` //	是否允许其他人操作该促销
-	AllowOtherUserCheck   bool   `json:"allow_other_user_check"`   //	是否允许其他人审核该促销
-	NeedManualCheck       bool   `json:"need_manual_check"`        //	促销是否需要人工审核
-	FreqBound             int64  `json:"freq_bound"`               //	促销限购一次形式：（0，不限，1、限ip、账号 2、限ip 3、限账号）
-	PerMaxNum             int64  `json:"per_max_num"`              //	单次最大购买数量：0、不限
-	PerMinNum             int64  `json:"per_min_num"`              //	单次最小购买数量：0、不限
-	PropType              int64  `json:"prop_type"`                //	道具类型：2、京豆，10 、店铺京券
-	PropNum               int64  `json:"prop_num"`                 //	道具数值
-	PropUsedWay           int64  `json:"prop_used_way"`            //	道具使用方式：0、消耗，2、奖励
-	CouponValidDays       int64  `json:"coupon_valid_days"`        //	优惠券的有效天数
-	TokenUseNum           int64  `json:"token_use_num"`            //	用户使用令牌的次数
-	UserPins              string `json:"user_pins"`                //	令牌用户列表
-	PromoAreaType         int64  `json:"promo_area_type"`          //	促销区域类型： 2 白名单 3 黑名单
-	PromoAreas            string `json:"promo_areas"`              //	促销区域列表（英文分号分隔）
-	SkuId                 string `json:"sku_id"`                   //	sku ID
-	PromoPrice            string `json:"promo_price"`              //	促销价
-	LimitNum              string `json:"limit_num"`                //限购数量。0:不限
+	Ip                    string `json:"ip"`                       // 调用方IP
+	Port                  string `json:"port"`                     // 调用方端口
+	RequestId             string `json:"request_id"`               // 防重码。业务唯一值
+	PromoName             string `json:"promo_name"`               // 促销名称。最大长度20个字符
+	BeginTime             string `json:"begin_time"`               // 促销开始时间。格式：yyyy-MM-dd HH:mm:ss
+	EndTime               string `json:"end_time"`                 // 促销结束时间。格式：yyyy-MM-dd HH:mm:ss
+	Slogan                string `json:"slogan"`                   // 促销宣传语。最大长度70个字符
+	Comment               string `json:"comment"`                  // 促销备注信息。最大长度100个字符
+	Link                  string `json:"link"`                     // 活动链接
+	PlusMember            int64  `json:"plusMember"`               // plus会员级别（0 非plus会员,1 付费及试用用户）
+	AllowOthersOperate    bool   `json:"allow_others_operate"`     // 是否允许其他来源操作该促销
+	AllowOthersCheck      bool   `json:"allow_others_check"`       // 是否允许其他来源审核该促销
+	AllowOtherUserOperate bool   `json:"allow_other_user_operate"` // 是否允许其他人操作该促销
+	AllowOtherUserCheck   bool   `json:"allow_other_user_check"`   // 是否允许其他人审核该促销
+	NeedManualCheck       bool   `json:"need_manual_check"`        // 促销是否需要人工审核
+	FreqBound             int64  `json:"freq_bound"`               // 促销限购一次形式：（0，不限，1、限ip、账号 2、限ip 3、限账号）
+	PerMaxNum             int64  `json:"per_max_num"`              // 单次最大购买数量：0、不限
+	PerMinNum             int64  `json:"per_min_num"`              // 单次最小购买数量：0、不限
+	PropType              int64  `json:"prop_type"`                // 道具类型：2、京豆，10 、店铺京券
+	PropNum               int64  `json:"prop_num"`                 // 道具数值
+	PropUsedWay           int64  `json:"prop_used_way"`            // 道具使用方式：0、消耗，2、奖励
+	CouponValidDays       int64  `json:"coupon_valid_days"`        // 优惠券的有效天数
+	TokenUseNum           int64  `json:"token_use_num"`            // 用户使用令牌的次数
+	UserPins              string `json:"user_pins"`                // 令牌用户列表
+	PromoAreaType         int64  `json:"promo_area_type"`          // 促销区域类型： 2 白名单 3 黑名单
+	PromoAreas            string `json:"promo_areas"`              // 促销区域列表（英文分号分隔，若地址是多级，则每一级的编号都必须传，各级之间用英文逗号分隔，eg：1,2,3;2,5,8;）
+	SkuId                 string `json:"sku_id"`                   // sku ID
+	PromoPrice            string `json:"promo_price"`              // 促销价
+	LimitNum              string `json:"limit_num"`                // 限购数量。0:不限
 }
 
 type FullCreateResponse struct {
 	ErrorResp *api.ErrorResponnse     `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *FullCreateResponseData `json:"jingdong_seller_promotion_create_responce,omitempty" codec:"jingdong_seller_promotion_create_responce,omitempty"`
+	Data      *FullCreateResponseData `json:"jingdong_seller_promotion_v2_unit_full_create_responce,omitempty" codec:"jingdong_seller_promotion_v2_unit_full_create_responce,omitempty"`
 }
 
 type FullCreateResponseData struct {
-	Code         string `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc    string `json:"error_description,omitempty" codec:"error_description,omitempty"`
-	CreateResult uint64 `json:"create_result,omitempty" codec:"create_result,omitempty"`
+	Code      string `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	PromoId   uint64 `json:"promo_id,omitempty" codec:"promo_id,omitempty"`
 }
 
-func FullCreate(req *FullCreateRequest) (interface{}, error) {
+func FullCreate(req *FullCreateRequest) (uint64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionFullCreateRequest()
@@ -94,7 +95,7 @@ func FullCreate(req *FullCreateRequest) (interface{}, error) {
 		r.SetLink(req.Link)
 	}
 
-	if req.PlusMember > 0 {
+	if req.PlusMember >= 0 {
 		r.SetPlusMember(req.PlusMember)
 	}
 
@@ -165,6 +166,7 @@ func FullCreate(req *FullCreateRequest) (interface{}, error) {
 	}
 
 	result, err := client.Execute(r.Request, req.Session)
+	fmt.Println(string(result))
 	if err != nil {
 		return 0, err
 	}
@@ -180,10 +182,12 @@ func FullCreate(req *FullCreateRequest) (interface{}, error) {
 	if response.ErrorResp != nil {
 		return 0, response.ErrorResp
 	}
-
 	if response.Data.Code != "0" {
 		return 0, errors.New(response.Data.ErrorDesc)
 	}
+	if response.Data.PromoId == 0 {
+		return 0, errors.New("No promotion id.")
+	}
 
-	return response.Data.CreateResult, nil
+	return response.Data.PromoId, nil
 }

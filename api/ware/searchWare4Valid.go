@@ -12,9 +12,9 @@ import (
 
 type SearchWare4ValidRequest struct {
 	api.BaseRequest
-	WareId               []uint64 `json:"wareId,omitempty" codec:"wareId,omitempty"`                             // 商品id列表,最多20个
+	WareId               string   `json:"wareId,omitempty" codec:"wareId,omitempty"`                             // 商品id列表,最多20个
 	SearchKey            string   `json:"searchKey,omitempty" codec:"searchKey,omitempty"`                       // 商品搜索关键词,需要配合搜索域实现
-	SearchField          []string `json:"searchField,omitempty" codec:"searchField,omitempty"`                   // 商品搜索域的范围,默认是商品名称.目前值范围[title]
+	SearchField          string   `json:"searchField,omitempty" codec:"searchField,omitempty"`                   // 商品搜索域的范围,默认是商品名称.目前值范围[title]
 	CategoryId           uint64   `json:"categoryId,omitempty" codec:"categoryId,omitempty"`                     // 商品叶子类目
 	ShopCategoryIdLevel1 uint64   `json:"shopCategoryIdLevel1,omitempty" codec:"shopCategoryIdLevel1,omitempty"` // 一级店内分类id
 	ShopCategoryIdLevel2 uint64   `json:"shopCategoryIdLevel2,omitempty" codec:"shopCategoryIdLevel2,omitempty"` // 二级店内分类id
@@ -75,7 +75,7 @@ func SearchWare4Valid(req *SearchWare4ValidRequest) (*SearchWare4ValidPage, erro
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := ware.NewSearchWare4ValidRequest()
-	if len(req.WareId) > 0 {
+	if req.WareId != "" {
 		r.SetWareId(req.WareId)
 	}
 	if req.Field != "" {
@@ -94,7 +94,7 @@ func SearchWare4Valid(req *SearchWare4ValidRequest) (*SearchWare4ValidPage, erro
 	if req.SearchKey != "" {
 		r.SetSearchKey(req.SearchKey)
 	}
-	if len(req.SearchField) > 0 {
+	if req.SearchField != "" {
 		r.SetSearchField(req.SearchField)
 	}
 	if len(req.OrderField) > 0 {
