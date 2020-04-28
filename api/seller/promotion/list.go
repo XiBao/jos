@@ -11,14 +11,16 @@ import (
 
 type ListRequest struct {
 	api.BaseRequest
-	Ip        string `json:"ip" codec:"ip"`
-	Port      string `json:"port" codec:"port"`
-	PromoId   uint64 `json:"promo_id" codec:"promo_id"`
-	PType     int    `json:"type" codec:"type"`
-	Page      int    `json:"page,omitempty" codec:"page,omitempty"`
-	PageSize  int    `json:"page_size,omitempty" codec:"page_size,omitempty"`
-	BeginTime string `json:"begin_time,omitempty" codec:"begin_time,omitempty"`
-	EndTime   string `json:"end_time,omitempty" codec:"end_time,omitempty"`
+	Ip          string `json:"ip" codec:"ip"`
+	Port        string `json:"port" codec:"port"`
+	PromoId     uint64 `json:"promo_id" codec:"promo_id"`
+	Name        string `json:"name" codec:"name"`
+	PType       int    `json:"type" codec:"type"`
+	Page        int    `json:"page,omitempty" codec:"page,omitempty"`
+	PageSize    int    `json:"page_size,omitempty" codec:"page_size,omitempty"`
+	PromoStatus string `json:"page_status,omitempty" codec:"page_status,omitempty"`
+	BeginTime   string `json:"begin_time,omitempty" codec:"begin_time,omitempty"`
+	EndTime     string `json:"end_time,omitempty" codec:"end_time,omitempty"`
 }
 type ListResponse struct {
 	ErrorResp *api.ErrorResponnse `json:"error_response,omitempty" codec:"error_response,omitempty"`
@@ -63,6 +65,13 @@ func List(req *ListRequest) ([]*PromotionList, error) {
 
 	if len(req.EndTime) > 0 {
 		r.SetEndTime(req.EndTime)
+	}
+
+	if req.Name != "" {
+		r.SetName(req.Name)
+	}
+	if req.PromoStatus != "" {
+		r.SetPromoStatus(req.PromoStatus)
 	}
 	result, err := client.Execute(r.Request, req.Session)
 	if err != nil {

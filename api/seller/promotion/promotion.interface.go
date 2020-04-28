@@ -73,4 +73,6 @@ type PromotionSkuList struct {
 	Modified    uint64 `json:"modified" codec:"modified"`
 	Rfld        uint64 `json:"rfId" codec:"rfId"`
 	Logo        string `json:"logo,omitempty" codec:"logo,omitempty"`
+	StockNum    int    `json:"stock_num,omitempty" codec:"stock_num,omitempty"`
+	WareTitle   string `json:"ware_title,omitempty" codec:"ware_title,omitempty"`
 }

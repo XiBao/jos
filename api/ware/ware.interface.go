@@ -95,7 +95,8 @@ type Sku struct {
 	XbOnlineSts          uint8       `json:"xb_online_sts,omitempty" codec:"xb_online_sts,omitempty"`
 	XbAuditSts           uint8       `json:"xb_audit_sts,omitempty" codec:"xb_audit_sts,omitempty"`
 	XbUpdatedAt          string      `json:"xb_updated_at,omitempty" codec:"xb_updated_at,omitempty"`
-	TrackUrl             string      `json:"track_url,omitempty" codec:"trace_url,omitempty"` // 京东追踪链接
+	TrackUrl             string      `json:"track_url,omitempty" codec:"trace_url,omitempty"`   // 京东追踪链接
+	PromoLimit           float64     `json:"promoLimit,omitempty" codec:"promoLimit,omitempty"` // 促销最低折扣
 }
 
 type Sku2 struct {

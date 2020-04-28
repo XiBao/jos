@@ -13,16 +13,16 @@ type CountRequest struct {
 	api.BaseRequest
 	Ip          string `json:"ip,omitempty" codec:"ip,omitempty"`
 	Port        string `json:"port,omitempty" codec:"port,omitempty"`
-	PromoId     uint64 `json:"promo_id,omitempty" codec:"promo_id,omitempty"` //促销ID
+	PromoId     uint64 `json:"promo_id,omitempty" codec:"promo_id,omitempty"` // 促销ID
 	Name        string `json:"name"`                                          // 促销名称
-	Type        uint8  `json:"type"`                                          //促销类型。1:单品促销,4:赠品促销,6:套装促销,10:总价促销
-	FavorMode   uint8  `json:"favor_mode"`                                    //0:满赠,1:满减,2:每满减, 3:百分比满减, 4: 阶梯满减,5:满赠加价购,6:满M件减N件,7:阶梯买M件减N件,13:M元任选N件,15:M件N折,16:满减送（元）
-	BeginTime   string `json:"begin_time"`                                    //开始时间。格式：yyyy-MM-dd HH:mm:ss
-	EndTime     string `json:"end_time"`                                      //结束时间。格式：yyyy-MM-dd HH:mm:ss
-	PromoStatus uint8  `json:"promo_status"`                                  //促销状态。1:驳回, 2:未审核, 3:人工审, 4:已审核, 5:已生效, 6:已暂停, 7:强制暂停
+	Type        uint8  `json:"type"`                                          // 促销类型。1:单品促销,4:赠品促销,6:套装促销,10:总价促销
+	FavorMode   uint8  `json:"favor_mode"`                                    // 0:满赠,1:满减,2:每满减, 3:百分比满减, 4: 阶梯满减,5:满赠加价购,6:满M件减N件,7:阶梯买M件减N件,13:M元任选N件,15:M件N折,16:满减送（元）
+	BeginTime   string `json:"begin_time"`                                    // 开始时间。格式：yyyy-MM-dd HH:mm:ss
+	EndTime     string `json:"end_time"`                                      // 结束时间。格式：yyyy-MM-dd HH:mm:ss
+	PromoStatus uint8  `json:"promo_status"`                                  // 促销状态。1:驳回, 2:未审核, 3:人工审, 4:已审核, 5:已生效, 6:已暂停, 7:强制暂停
 	WareId      string `json:"ware_id"`                                       // 商品ID
-	SkuId       string `json:"sku_id"`                                        //  sku ID
-	SrcType     uint64 `json:"src_type"`                                      //来源Id
+	SkuId       string `json:"sku_id"`                                        // sku ID
+	SrcType     uint64 `json:"src_type"`                                      // 来源Id
 }
 
 type CountResponse struct {

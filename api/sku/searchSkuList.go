@@ -58,6 +58,9 @@ func SearchSkuList(req *SearchSkuListRequest) (*SearchSkuListPage, error) {
 	if len(req.WareId) > 0 {
 		r.SetWareId(req.WareId)
 	}
+	if len(req.SkuId) > 0 {
+		r.SetSkuId(req.SkuId)
+	}
 	if req.Field != "" {
 		r.SetField(req.Field)
 	}

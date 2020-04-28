@@ -113,16 +113,16 @@ func (req *SellerPromotionListRequest) GetEndTime() string {
 	return ""
 }
 
-func (req *SellerPromotionListRequest) SetPromoStatus(promoStatus int) {
+func (req *SellerPromotionListRequest) SetPromoStatus(promoStatus string) {
 	req.Request.Params["promo_status"] = promoStatus
 }
 
-func (req *SellerPromotionListRequest) GetPromoStatus() int {
+func (req *SellerPromotionListRequest) GetPromoStatus() string {
 	promoStatus, found := req.Request.Params["promo_status"]
 	if found {
-		return promoStatus.(int)
+		return promoStatus.(string)
 	}
-	return 0
+	return ""
 }
 
 func (req *SellerPromotionListRequest) SetWareId(wareId uint64) {

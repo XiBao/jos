@@ -65,6 +65,18 @@ func (req *SearchSkuListRequest) GetWareId() []uint64 {
 	return nil
 }
 
+func (req *SearchSkuListRequest) SetSkuId(skuId []uint64) {
+	req.Request.Params["skuId"] = skuId
+}
+
+func (req *SearchSkuListRequest) GetSkuId() []uint64 {
+	skuId, found := req.Request.Params["skuId"]
+	if found {
+		return skuId.([]uint64)
+	}
+	return nil
+}
+
 func (req *SearchSkuListRequest) SetField(field string) {
 	req.Request.Params["field"] = field
 }
