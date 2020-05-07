@@ -72,6 +72,9 @@ type Coupon struct {
 	JdItem        uint              `json:"jdItem,omitempty"`        // 京豆数
 	ItemId        uint64            `json:"itemId,omitempty"`        // 京豆换券项目ID
 	ShareType     uint              `json:"shareType,omitempty"`     // 分享类型 1分享 2不分享
+	UserClass     int               `json:"userClass,omitempty"`     // 会员类别 20000-普通会员，30000-付费会员，60000-新付费会员
+	PaidMembers   string            `json:"paidMembers,omitempty"`   // 101,201 - 正式+试用，101-试用会员，201-正式会员
+	SkuId         []uint64          `json:"skuId,omitempty"`         // 商品sku编号(如设置bindType为2，此参数必填,需是有效sku)
 	Ext           map[string]string `json:"extMapInfo,omitempty"`    // 券扩展信息Map(当前key有：putKey，encLink，encMobileLink等,key与value均为String类型)
 }
 

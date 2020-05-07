@@ -12,7 +12,7 @@ type PromotionList struct {
 	Member                uint   `json:"member" codec:"member"`                       // 参加促销的会员级别
 	Slogan                string `json:"slogan,omitempty" codec:"slogan,omitempty"`   // 促销宣传语
 	Comment               string `json:"comment,omitempty" codec:"comment,omitempty"` // 促销备注信息
-	PromoStatus           uint8  `json:"promo_status" codec:"promo_status"`           // 促销状态。-1:促销被创建但还没commit,0:无效,1:驳回,2:未审核,3:人工审,4:已审核,5:已生效,6:已暂停,7:强制暂停
+	PromoStatus           int8   `json:"promo_status" codec:"promo_status"`           // 促销状态。-1:促销被创建但还没commit,0:无效,1:驳回,2:未审核,3:人工审,4:已审核,5:已生效,6:已暂停,7:强制暂停
 	Created               uint64 `json:"created" codec:"created"`
 	Modified              uint64 `json:"modified" codec:"modified"`
 	Platform              uint8  `json:"platform" codec:"platform"`                                       // 平台类型（1、全渠道，2、手机客户端，3、微信，5、手Q）
@@ -46,6 +46,9 @@ type PromotionList struct {
 	UserPins              string `json:"user_pins,omitempty" codec:"user_pins,omitempty"`                 // 令牌用户列表
 	PromoAreaType         uint8  `json:"promo_area_type,omitempty" codec:"promo_area_type,omitempty"`     // 促销区域类型： 2 白名单 3 黑名单
 	PromoAreas            string `json:"promo_areas,omitempty" codec:"promo_areas,omitempty"`             // 促销区域列表（英文分号分隔）
+	PromoCreated          string `json:"promo_created,omitempty" codec:"promo_created,omitempty"`
+	PromoModified         string `json:"promo_modified,omitempty" codec:"promo_modified,omitempty"`
+	IsExpired             uint8  `json:"is_expired" codec:"is_expired"`
 }
 
 type PromotionUserList struct {
