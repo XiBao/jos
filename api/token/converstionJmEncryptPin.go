@@ -17,7 +17,7 @@ type ConverstionJmEncryptPinRequest struct {
 
 type ConverstionJmEncryptPinResponse struct {
 	ErrorResp *api.ErrorResponnse          `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *ConverstionJmEncryptPinData `json:"jingdong_TokenToPinCenter_converstionJmEncryptPin_response,omitempty" codec:"jingdong_TokenToPinCenter_converstionJmEncryptPin_response,omitempty"`
+	Data      *ConverstionJmEncryptPinData `json:"jingdong_TokenToPinCenter_converstionJmEncryptPin_responce,omitempty" codec:"jingdong_TokenToPinCenter_converstionJmEncryptPin_responce,omitempty"`
 }
 
 type ConverstionJmEncryptPinData struct {
