@@ -53,7 +53,7 @@ type CommonQueryResult struct {
 }
 
 //通过组件化的方式，提供相关统一的查询方式
-func CommonQuery(req *CommonQueryRequest) ([]*CommonQueryResult, error) {
+func CommonQuery(req *CommonQueryRequest) (string, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := vender.NewVenderCommonQueryRequest()
@@ -65,32 +65,26 @@ func CommonQuery(req *CommonQueryRequest) ([]*CommonQueryResult, error) {
 	}
 	result, err := client.Execute(r.Request, req.Session)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	if len(result) == 0 {
-		return nil, errors.New("No query info.")
+		return "", errors.New("No query info.")
 	}
 
 	var response CommonQueryResponse
 	err = ljson.Unmarshal([]byte(result), &response)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
+		return "", response.ErrorResp
 	}
 	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
+		return "", errors.New(response.Data.ErrorDesc)
 	}
 	if response.Data.Response.Code != 0 {
-		return nil, errors.New(response.Data.Response.Msg)
+		return "", errors.New(response.Data.Response.Msg)
 	}
 
-	var res []*CommonQueryResult
-	err = ljson.Unmarshal([]byte(response.Data.Response.Result), &res)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
+	return response.Data.Response.Result, nil
 }

@@ -19,7 +19,7 @@ type PromotionList struct {
 	Link                  string `json:"link,omitempty" codec:"link,omitempty"`                           // 活动链接
 	ShopMember            uint   `json:"shop_member,omitempty" codec:"shop_member,omitempty"`             // 店铺会员级别
 	QqMember              uint   `json:"qq_member,omitempty" codec:"qq_member,omitempty"`                 // QQ会员级别
-	PlusMember            uint   `json:"plus_member,omitempty" codec:"plus_member,omitempty"`             // plus会员级别
+	PlusMember            uint   `json:"plus_member" codec:"plus_member"`                                 // plus会员级别
 	MemberLevelOnly       bool   `json:"member_level_only" codec:"member_level_only"`                     // 是否是会员级别专享
 	AllowOthersOperate    bool   `json:"allow_others_operate" codec:"allow_others_operate"`               // 是否允许其他来源操作该促销
 	AllowOthersCheck      bool   `json:"allow_others_check" codec:"allow_others_check"`                   // 是否允许其他来源审核该促销
@@ -29,9 +29,9 @@ type PromotionList struct {
 	AllowCheck            bool   `json:"allow_check" codec:"allow_check"`                                 // 是否允许审核该促销
 	AllowOperate          bool   `json:"allow_operate" codec:"allow_operate"`                             // 是否允许操作该促销
 	IsJingdouRequired     bool   `json:"is_jingdou_required" codec:"is_jingdou_required"`                 // 是否是京豆优惠购促销销
-	FreqBound             uint8  `json:"freq_bound,omitempty" codec:"freq_bound,omitempty"`               // 促销限购一次形式：（0，不限，1、限ip、账号 2、限ip 3、限账号）
-	PerMaxNum             uint   `json:"per_max_num,omitempty" codec:"per_max_num,omitempty"`             // 单次最大购买数量：0、不限
-	PerMinNum             uint   `json:"per_min_num,omitempty" codec:"per_min_num,omitempty"`             // 单次最小购买数量：0、不限
+	FreqBound             uint8  `json:"freq_bound" codec:"freq_bound"`                                   // 促销限购一次形式：（0，不限，1、限ip、账号 2、限ip 3、限账号）
+	PerMaxNum             uint   `json:"per_max_num" codec:"per_max_num"`                                 // 单次最大购买数量：0、不限
+	PerMinNum             uint   `json:"per_min_num" codec:"per_min_num"`                                 // 单次最小购买数量：0、不限
 	PropType              uint8  `json:"prop_type,omitempty" codec:"prop_type,omitempty"`                 // 道具类型：2、京豆，10 、店铺京券
 	PropNum               uint   `json:"prop_num,omitempty" codec:"prop_num,omitempty"`                   // 道具数值
 	PropUsedWay           uint8  `json:"prop_used_way,omitempty" codec:"prop_used_way,omitempty"`         // 道具使用方式：1、消耗，2、奖励
