@@ -233,38 +233,38 @@ func (req *SellerPromotionFullCreateRequest) GetPerMinNum() int64 {
 	return 0
 }
 
-func (req *SellerPromotionFullCreateRequest) SetPropType(PropType int64) {
+func (req *SellerPromotionFullCreateRequest) SetPropType(PropType uint8) {
 	req.Request.Params["prop_type"] = PropType
 }
 
-func (req *SellerPromotionFullCreateRequest) GetPropType() int64 {
+func (req *SellerPromotionFullCreateRequest) GetPropType() uint8 {
 	PropType, found := req.Request.Params["prop_type"]
 	if found {
-		return PropType.(int64)
+		return PropType.(uint8)
 	}
 	return 0
 }
 
-func (req *SellerPromotionFullCreateRequest) SetPropNum(PropNum int64) {
+func (req *SellerPromotionFullCreateRequest) SetPropNum(PropNum uint) {
 	req.Request.Params["prop_num"] = PropNum
 }
 
-func (req *SellerPromotionFullCreateRequest) GetPropNum() int64 {
+func (req *SellerPromotionFullCreateRequest) GetPropNum() uint {
 	PropNum, found := req.Request.Params["prop_num"]
 	if found {
-		return PropNum.(int64)
+		return PropNum.(uint)
 	}
 	return 0
 }
 
-func (req *SellerPromotionFullCreateRequest) SetPropUsedWay(PropUsedWay int64) {
+func (req *SellerPromotionFullCreateRequest) SetPropUsedWay(PropUsedWay uint8) {
 	req.Request.Params["prop_used_way"] = PropUsedWay
 }
 
-func (req *SellerPromotionFullCreateRequest) GetPropUsedWay() int64 {
+func (req *SellerPromotionFullCreateRequest) GetPropUsedWay() uint8 {
 	PropUsedWay, found := req.Request.Params["prop_used_way"]
 	if found {
-		return PropUsedWay.(int64)
+		return PropUsedWay.(uint8)
 	}
 	return 0
 }

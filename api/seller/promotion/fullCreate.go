@@ -30,9 +30,9 @@ type FullCreateRequest struct {
 	FreqBound             int64  `json:"freq_bound"`               // 促销限购一次形式：（0，不限，1、限ip、账号 2、限ip 3、限账号）
 	PerMaxNum             int64  `json:"per_max_num"`              // 单次最大购买数量：0、不限
 	PerMinNum             int64  `json:"per_min_num"`              // 单次最小购买数量：0、不限
-	PropType              int64  `json:"prop_type"`                // 道具类型：2、京豆，10 、店铺京券
-	PropNum               int64  `json:"prop_num"`                 // 道具数值
-	PropUsedWay           int64  `json:"prop_used_way"`            // 道具使用方式：0、消耗，2、奖励
+	PropType              uint8  `json:"prop_type"`                // 道具类型：2、京豆，10 、店铺京券
+	PropNum               uint   `json:"prop_num"`                 // 道具数值
+	PropUsedWay           uint8  `json:"prop_used_way"`            // 道具使用方式：0、消耗，2、奖励
 	CouponValidDays       int64  `json:"coupon_valid_days"`        // 优惠券的有效天数
 	TokenUseNum           int64  `json:"token_use_num"`            // 用户使用令牌的次数
 	UserPins              string `json:"user_pins"`                // 令牌用户列表
@@ -129,7 +129,7 @@ func FullCreate(req *FullCreateRequest) (uint64, error) {
 		r.SetPropNum(req.PropNum)
 	}
 
-	if req.PropUsedWay > 0 {
+	if req.PropType > 0 && req.PropUsedWay >= 0 {
 		r.SetPropUsedWay(req.PropUsedWay)
 	}
 
