@@ -2,9 +2,9 @@ package center
 
 import (
 	"errors"
+    "github.com/XiBao/jos/api/util"
 
-	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/center"
+    "github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/interact/center"
 	"github.com/daviddengcn/ljson"
