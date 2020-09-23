@@ -9,7 +9,7 @@ import (
     "github.com/daviddengcn/ljson"
 )
 
-type WriteWritePersonInfoRequest struct {
+type WritePersonInfoRequest struct {
     BaseRequest
     AppName     string `json:"appName,omitempty" codec:"appName,omitempty"`             // ISV服务商名称
     Channel     uint8  `json:"channel,omitempty" codec:"channel,omitempty"`             // PC:1, APP:2, 任务中心:3,发现频道:4, 上海运营模板::5 , 微信: 6, QQ: 7, ARVR: 9
@@ -32,25 +32,25 @@ type WriteWritePersonInfoRequest struct {
     //  行为动作类型 1: 参与 2：分享 3： 助力 4：浏览店铺 5：浏览商品 6：关注店铺 7：关注商品 8:开卡会员 9：加购
 }
 
-type WriteWritePersonInfoResponse struct {
+type WritePersonInfoResponse struct {
     ErrorResp *ErrorResponnse                               `json:"error_response,omitempty" codec:"error_response,omitempty"`
-    Response  WriteWritePersonInfoResponse1 `json:"jingdong_interact_center_api_service_write_writePersonInfo_responce,omitempty" codec:"jingdong_interact_center_api_service_write_writePersonInfo_responce,omitempty"`
+    Response  WritePersonInfoResponse1 `json:"jingdong_interact_center_api_service_write_writePersonInfo_responce,omitempty" codec:"jingdong_interact_center_api_service_write_writePersonInfo_responce,omitempty"`
 }
 
-type WriteWritePersonInfoResponse1 struct {
-    Result WriteWritePersonInfoResult `json:"giftActivityResults" codec:"giftActivityResults"`
+type WritePersonInfoResponse1 struct {
+    Result WritePersonInfoResult `json:"giftActivityResults" codec:"giftActivityResults"`
 }
 
-type WriteWritePersonInfoResult struct {
+type WritePersonInfoResult struct {
     Data bool   `json:"data" codec:"data"` //请求是否成功
     Code uint   `json:"code" codec:"code"` //返回状态码
     Msg  string `json:"msg" codec:"msg"`
 }
 
-func WriteWritePersonInfo(req WriteWritePersonInfoRequest) (bool, error) {
+func WritePersonInfo(req WritePersonInfoRequest) (bool, error) {
     client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
     client.Debug = req.Debug
-    r := center.NewWriteWritePersonInfoRequest()
+    r := center.NewWritePersonInfoRequest()
     r.SetAppName(req.AppName)
     r.SetChannel(req.Channel)
     r.SetPin(req.Pin)
@@ -71,7 +71,7 @@ func WriteWritePersonInfo(req WriteWritePersonInfoRequest) (bool, error) {
         return false, err
     }
 
-    var response WriteWritePersonInfoResponse
+    var response WritePersonInfoResponse
     err = ljson.Unmarshal(result, &response)
     if err != nil {
         return false, err
