@@ -2,7 +2,6 @@ package vender
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -37,7 +36,6 @@ func CheckAuthForVenderId(req *CheckAuthForVenderIdRequest) (bool, error) {
 	r := vender.NewCheckAuthForVenderIdRequest()
 	r.SetPermCode(req.PermCode)
 	result, err := client.Execute(r.Request, req.Session)
-	fmt.Println(string(result))
 	if err != nil {
 		return false, err
 	}

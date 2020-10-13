@@ -2,7 +2,6 @@ package promotion
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -166,7 +165,6 @@ func FullCreate(req *FullCreateRequest) (uint64, error) {
 	}
 
 	result, err := client.Execute(r.Request, req.Session)
-	fmt.Println(string(result))
 	if err != nil {
 		return 0, err
 	}

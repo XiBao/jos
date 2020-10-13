@@ -2,7 +2,6 @@ package promotion
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/util"
@@ -45,7 +44,6 @@ func Suspend(req *SuspendRequest) (bool, error) {
 	}
 
 	result, err := client.Execute(r.Request, req.Session)
-	fmt.Println(string(result))
 	if err != nil {
 		return false, err
 	}
