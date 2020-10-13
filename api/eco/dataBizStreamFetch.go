@@ -2,7 +2,6 @@ package eco
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -94,9 +93,7 @@ func BizStreamFetch(req *BizStreamFetchRequest) ([]map[string]interface{}, error
 	if req.ActEffectId != "" {
 		r.SetActEffectId(req.ActEffectId)
 	}
-	fmt.Println(fmt.Sprintf("%#v", req))
 	result, err := client.Execute(r.Request, req.Session)
-	fmt.Println(fmt.Sprintf("%s", result))
 	if err != nil {
 		return nil, err
 	}
