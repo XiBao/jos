@@ -121,7 +121,9 @@ func (c *Client) Execute(req *Request, token string) (result []byte, err error) 
 		values.Add(k, v)
 	}
 	gwURL := GATEWAY_URL
-	if req.IsLogGW {
+	if c.Debug {
+		gwURL = GATEWAY_DEV_URL
+	} else if req.IsLogGW {
 		gwURL = LOG_GATEWAY_URL
 	} else if req.IsUnionGW {
 		gwURL = UNION_GATEWAY_URL

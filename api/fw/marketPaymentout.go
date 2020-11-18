@@ -2,7 +2,6 @@ package fw
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -96,7 +95,6 @@ func MarketPaymentout(req *MarketPaymentoutRequest) (*MarketPaymentoutReturnType
 	if req.SuccessUrl != "" {
 		r.SetSuccessUrl(req.SuccessUrl)
 	}
-	fmt.Println(fmt.Sprintf("%#v", req))
 
 	result, err := client.Execute(r.Request, req.Session)
 	if err != nil {

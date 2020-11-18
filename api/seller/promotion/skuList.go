@@ -17,6 +17,7 @@ type SkuListRequest struct {
 	PromoType int    `json:"promo_type" codec:"promo_type"`
 	Page      int    `json:"page,omitempty" codec:"page,omitempty"`
 	PageSize  int    `json:"page_size,omitempty" codec:"page_size,omitempty"`
+	BindType  uint8  `json:"bind_type,omitempey" codec:"bind_type,omitempty"`
 }
 type SkuListResponse struct {
 	ErrorResp *api.ErrorResponnse  `json:"error_response,omitempty" codec:"error_response,omitempty"`
@@ -56,6 +57,10 @@ func SkuList(req *SkuListRequest) ([]*PromotionSkuList, error) {
 		r.SetPromoType(req.PromoType)
 	} else {
 		r.SetPromoType(1)
+	}
+
+	if req.BindType > 0 {
+		r.SetBindType(req.BindType)
 	}
 
 	result, err := client.Execute(r.Request, req.Session)
