@@ -136,3 +136,15 @@ func (req *BizStreamFetchRequest) GetActEffectId() string {
 	}
 	return ""
 }
+
+func (req *BizStreamFetchRequest) SetTicketType(ticketType string) {
+	req.Request.Params["TICKETTYPE"] = ticketType
+}
+
+func (req *BizStreamFetchRequest) GetTicketType() string {
+	ticketType, found := req.Request.Params["TICKETTYPE"]
+	if found {
+		return ticketType.(string)
+	}
+	return ""
+}

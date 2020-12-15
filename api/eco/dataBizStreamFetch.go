@@ -21,6 +21,7 @@ type BizStreamFetchRequest struct {
 	Sku         string `json:"SKU,omitempty" codec:"SKU,omitempty"`
 	AdType      string `json:"ADTYPE,omitempty" codec:"ADTYPE,omitempty"`
 	ActEffectId string `json:"ACTEFFECTID,omitempty" codec:"ACTEFFECTID,omitempty"`
+	TicketType  string `json:"TICKETTYPE,omitempty" codec:"TICKETTYPE,omitempty"`
 }
 
 type BizStreamFetchResponse struct {
@@ -92,6 +93,9 @@ func BizStreamFetch(req *BizStreamFetchRequest) ([]map[string]interface{}, error
 	}
 	if req.ActEffectId != "" {
 		r.SetActEffectId(req.ActEffectId)
+	}
+	if req.TicketType != "" {
+		r.SetTicketType(req.TicketType)
 	}
 	result, err := client.Execute(r.Request, req.Session)
 	if err != nil {
