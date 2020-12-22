@@ -130,6 +130,10 @@ func (c *Client) Execute(req *Request, token string) (result []byte, err error) 
 	}
 	debug.DebugPrintPostJSONRequest(gwURL, Json(sysParams))
 	gatewayUrl := fmt.Sprintf(`%s?%s`, gwURL, values.Encode())
+	if c.Debug {
+		unescapeUrl, _ := url.QueryUnescape(gatewayUrl)
+		fmt.Println(unescapeUrl)
+	}
 	debug.DebugPrintGetRequest(gatewayUrl)
 	var (
 		response *http.Response
