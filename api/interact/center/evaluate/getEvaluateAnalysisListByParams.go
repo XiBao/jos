@@ -11,43 +11,39 @@ import (
 	"github.com/daviddengcn/ljson"
 )
 
-type GetEvaluateAnalysisListRequest struct {
+type GetEvaluateAnalysisListByParamsRequest struct {
 	api.BaseRequest
 	AppName    string `json:"appName" codec:"appName"`
 	Channel    uint8  `json:"channel" codec:"channel"`
 	ActivityId uint64 `json:"activityId" codec:"activityId"`
+	PageNumber uint   `json:"pageNumber" codec:"pageNumber"`
+	PageSize   uint   `json:"pageSize" codec:"pageSize"`
+	SkuId      uint64 `json:"skuId,omitempty" codec:"skuId,omitempty"`
 }
 
-type GetEvaluateAnalysisListResponse struct {
-	ErrorResp *api.ErrorResponnse          `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *GetEvaluateAnalysisListData `json:"jingdong_com_jd_interact_center_api_service_read_EvaluateAnalysisReadService_getAnalysisList_responce,omitempty" codec:"jingdong_com_jd_interact_center_api_service_read_EvaluateAnalysisReadService_getAnalysisList_responce,omitempty"`
+type GetEvaluateAnalysisListByParamsResponse struct {
+	ErrorResp *api.ErrorResponnse                  `json:"error_response,omitempty" codec:"error_response,omitempty"`
+	Data      *GetEvaluateAnalysisListByParamsData `json:"jingdong_com_jd_interact_center_api_service_read_EvaluateAnalysisReadService_getAnalysisListByParams_responce,omitempty" codec:"jingdong_com_jd_interact_center_api_service_read_EvaluateAnalysisReadService_getAnalysisListByParams_responce,omitempty"`
 }
 
-type GetEvaluateAnalysisListData struct {
+type GetEvaluateAnalysisListByParamsData struct {
 	Code      string              `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string              `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    []*EvaluateAnalysis `json:"result,omitempty" codec:"result,omitempty"`
 }
 
-type EvaluateAnalysis struct {
-	ActivityId    uint64  `json:"activity_id"`    // 活动id
-	PrizeRate     float64 `json:"prize_rate"`     // 获奖比率
-	Count         uint    `json:"count"`          // 活动期间的评价数量
-	StandardRate  float64 `json:"standard_rate"`  // 达标评价的数量
-	VenderId      uint64  `json:"vender_id"`      // 商家id
-	SkuId         uint64  `json:"sku_id"`         // skuId
-	Id            uint64  `json:"id"`             // 业务id
-	StandardCount uint    `json:"standard_count"` // 达标评价的数量
-	PrizeCount    uint    `json:"prize_count"`    // 获奖评价的数量
-}
-
-func GetEvaluateAnalysisList(req *GetEvaluateAnalysisListRequest) ([]*EvaluateAnalysis, error) {
+func GetEvaluateAnalysisListByParams(req *GetEvaluateAnalysisListByParamsRequest) ([]*EvaluateAnalysis, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
-	r := center.NewGetEvaluateAnalysisListRequest()
+	r := center.NewGetEvaluateAnalysisListByParamsRequest()
 	r.SetAppName(req.AppName)
 	r.SetChannel(req.Channel)
 	r.SetActivityId(req.ActivityId)
+	r.SetPageSize(req.PageSize)
+	r.SetPageNumber(req.PageNumber)
+	if req.SkuId > 0 {
+		r.SetSkuId(req.SkuId)
+	}
 
 	result, err := client.Execute(r.Request, req.Session)
 	if err != nil {
@@ -55,7 +51,7 @@ func GetEvaluateAnalysisList(req *GetEvaluateAnalysisListRequest) ([]*EvaluateAn
 	}
 	result = util.RemoveJsonSpace(result)
 
-	var response GetEvaluateAnalysisListResponse
+	var response GetEvaluateAnalysisListByParamsResponse
 	err = ljson.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err

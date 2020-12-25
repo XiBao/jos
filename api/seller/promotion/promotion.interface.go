@@ -8,16 +8,14 @@ type PromotionList struct {
 	FavorMode             int16   `json:"favor_mode" codec:"favor_mode"` // 促销子类型。0:满赠,1:满减,2:每满减, 3:百分比满减, 4: 阶梯满减,5:满赠加价购,6:满M件减N件,7:阶梯买M件减N件,13:M元任选N件,15:M件N折,16:满减送（元）
 	BeginTime             string  `json:"begin_time" codec:"begin_time"`
 	EndTime               string  `json:"end_time" codec:"end_time"`
-	Bound                 uint8   `json:"bound" codec:"bound"`                         // 促销范围。1：部分商品参加 2：全部商品参加 3：部分商品部参加 4：全场促销
-	Member                uint    `json:"member" codec:"member"`                       // 参加促销的会员级别
-	Slogan                string  `json:"slogan,omitempty" codec:"slogan,omitempty"`   // 促销宣传语
-	Comment               string  `json:"comment,omitempty" codec:"comment,omitempty"` // 促销备注信息
-	PromoStatus           int8    `json:"promo_status" codec:"promo_status"`           // 促销状态。-1:促销被创建但还没commit,0:无效,1:驳回,2:未审核,3:人工审,4:已审核,5:已生效,6:已暂停,7:强制暂停
-	Created               uint64  `json:"created" codec:"created"`
-	Modified              uint64  `json:"modified" codec:"modified"`
+	Bound                 uint8   `json:"bound" codec:"bound"`                                             // 促销范围。1：部分商品参加 2：全部商品参加 3：部分商品部参加 4：全场促销
+	Member                uint    `json:"member" codec:"member"`                                           // 参加促销的会员级别
+	Slogan                string  `json:"slogan,omitempty" codec:"slogan,omitempty"`                       // 促销宣传语
+	Comment               string  `json:"comment,omitempty" codec:"comment,omitempty"`                     // 促销备注信息
+	PromoStatus           int8    `json:"promo_status" codec:"promo_status"`                               // 促销状态。-1:促销被创建但还没commit,0:无效,1:驳回,2:未审核,3:人工审,4:已审核,5:已生效,6:已暂停,7:强制暂停
 	Platform              uint    `json:"platform" codec:"platform"`                                       // 平台类型（1、全渠道，2、手机客户端，3、微信，5、手Q）
 	Link                  string  `json:"link,omitempty" codec:"link,omitempty"`                           // 活动链接
-	ShopMember            uint    `json:"shop_member,omitempty" codec:"shop_member,omitempty"`             // 店铺会员级别
+	ShopMember            uint    `json:"shop_member,omitempty" codec:"shop_member,omitempty"`             // 店铺会员级别（5001:一星会员5002:二星会员5003:三星会员5004:四星会员5005:五星会员)
 	QqMember              uint    `json:"qq_member,omitempty" codec:"qq_member,omitempty"`                 // QQ会员级别
 	PlusMember            uint    `json:"plus_member" codec:"plus_member"`                                 // plus会员级别
 	MemberLevelOnly       bool    `json:"member_level_only" codec:"member_level_only"`                     // 是否是会员级别专享
@@ -46,6 +44,17 @@ type PromotionList struct {
 	UserPins              string  `json:"user_pins,omitempty" codec:"user_pins,omitempty"`                 // 令牌用户列表
 	PromoAreaType         uint8   `json:"promo_area_type,omitempty" codec:"promo_area_type,omitempty"`     // 促销区域类型： 2 白名单 3 黑名单
 	PromoAreas            string  `json:"promo_areas,omitempty" codec:"promo_areas,omitempty"`             // 促销区域列表（英文分号分隔）
+	FreePostage           uint8   `json:"free_postage,omitempty" codec:"free_postage,omitempty"`           // 总价促销是否免邮。1：免邮
+	TopMn                 uint8   `json:"top_mn,omitempty" codec:"top_mn,omitempty"`                       // 限时限量促销。1：限量2：限时
+	PromoChannels         string  `json:"promo_channels,omitempty" codec:"promo_channels,omitempty"`       // 开普勒渠道（英文分号分隔）
+	TargetPp              uint    `json:"target_pp,omitempty" codec:"target_pp,omitempty"`                 // 目标人群。1005家庭价1006流失用户1007首单新人价1009企业新人1010国际新人
+	NewPersonPrice        uint8   `json:"new_person_price,omitempty" codec:"new_person_price,omitempty"`   // 30天新人促销。1：30天新人促销
+	StudentPrice          uint8   `json:"student_price,omitempty" codec:"student_price,omitempty"`         // 学生价促销。1：学生价
+	Gaf                   uint8   `json:"gaf,omitempty" codec:"gaf,omitempty"`                             // 红包促销。1：红包促销
+	ShopFans              uint8   `json:"shop_fans,omitempty" coded:"shop_fans,omitempty"`                 // 粉丝促销。1：粉丝用户
+	PlatformSet           string  `json:"platform_set,omitempty" codec:"platform_set,omitempty"`           // 平台类型（英文分号分隔，原有platform作废）。1全渠道2APP专享3微信专享5手Q专享7PC专享8一号店26京东健康101京东极速版102京喜APP
+	Created               uint64  `json:"created" codec:"created"`
+	Modified              uint64  `json:"modified" codec:"modified"`
 	PromoCreated          string  `json:"promo_created,omitempty" codec:"promo_created,omitempty"`
 	PromoModified         string  `json:"promo_modified,omitempty" codec:"promo_modified,omitempty"`
 	IsExpired             uint8   `json:"is_expired" codec:"is_expired"`

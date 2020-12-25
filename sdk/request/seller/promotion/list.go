@@ -184,3 +184,15 @@ func (req *SellerPromotionListRequest) GetPageSize() int {
 	}
 	return 0
 }
+
+func (req *SellerPromotionListRequest) SetStartId(startId uint64) {
+	req.Request.Params["start_id"] = startId
+}
+
+func (req *SellerPromotionListRequest) GetStartId() uint64 {
+	startId, found := req.Request.Params["start_id"]
+	if found {
+		return startId.(uint64)
+	}
+	return 0
+}

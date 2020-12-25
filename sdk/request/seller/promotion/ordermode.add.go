@@ -100,3 +100,15 @@ func (req *SellerPromotionOrdermodeAddRequest) GetLink() string {
 	}
 	return ""
 }
+
+func (req *SellerPromotionOrdermodeAddRequest) SetFreePostage(freePostage string) {
+	req.Request.Params["free_postage"] = freePostage
+}
+
+func (req *SellerPromotionOrdermodeAddRequest) GetFreePostage() string {
+	freePostage, found := req.Request.Params["free_postage"]
+	if found {
+		return freePostage.(string)
+	}
+	return ""
+}

@@ -11,13 +11,14 @@ import (
 
 type OrdermodeAddRequest struct {
 	api.BaseRequest
-	PromoId   uint64 `json:"promo_id" codec:"promo_id"`     // 促销编号
-	FavorMode uint8  `json:"favor_mode" codec:"favor_mode"` // 订单规则类型，可选值：满赠（0），满减（1），每满减（2），满赠加价购（5），满M件减N件（6），M元任选N件（13），M件N折（15），满减送（元）（16）
-	Quota     string `json:"quota" codec:"quota"`           // 订单额度；（满M件减N件或M件N折时为M的值，单位件，只支持正整数；M元任选N件时为M的值，单位元，支持小数点后一位，例：9.9元；满减送时为订单满金额，单位元，只支持正整数；）
-	Rate      string `json:"rate" codec:"rate"`             // 优惠力度；（满M件减N件、M元任选N件时为N的值，单位件,只支持正整数；M件N折时为N的值，单位折，支持小数点后一位，例：8.5折；满减送不支持此字段，除满减送之外其它促销为必填项）
-	Plus      string `json:"plus" codec:"plus"`             // 加价金额，只支持正整数；（只满减送有效，且为可选项，该字段设置了值，必须送赠品）
-	Minus     string `json:"minus" codec:"minus"`           // 减金额，只支持正整数；（只满减送有效，且为可选项）
-	Link      string `json:"link" codec:"link"`             // 店铺活动链接地址
+	PromoId     uint64 `json:"promo_id" codec:"promo_id"`         // 促销编号
+	FavorMode   uint8  `json:"favor_mode" codec:"favor_mode"`     // 订单规则类型，可选值：满赠（0），满减（1），每满减（2），满赠加价购（5），满M件减N件（6），M元任选N件（13），M件N折（15），满减送（元）（16）
+	Quota       string `json:"quota" codec:"quota"`               // 订单额度；（满M件减N件或M件N折时为M的值，单位件，只支持正整数；M元任选N件时为M的值，单位元，支持小数点后一位，例：9.9元；满减送时为订单满金额，单位元，只支持正整数；）
+	Rate        string `json:"rate" codec:"rate"`                 // 优惠力度；（满M件减N件、M元任选N件时为N的值，单位件,只支持正整数；M件N折时为N的值，单位折，支持小数点后一位，例：8.5折；满减送不支持此字段，除满减送之外其它促销为必填项）
+	Plus        string `json:"plus" codec:"plus"`                 // 加价金额，只支持正整数；（只满减送有效，且为可选项，该字段设置了值，必须送赠品）
+	Minus       string `json:"minus" codec:"minus"`               // 减金额，只支持正整数；（只满减送有效，且为可选项）
+	Link        string `json:"link" codec:"link"`                 // 店铺活动链接地址
+	FreePostage string `json:"free_postage" codec:"free_postage"` // 是否免邮（促销下订单规则列表的包邮必须保持一致）。0：不免邮1：免邮
 }
 type OrdermodeAddResponse struct {
 	ErrorResp *api.ErrorResponnse       `json:"error_response,omitempty" codec:"error_response,omitempty"`
@@ -49,6 +50,9 @@ func OrdermodeAdd(req *OrdermodeAddRequest) ([]uint64, error) {
 	}
 	if req.Link != "" {
 		r.SetLink(req.Link)
+	}
+	if req.FreePostage != "" {
+		r.SetFreePostage(req.FreePostage)
 	}
 	result, err := client.Execute(r.Request, req.Session)
 	if err != nil {

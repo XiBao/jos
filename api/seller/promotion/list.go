@@ -21,6 +21,7 @@ type ListRequest struct {
 	PromoStatus string `json:"page_status,omitempty" codec:"page_status,omitempty"`
 	BeginTime   string `json:"begin_time,omitempty" codec:"begin_time,omitempty"`
 	EndTime     string `json:"end_time,omitempty" codec:"end_time,omitempty"`
+	StartId     uint64 `json:"start_id,omitempty" codec:"start_id,omitempty"`
 }
 type ListResponse struct {
 	ErrorResp *api.ErrorResponnse `json:"error_response,omitempty" codec:"error_response,omitempty"`
@@ -72,6 +73,9 @@ func List(req *ListRequest) ([]*PromotionList, error) {
 	}
 	if req.PromoStatus != "" {
 		r.SetPromoStatus(req.PromoStatus)
+	}
+	if req.StartId >= 0 {
+		r.SetStartId(req.StartId)
 	}
 	result, err := client.Execute(r.Request, req.Session)
 	if err != nil {
