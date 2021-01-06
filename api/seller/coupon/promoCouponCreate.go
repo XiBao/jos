@@ -2,7 +2,6 @@ package coupon
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -18,7 +17,7 @@ type PromoCouponCreateRequest struct {
 
 type PromoCouponCreateResponse struct {
 	ErrorResp *api.ErrorResponnse    `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *PromoCouponCreateData `json:"jingdong_pop_promo_coupon_create_responce,omitempty" codec:"jingdong_pop_promo_coupon_create_responce,omitempty"`
+	Data      *PromoCouponCreateData `json:"jingdong_pop_promo_coupon_createCoupon_responce,omitempty" codec:"jingdong_pop_promo_coupon_createCoupon_responce,omitempty"`
 }
 
 type PromoCouponCreateData struct {
@@ -43,7 +42,6 @@ func PromoCouponCreate(req *PromoCouponCreateRequest) (uint64, error) {
 	r.SetParam(req.CouponOuterParam)
 
 	result, err := client.Execute(r.Request, req.Session)
-	fmt.Println(string(result))
 	if err != nil {
 		return 0, err
 	}

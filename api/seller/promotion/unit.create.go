@@ -2,7 +2,6 @@ package promotion
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -43,7 +42,6 @@ func UnitCreate(req *UnitCreateRequest) (uint64, error) {
 	r.SetPromoParam(req.PromoParam)
 
 	result, err := client.Execute(r.Request, req.Session)
-	fmt.Println(string(result))
 	if err != nil {
 		return 0, err
 	}

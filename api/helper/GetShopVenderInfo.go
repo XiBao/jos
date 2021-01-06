@@ -17,7 +17,6 @@ func GetShopVenderInfo(req *GetShopVenderInfoRequest) (*vender.ShopInfo, error) 
 		BaseRequest: api.BaseRequest{
 			Session:  req.Session,
 			AnApiKey: req.AnApiKey,
-			Debug:    req.Debug,
 		},
 	})
 	if err != nil {
@@ -27,7 +26,6 @@ func GetShopVenderInfo(req *GetShopVenderInfoRequest) (*vender.ShopInfo, error) 
 		BaseRequest: api.BaseRequest{
 			Session:  req.Session,
 			AnApiKey: req.AnApiKey,
-			Debug:    req.Debug,
 		},
 	})
 	if err != nil {

@@ -35,22 +35,17 @@ func SkuList(req *SkuListRequest) ([]*PromotionSkuList, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionSkuListRequest()
+	r.SetPromoId(req.PromoId)
 	if req.PageSize > 0 {
 		r.SetPageSize(req.PageSize)
 	} else {
-		r.SetPageSize(100)
+		r.SetPageSize(20)
 	}
 
 	if req.Page > 0 {
 		r.SetPage(req.Page)
 	} else {
 		r.SetPage(1)
-	}
-
-	if req.PromoId > 0 {
-		r.SetPromoId(req.PromoId)
-	} else {
-		return nil, errors.New("no promo id")
 	}
 
 	if req.PromoType > 0 {
