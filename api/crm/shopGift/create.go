@@ -27,8 +27,8 @@ type ShopGiftCreateRequest struct {
 	OpenIdSeller  string `json:"open_id_seller" codec:"open_id_seller"`               // 活动创建者，商家用户pin
 	OpenIdIsv     string `json:"open_id_isv" codec:"open_id_isv"`                     // 创建者的用户pin
 	Discount      string `json:"discount" codec:"discount"`                           // 优惠金额 单位奖项额度 京券、东券、京豆、积分； 例满100减1的东券，此处填写1，
-	Quota         string `json:"quota" codec:"quota"`                                 // 满足优惠的消费金额 -东券；例满100减1的东券，此处填写100
-	ValidateDay   string `json:"validateDay" codec:"validateDay"`                     // 有效期(天数) --东券 京券
+	Quota         string `json:"quota,omitempty" codec:"quota,omitempty"`             // 满足优惠的消费金额 -东券；例满100减1的东券，此处填写100
+	ValidateDay   string `json:"validateDay,omitempty" codec:"validateDay,omitempty"` // 有效期(天数) --东券 京券
 	PrizeType     string `json:"prizeType" codec:"prizeType"`                         // 奖品类型code及代表类型如下： 0:京券 1:东券 4:京豆 6:积分
 	SendCount     string `json:"sendCount" codec:"sendCount"`                         // 奖项发放人数
 }
@@ -45,9 +45,9 @@ type ShopGiftCreateData struct {
 }
 
 type ShopGiftCreateResult struct {
-	Code string `json:"code,omitempty" codec:"code,omiempty"`
+	Code string `json:"code,omitempty" codec:"code,omitempty"`
 	Data uint64 `json:"data,omitempty" codec:"data,omitempty"`
-	Desc string `json:"desc,omitempty" codec:"desc,oomitempty"`
+	Desc string `json:"desc,omitempty" codec:"desc,omitempty"`
 }
 
 func ShopGiftCreate(req *ShopGiftCreateRequest) (uint64, error) {
@@ -90,6 +90,9 @@ func ShopGiftCreate(req *ShopGiftCreateRequest) (uint64, error) {
 	}
 	var response ShopGiftCreateResponse
 	err = ljson.Unmarshal(result, &response)
+	if err != nil {
+		return 0, err
+	}
 	if response.ErrorResp != nil {
 		return 0, response.ErrorResp
 	}

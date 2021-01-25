@@ -2,7 +2,6 @@ package coupon
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -30,7 +29,7 @@ type PromoCouponCheckDiscountAuthData struct {
 }
 
 type PromoCouponCheckDiscountAuthResult struct {
-	Code    string `json:"code,omitempty" codec:"code,omiempty"`
+	Code    string `json:"code,omitempty" codec:"code,omitempty"`
 	Success bool   `json:"success,omitempty" codec:"success,omitempty"`
 	Data    bool   `json:"data,omitempty" codec:"data,omitempty"`
 	Msg     string `json:"msg,omitempty" codec:"msg.omitempty"`
@@ -51,7 +50,6 @@ func PromoCouponCheckDiscountAuth(req *PromoCouponCheckDiscountAuthRequest) (boo
 		r.SetAppId(req.AppId)
 	}
 	result, err := client.Execute(r.Request, req.Session)
-	fmt.Println(string(result))
 	if err != nil {
 		return false, err
 	}

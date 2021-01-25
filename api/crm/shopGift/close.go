@@ -27,39 +27,42 @@ type ShopGiftCloseData struct {
 }
 
 type ShopGiftCloseResult struct {
-	Code string `json:"code,omitempty" codec:"code,omiempty"`
-	Data uint64 `json:"data,omitempty" codec:"data,omitempty"`
-	Desc string `json:"desc,omitempty" codec:"desc,oomitempty"`
+	Code string `json:"code,omitempty" codec:"code,omitempty"`
+	Data bool   `json:"data,omitempty" codec:"data,omitempty"`
+	Desc string `json:"desc,omitempty" codec:"desc,omitempty"`
 }
 
-func ShopGiftClose(req *ShopGiftCloseRequest) (uint64, error) {
+func ShopGiftClose(req *ShopGiftCloseRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewShopGiftCloseRequest()
 	r.SetActivityId(req.ActivityId)
 	result, err := client.Execute(r.Request, req.Session)
 	if err != nil {
-		return 0, err
+		return false, err
 	}
 	if len(result) == 0 {
-		return 0, errors.New("No result info.")
+		return false, errors.New("No result info.")
 	}
 	var response ShopGiftCloseResponse
 	err = ljson.Unmarshal(result, &response)
+	if err != nil {
+		return false, err
+	}
 	if response.ErrorResp != nil {
-		return 0, response.ErrorResp
+		return false, response.ErrorResp
 	}
 	if response.Data.Code != "0" {
-		return 0, errors.New(response.Data.ErrorDesc)
+		return false, errors.New(response.Data.ErrorDesc)
 	}
 	if response.Data.Result == nil {
-		return 0, errors.New("No close result.")
+		return false, errors.New("No close result.")
 	}
 	if response.Data.Result.Code != "200" {
 		if response.Data.Result.Desc == "" {
-			return 0, errors.New("未知错误")
+			return false, errors.New("未知错误")
 		} else {
-			return 0, errors.New(response.Data.Result.Desc)
+			return false, errors.New(response.Data.Result.Desc)
 		}
 	}
 	return response.Data.Result.Data, nil

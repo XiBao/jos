@@ -17,11 +17,11 @@ func NewShopGiftCloseRequest() (req *ShopGiftCloseRequest) {
 	return
 }
 
-func (req *ShopGiftCreateRequest) SetActivityId(activityId uint64) {
+func (req *ShopGiftCloseRequest) SetActivityId(activityId uint64) {
 	req.Request.Params["activityId"] = activityId
 }
 
-func (req *ShopGiftCreateRequest) GetActivityId() uint64 {
+func (req *ShopGiftCloseRequest) GetActivityId() uint64 {
 	activityId, found := req.Request.Params["activityId"]
 	if found {
 		return activityId.(uint64)

@@ -10,7 +10,7 @@ type OrderReq struct {
 	Type         uint   `json:"type"`
 	Time         string `json:"time"`
 	ChildUnionId string `json:"childUnionId,omitempty"`
-	Key          string `json:"key,omiempty"`
+	Key          string `json:"key,omitempty"`
 }
 
 type UnionOrderQueryRequest struct {

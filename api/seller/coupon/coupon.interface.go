@@ -14,7 +14,7 @@ type Coupon struct {
 	GrantType              uint                                        `json:"grantType,omitempty"`              // 发放类型 1促销绑定 2推送 3免费领取 4京豆换券 5互动平台
 	Num                    uint                                        `json:"num,omitempty"`                    // 优惠券数量
 	Discount               float64                                     `json:"discount,omitempty"`               // 优惠券面额
-	Quota                  uint                                        `json:"quota,omitempty"`                  // 优惠限额
+	Quota                  float64                                     `json:"quota,omitempty"`                  // 优惠限额
 	ValidityType           uint                                        `json:"validityType,omitempty"`           // 有效期类型 1相对时间 5绝对时间
 	Days                   uint                                        `json:"days,omitempty"`                   // 有效期
 	BeginTime              int64                                       `json:"beginTime,omitempty"`              // 有效期开始时间

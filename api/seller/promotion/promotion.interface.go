@@ -58,6 +58,7 @@ type PromotionList struct {
 	PromoCreated          string  `json:"promo_created,omitempty" codec:"promo_created,omitempty"`
 	PromoModified         string  `json:"promo_modified,omitempty" codec:"promo_modified,omitempty"`
 	IsExpired             uint8   `json:"is_expired" codec:"is_expired"`
+	IsNotBegin            uint8   `json:"is_not_begin" codec:"is_not_begin"`
 	OrderAmt              float64 `json:"order_amt,omitempty" codec:"order_amt,omitempty"`
 }
 
