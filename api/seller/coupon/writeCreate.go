@@ -113,7 +113,7 @@ func CouponWriteCreate(req *CouponWriteCreateRequest) (uint64, error) {
 		r.SetActivityLink(req.ActivityLink)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
+	result, err := client.PostExecute(r.Request, req.Session)
 	if err != nil {
 		return 0, err
 	}

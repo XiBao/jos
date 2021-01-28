@@ -51,7 +51,7 @@ func SkuAdd(req *SkuAddRequest) ([]uint64, error) {
 	if req.BindType != "" {
 		r.SetBindType(req.BindType)
 	}
-	result, err := client.Execute(r.Request, req.Session)
+	result, err := client.PostExecute(r.Request, req.Session)
 	if err != nil {
 		return nil, err
 	}

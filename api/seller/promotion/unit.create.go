@@ -41,7 +41,7 @@ func UnitCreate(req *UnitCreateRequest) (uint64, error) {
 	r.SetClient(req.Client)
 	r.SetPromoParam(req.PromoParam)
 
-	result, err := client.Execute(r.Request, req.Session)
+	result, err := client.PostExecute(r.Request, req.Session)
 	if err != nil {
 		return 0, err
 	}

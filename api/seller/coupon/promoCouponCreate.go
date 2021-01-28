@@ -41,7 +41,7 @@ func PromoCouponCreate(req *PromoCouponCreateRequest) (uint64, error) {
 	r.SetClientInfo(req.ClientInfo)
 	r.SetParam(req.CouponOuterParam)
 
-	result, err := client.Execute(r.Request, req.Session)
+	result, err := client.PostExecute(r.Request, req.Session)
 	if err != nil {
 		return 0, err
 	}

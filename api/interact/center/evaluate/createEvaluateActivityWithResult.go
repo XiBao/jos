@@ -161,7 +161,7 @@ func CreateEvaluateActivityWithResult(req *CreateEvaluateActivityWithResultReque
 		r.SetWordRequirement(req.WordRequirement)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
+	result, err := client.PostExecute(r.Request, req.Session)
 	if err != nil {
 		return 0, err
 	}
