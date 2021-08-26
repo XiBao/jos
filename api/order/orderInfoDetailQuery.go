@@ -7,15 +7,18 @@ import (
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/order"
 	"github.com/bububa/ljson"
+
+	"github.com/XiBao/jos/api/util"
 )
 
 type OrderInfoDetailQueryRequest struct {
 	BaseRequest
 
 	ActivityId uint64 `json:"activityId,omitempty" codec:"activityId,omitempty"`
+	VenderId   uint64 `json:"venderId,omitempty" codec:"venderId,omitempty"`
 	IsvSign    string `json:"isvSign,omitempty" codec:"isvSign,omitempty"`
-	PageNo     int    `json:"pageNo,omitempty" codec:"pageNo,omitempty"`
-	RowNo      int    `json:"rowNo,omitempty" codec:"rowNo,omitempty"`
+	StartRow   int    `json:"startRow,omitempty" codec:"startRow,omitempty"`
+	EndRow     int    `json:"endRow,omitempty" codec:"endRow,omitempty"`
 	SearchDate string `json:"searchDate,omitempty" codec:"searchDate,omitempty"`
 }
 
@@ -37,27 +40,28 @@ type OrderInfoDetailQueryResult struct {
 }
 
 type OrderInfoDetailQueryContent struct {
-	SkuString  string  `json:"sku_string"`
+	SkuString  string  `json:"skuString"`
 	Pin        string  `json:"pin"`
 	CreateTime string  `json:"create_time"`
-	OrderId    string  `json:"order_id"`
-	DealAmount float64 `json:"deal_amount"`
-	VenderId   string  `json:"vender_id"`
+	OrderId    string  `json:"orderId"`
+	SaleOrdDt  string  `json:"saleOrdDt"`
+	DealAmount float64 `json:"dealAmount"`
+	VenderId   string  `json:"venderId"`
+	RankId     uint    `json:"rendId"`
+	TotalRows  uint    `json:"totalRows"`
 }
 
 func OrderInfoDetailQuery(req *OrderInfoDetailQueryRequest) ([]OrderInfoDetailQueryContent, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := order.NewOrderInfoDetailQueryRequest()
+	r.SetVenderId(req.VenderId)
 	r.SetActivityId(req.ActivityId)
+	r.SetStartRow(req.StartRow)
+	r.SetEndRow(req.EndRow)
+
 	if req.IsvSign != "" {
 		r.SetIsvSign(req.IsvSign)
-	}
-	if req.PageNo > 0 {
-		r.SetPageNo(req.PageNo)
-	}
-	if req.RowNo > 0 {
-		r.SetRowNo(req.RowNo)
 	}
 	if req.SearchDate != "" {
 		r.SetSearchDate(req.SearchDate)
@@ -67,7 +71,7 @@ func OrderInfoDetailQuery(req *OrderInfoDetailQueryRequest) ([]OrderInfoDetailQu
 	if err != nil {
 		return nil, err
 	}
-	result = RemoveJsonSpace(result)
+	result = util.RemoveJsonSpace(result)
 
 	var response OrderInfoDetailQueryResponse
 	err = ljson.Unmarshal(result, &response)

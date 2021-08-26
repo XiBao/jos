@@ -1,3 +1,5 @@
+github.com/bububa/ljson v0.0.0-20170219111042-5e36bd133e32 h1:OYBJLkSYSVS56hDQbP5KBxeXMx+fkIVuxEn31QEqFMo=
+github.com/bububa/ljson v0.0.0-20170219111042-5e36bd133e32/go.mod h1:lPz3cUaf4fXbEVN2rKqQOlXhwionXQ2NxAmUrA4ClJg=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/daviddengcn/ljson v0.0.0-20151005073359-c7991804aec0 h1:7e6+RbcU1QmmUQaE+lrvHb0XY/mMoch+4yRWk6UfsDc=

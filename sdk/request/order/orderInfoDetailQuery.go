@@ -17,6 +17,18 @@ func NewOrderInfoDetailQueryRequest() (req *OrderInfoDetailQueryRequest) {
 	return
 }
 
+func (req *OrderInfoDetailQueryRequest) SetVenderId(venderId uint64) {
+	req.Request.Params["venderId"] = venderId
+}
+
+func (req *OrderInfoDetailQueryRequest) GetVenderId() uint64 {
+	venderId, found := req.Request.Params["venderId"]
+	if found {
+		return venderId.(uint64)
+	}
+	return 0
+}
+
 func (req *OrderInfoDetailQueryRequest) SetActivityId(activityId uint64) {
 	req.Request.Params["activityId"] = activityId
 }
@@ -41,26 +53,26 @@ func (req *OrderInfoDetailQueryRequest) GetIsvSign() string {
 	return ""
 }
 
-func (req *OrderInfoDetailQueryRequest) SetPageNo(pageNo int) {
-	req.Request.Params["pageNo"] = pageNo
+func (req *OrderInfoDetailQueryRequest) SetStartRow(startRow int) {
+	req.Request.Params["startRow"] = startRow
 }
 
-func (req *OrderInfoDetailQueryRequest) GetPageNo() int {
-	pageNo, found := req.Request.Params["pageNo"]
+func (req *OrderInfoDetailQueryRequest) GetStartRow() int {
+	startRow, found := req.Request.Params["startRow"]
 	if found {
-		return pageNo.(int)
+		return startRow.(int)
 	}
 	return 0
 }
 
-func (req *OrderInfoDetailQueryRequest) SetRowNo(rowNo int) {
-	req.Request.Params["rowNo"] = rowNo
+func (req *OrderInfoDetailQueryRequest) SetEndRow(endRow int) {
+	req.Request.Params["endRow"] = endRow
 }
 
-func (req *OrderInfoDetailQueryRequest) GetRowNo() int {
-	rowNo, found := req.Request.Params["rowNo"]
+func (req *OrderInfoDetailQueryRequest) GetEndRow() int {
+	endRow, found := req.Request.Params["endRow"]
 	if found {
-		return rowNo.(int)
+		return endRow.(int)
 	}
 	return 0
 }
