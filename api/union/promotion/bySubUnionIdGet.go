@@ -13,7 +13,7 @@ import (
 
 type UnionPromotionBySubUnionIdGetResponse struct {
 	ErrorResp *api.ErrorResponnse             `json:"error_response,omitempty"`
-	Data      *UnionPromotionCodeResponseData `json:"jd_union_open_promotion_bysubunionid_get_response,omitempty"`
+	Data      *UnionPromotionCodeResponseData `json:"jd_union_open_promotion_bysubunionid_get_responce,omitempty"`
 }
 
 // 获取通用推广链接

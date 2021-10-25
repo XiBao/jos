@@ -98,7 +98,7 @@ func (c *Client) Execute(req *Request, token string) (result []byte, err error) 
 	if paramJson, e := json.Marshal(req.Params); e != nil {
 		return nil, e
 	} else if req.IsUnionGW {
-		sysParams["param_json"] = string(paramJson)
+		sysParams["360buy_param_json"] = string(paramJson)
 	} else {
 		sysParams["360buy_param_json"] = string(paramJson)
 	}
@@ -168,7 +168,7 @@ func (c *Client) PostExecute(req *Request, token string) (result []byte, err err
 	if paramJson, e := json.Marshal(req.Params); e != nil {
 		return nil, e
 	} else if req.IsUnionGW {
-		sysParams["param_json"] = string(paramJson)
+		sysParams["360buy_param_json"] = string(paramJson)
 	} else {
 		sysParams["360buy_param_json"] = string(paramJson)
 	}

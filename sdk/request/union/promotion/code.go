@@ -6,7 +6,7 @@ import (
 
 type PromotionCodeReq struct {
 	MaterialId string `json:"materialId"`
-	SiteId     string `json:"siteId"`
+	SiteId     string `json:"siteId,omitempty"`
 	PositionId uint64 `json:"positionId,omitempty"`
 	SubUnionId string `json:"subUnionId,omitempty"`
 	Ext1       string `json:"ext1,omitempty"`

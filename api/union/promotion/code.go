@@ -14,7 +14,7 @@ import (
 type UnionPromotionCodeRequest struct {
 	api.BaseRequest
 	MaterialId string `json:"materialId"`           // 推广物料
-	SiteId     string `json:"siteId"`               // 站点ID是指在联盟后台的推广管理中的网站Id、APPID（1、通用转链接口禁止使用社交媒体id入参；2、订单来源，即投放链接的网址或应用必须与传入的网站ID/AppID备案一致，否则订单会判“无效-来源与备案网址不符”）
+	SiteId     string `json:"siteId,omitempty"`     // 站点ID是指在联盟后台的推广管理中的网站Id、APPID（1、通用转链接口禁止使用社交媒体id入参；2、订单来源，即投放链接的网址或应用必须与传入的网站ID/AppID备案一致，否则订单会判“无效-来源与备案网址不符”）
 	PositionId uint64 `json:"positionId,omitempty"` // 推广位id
 	SubUnionId string `json:"subUnionId,omitempty"` // 子联盟ID（需要联系运营开通权限才能拿到数据）
 	Ext1       string `json:"ext1,omitempty"`       // 推客生成推广链接时传入的扩展字段（查看订单对应字段信息，需要联系运营开放白名单才能看到）
@@ -29,7 +29,7 @@ type UnionPromotionCodeResponse struct {
 }
 
 type UnionPromotionCodeResponseData struct {
-	Result string `json:"result,omitempty"`
+	Result string `json:"getResult,omitempty"`
 }
 
 type UnionPromotioncodeResult struct {
