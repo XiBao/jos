@@ -25,7 +25,7 @@ type UnionPromotionCodeRequest struct {
 
 type UnionPromotionCodeResponse struct {
 	ErrorResp *api.ErrorResponnse             `json:"error_response,omitempty"`
-	Data      *UnionPromotionCodeResponseData `json:"jd_union_open_promotion_common_get_response,omitempty"`
+	Data      *UnionPromotionCodeResponseData `json:"jd_union_open_promotion_common_get_responce,omitempty"`
 }
 
 type UnionPromotionCodeResponseData struct {
