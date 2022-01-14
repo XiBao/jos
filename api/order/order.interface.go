@@ -1,5 +1,38 @@
 package order
 
+type JdOrderInfo struct {
+	OrderType          int       `json:"orderType,omitempty" codec:"orderType,omitempty"`                   // 订单类型（22 SOP； 75 LOC） 可选字段，需要在输入参数optional_fields中写入才能返回
+	OrderCreated       int64     `json:"orderCreated,omitempty" codec:"orderCreated,omitempty"`             // 订单创建时间
+	Skus               []SkuInfo `json:"skus,omitempty" codec:"skus,omitempty"`                             // 商品信息
+	OrderId            uint64    `json:"orderId,omitempty" codec:"orderId,omitempty"`                       // 订单id
+	City               string    `json:"city,omitempty" codec:"city,omitempty"`                             // 市
+	Town               string    `json:"town,omitempty" codec:"town,omitempty"`                             // 县
+	PaymentConfirmTime int64     `json:"paymentConfirmTime,omitempty" codec:"paymentConfirmTime,omitempty"` // 支付时间
+	Province           string    `json:"province,omitempty" codec:"province,omitempty"`                     // 省
+	ParentId           uint64    `json:"parentId,omitempty" codec:"parentId,omitempty"`                     // 父订单
+	Pin                string    `json:"pin,omitempty" codec:"pin,omitempty"`                               // pin
+	County             string    `json:"county,omitempty" codec:"county,omitempty"`                         // 区
+	OrderEndTime       int64     `json:"orderEndTime,omitempty" codec:"orderEndTime,omitempty"`             // 订单完成时间
+	OrderPrice         float64   `json:"orderPrice,omitempty" codec:"orderPrice,omitempty"`                 // 订单价格
+	ShopId             uint64    `json:"shopId,omitempty" codec:"shopId,omitempty"`                         // 商家ID
+	Status             string    `json:"status,omitempty" codec:"status,omitempty"`                         // NOT_PAY 等待付款 ；SUSPEND 暂停； WAIT_DELIVERY 等待出库；WAIT_SHIPMENTS 等待发货；FINISH 完成 ；CANCEL 取消；LOCK 锁定;
+	SendPay            string    `json:"sendPay,omitempty" codec:"sendPay,omitempty"`                       // SendPay
+	DeliveryTime       int64     `json:"deliveryTime,omitempty" codec:"deliveryTime,omitempty"`             // 出库发货时间
+	PaymentType        string    `json:"paymentType,omitempty" codec:"paymentType,omitempty"`               // 支付方式
+	OrderCancelTime    int64     `json:"orderCancelTime,omitempty" codec:"orderCancelTime,omitempty"`       // 取消时间
+	DParentId          uint64    `json:"dParentId,omitempty" codec:"dParentId,omitempty"`                   // 父订单号
+	OpenIdBuyer        string    `json:"open_id_buyer,omitempty" codec:"open_id_buyer,omitempty"`           // pin
+	XidBuyer           string    `json:"xid_buyer,omitempty" codec:"xid_buyer,omitempty"`                   // pin
+}
+
+type SkuInfo struct {
+	SkuName  string  `json:"skuName"`          // 商品名称
+	Number   int     `json:"number"`           // 数量
+	SkuPrice float64 `json:"skuPrice"`         // 价格
+	SkuId    string  `json:"skuId"`            // SKUID
+	WareId   string  `json:"wareId,omitempty"` // WareID
+}
+
 type OrderInfo struct {
 	OrderId             string           `json:"orderId,omitempty" codec:"orderId,omitempty"`                         // 订单id
 	VenderId            string           `json:"venderId,omitempty" codec:"venderId,omitempty"`                       // 商家id
