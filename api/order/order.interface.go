@@ -58,6 +58,7 @@ type OrderInfo struct {
 	VenderRemark        string           `json:"venderRemark,omitempty" codec:"venderRemark,omitempty"`               // 商家订单备注（不大于500字符） 可选字段，需要在输入参数optional_fields中写入才能返回
 	BalanceUsed         string           `json:"balanceUsed,omitempty" codec:"balanceUsed,omitempty"`                 // 余额支付金额 可选字段，需要在输入参数optional_fields中写入才能返回
 	Pin                 string           `json:"pin,omitempty" codec:"pin,omitempty"`                                 // 买家的账号信息 可选字段，需要在输入参数optional_fields中写入才能返回
+	RealPin             string           `json:"realPin,omitempty" codec:"realPin,omitempty"`                         // 买家真实pin
 	ReturnOrder         string           `json:"returnOrder,omitempty" codec:"returnOrder,omitempty"`                 // 售后订单标记 0:不是换货订单 1返修发货,直接赔偿,客服补件 2售后调货 可选字段，需要在输入参数optional_fields中写入才能返回
 	PaymentConfirmTime  string           `json:"paymentConfirmTime,omitempty" codec:"paymentConfirmTime,omitempty"`   // 付款确认时间 如果没有付款时间 默认返回0001-01-01 00:00:00 可选字段，需要在输入参数optional_fields中写入才能返回
 	Waybill             string           `json:"waybill,omitempty" codec:"waybill,omitempty"`                         // 运单号(当厂家自送时运单号可为空，不同物流公司的运单号用|分隔，如果同一物流公司有多个运单号，则用英文逗号分隔) 可选字段，需要在输入参数optional_fields中写入才能返回

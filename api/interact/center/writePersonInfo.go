@@ -16,6 +16,7 @@ type WritePersonInfoRequest struct {
 	Channel     uint8  `json:"channel,omitempty" codec:"channel,omitempty"`             // PC:1, APP:2, 任务中心:3,发现频道:4, 上海运营模板::5 , 微信: 6, QQ: 7, ARVR: 9
 	Pin         string `json:"pin,omitempty" codec:"pin,omitempty"`                     // 用户pin
 	OpenIdBuyer string `json:"open_id_buyer,omitempty" codec:"open_id_buyer,omitempty"` // 用户pin
+	XIdBuyer    string `json:"xid_buyer,omitempty" codec:"xid_buyer,omitempty"`         // 用户pin
 	ProfileUrl  string `json:"profileUrl,omitempty" codec:"profileUrl,omitempty"`       // 用户头像连接 非必填
 	ActivityId  string `json:"activityId,omitempty" codec:"activityId,omitempty"`       // 活动id
 	Created     string `json:"created,omitempty" codec:"created,omitempty"`             // 创建时间
@@ -56,6 +57,7 @@ func WritePersonInfo(req WritePersonInfoRequest) (bool, error) {
 	r.SetChannel(req.Channel)
 	r.SetPin(req.Pin)
 	r.SetOpenIdBuyer(req.OpenIdBuyer)
+	r.SetXIdBuyer(req.XIdBuyer)
 	r.SetActivityId(req.ActivityId)
 	r.SetCreated(req.Created)
 	r.SetStartTime(req.StartTime)
