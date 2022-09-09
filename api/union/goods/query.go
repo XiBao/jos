@@ -41,7 +41,7 @@ type QueryRequest struct {
 
 type QueryResponse struct {
 	ErrorResp *api.ErrorResponnse `json:"error_response,omitempty"`
-	Data      *QueryResponseData  `json:"jd_union_open_goods_query_response,omitempty"`
+	Data      *QueryResponseData  `json:"jd_union_open_goods_query_responce,omitempty"`
 }
 
 type QueryResponseData struct {
