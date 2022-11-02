@@ -100,11 +100,11 @@ type CatInfo struct {
 
 type GoodInfo struct {
 	ImageUrl  string `json:"imageUrl,omitempty"`  // sku主图链接
-	Owner     string `json:"owner",omitempty`     // g=自营，p=pop
+	Owner     string `json:"owner,omitempty"`     // g=自营，p=pop
 	MainSkuId uint64 `json:"mainSkuId,omitempty"` // 自营商品主Id（owner=g取此值）
 	ProductId uint64 `json:"productId,omitempty"` // 非自营商品主Id（owner=p取此值）
 	ShopName  string `json:"shopName,omitempty"`  // 店铺名称（或供应商名称）
-	ShopId    uint64 `json:"shopId,omitempty"`    // 店铺Id
+	ShopId    int64  `json:"shopId,omitempty"`    // 店铺Id
 }
 
 // 订单查询接口
