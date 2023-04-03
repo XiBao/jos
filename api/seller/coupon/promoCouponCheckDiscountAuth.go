@@ -32,7 +32,7 @@ type PromoCouponCheckDiscountAuthResult struct {
 	Code    string `json:"code,omitempty" codec:"code,omitempty"`
 	Success bool   `json:"success,omitempty" codec:"success,omitempty"`
 	Data    bool   `json:"data,omitempty" codec:"data,omitempty"`
-	Msg     string `json:"msg,omitempty" codec:"msg.omitempty"`
+	Msg     string `json:"msg,omitempty" codec:"msg,omitempty"`
 }
 
 func PromoCouponCheckDiscountAuth(req *PromoCouponCheckDiscountAuthRequest) (bool, error) {
