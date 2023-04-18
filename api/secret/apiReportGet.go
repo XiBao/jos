@@ -1,12 +1,12 @@
 package secret
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/secret"
-	"github.com/daviddengcn/ljson"
 )
 
 type SecretApiReportGetRequest struct {
@@ -52,7 +52,7 @@ func SecretApiReportGet(req *SecretApiReportGetRequest) error {
 		return errors.New("No result.")
 	}
 	var response SecretApiReportGetResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return err
 	}

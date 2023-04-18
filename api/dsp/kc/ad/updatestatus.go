@@ -1,12 +1,12 @@
 package ad
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/ad"
-	"github.com/daviddengcn/ljson"
 )
 
 type AdUpdateStatusRequest struct {
@@ -48,7 +48,7 @@ func AdUpdateStatus(req *AdUpdateStatusRequest) (bool, error) {
 		return false, errors.New("no result info")
 	}
 	var response AdUpdateStatusResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

@@ -1,12 +1,12 @@
 package promotion
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
-	"github.com/daviddengcn/ljson"
 )
 
 type RemovePromoUsersRequest struct {
@@ -64,7 +64,7 @@ func RemovePromoUsers(req *RemovePromoUsersRequest) (interface{}, error) {
 	}
 
 	var response RemovePromoUsersResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

@@ -1,12 +1,12 @@
 package fullcoupon
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/fullcoupon"
-	"github.com/daviddengcn/ljson"
 )
 
 // 满额返券活动详情查询
@@ -48,7 +48,7 @@ func GetPromoDetailInfo(req *FullCouponGetPromoDetailInfoRequest) (*PromoDetails
 	}
 
 	var response FullCouponGetPromoDetailInfoResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,7 @@
 package report
 
 import (
+	"encoding/json"
 	"errors"
 	"strconv"
 	"time"
@@ -8,7 +9,6 @@ import (
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/report"
-	"github.com/daviddengcn/ljson"
 )
 
 type AdgroupkeywordQueryRequest struct {
@@ -236,7 +236,7 @@ func AdgroupkeywordQuery(req *AdgroupkeywordQueryRequest) ([]*JosKeyword, error)
 		return nil, errors.New("no result info")
 	}
 	var response AdgroupkeywordQueryResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

@@ -1,12 +1,12 @@
 package jm
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/jm"
-	"github.com/daviddengcn/ljson"
 )
 
 type GetEncryptPinNewRequest struct {
@@ -47,7 +47,7 @@ func GetEncryptPinNew(req *GetEncryptPinNewRequest) (string, error) {
 		return ``, errors.New("No result info.")
 	}
 	var response GetEncryptPinNewResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return ``, err
 	}

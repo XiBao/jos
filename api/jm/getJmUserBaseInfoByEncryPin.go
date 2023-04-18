@@ -1,13 +1,13 @@
 package jm
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/user"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/jm"
-	"github.com/daviddengcn/ljson"
 )
 
 type GetJmUserBaseInfoByEncryPinRequest struct {
@@ -42,7 +42,7 @@ func GetJmUserBaseInfoByEncryPin(req *GetJmUserBaseInfoByEncryPinRequest) (*user
 		return nil, errors.New("no result.")
 	}
 	var response GetJmUserBaseInfoByEncryPinResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

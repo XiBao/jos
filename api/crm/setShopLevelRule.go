@@ -1,12 +1,12 @@
 package crm
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
-	"github.com/daviddengcn/ljson"
 )
 
 type SetShopLevelRuleRequest struct {
@@ -23,7 +23,7 @@ type SetShopLevelRuleData struct {
 	ReturnType *ReturnType `json:"returnType,omitempty" codec:"returnType,omitempty"`
 }
 
-//TODO 修改会员体系规则
+// TODO 修改会员体系规则
 func SetShopLevelRule(req *SetShopLevelRuleRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -40,7 +40,7 @@ func SetShopLevelRule(req *SetShopLevelRuleRequest) (bool, error) {
 		return false, errors.New("no result info")
 	}
 	var response SetShopLevelRuleResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

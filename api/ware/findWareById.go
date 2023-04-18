@@ -1,12 +1,12 @@
 package ware
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/ware"
-	"github.com/daviddengcn/ljson"
 )
 
 type FindWareByIdRequest struct {
@@ -44,7 +44,7 @@ func FindWareById(req *FindWareByIdRequest) (*Ware, error) {
 		return nil, errors.New("No ware info.")
 	}
 	var response FindWareByIdResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

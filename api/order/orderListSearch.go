@@ -1,12 +1,12 @@
 package order
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/order"
-	"github.com/daviddengcn/ljson"
 )
 
 type OrderListSearchRequest struct {
@@ -60,7 +60,7 @@ func OrderListSearch(req *OrderListSearchRequest) ([]uint64, int, error) {
 	}
 
 	var response OrderListSearchResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, 0, err
 	}

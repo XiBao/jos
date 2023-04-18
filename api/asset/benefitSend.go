@@ -1,13 +1,13 @@
 package asset
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/asset"
-	"github.com/daviddengcn/ljson"
 )
 
 type BenefitSendRequest struct {
@@ -65,7 +65,7 @@ func BenefitSend(req *BenefitSendRequest) (int, error) {
 	result = util.RemoveJsonSpace(result)
 
 	var response BenefitSendResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return 0, err
 	}

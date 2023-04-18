@@ -1,12 +1,12 @@
 package jm
 
 import (
+	"encoding/json"
 	"errors"
 
 	. "github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/jm"
-	"github.com/daviddengcn/ljson"
 )
 
 type GetOpenIdRequest struct {
@@ -46,7 +46,7 @@ func GetOpenId(req GetOpenIdRequest) (GetOpenIdReturnType, error) {
 		return GetOpenIdReturnType{}, errors.New("no result.")
 	}
 	var response GetOpenIdResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return GetOpenIdReturnType{}, err
 	}

@@ -1,12 +1,12 @@
 package crm
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
-	"github.com/daviddengcn/ljson"
 )
 
 type GetMemeberDiscountRequest struct {
@@ -35,7 +35,7 @@ type ShopRuleDiscountDTO struct {
 	Discount     string `json:"discount,omitempty" codec:"discount,omitempty"`         //会员折扣(1-9.9),为空表示未设置折扣
 }
 
-//TODO 查询会员折扣信息
+// TODO 查询会员折扣信息
 func GetMemeberDiscount(req *GetMemeberDiscountRequest) ([]*ShopRuleDiscountDTO, error) {
 
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
@@ -50,7 +50,7 @@ func GetMemeberDiscount(req *GetMemeberDiscountRequest) ([]*ShopRuleDiscountDTO,
 		return nil, errors.New("no result info")
 	}
 	var response GetMemeberDiscountResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,7 @@
 package crm
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -9,7 +10,6 @@ import (
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
-	"github.com/daviddengcn/ljson"
 )
 
 const (
@@ -69,7 +69,7 @@ func SendPoints(req *SendPointsRequest) (int64, error) {
 		return 0, errors.New("No result info.")
 	}
 	var response SendPointsResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return 0, errors.New(fmt.Sprintf("%s result :%s", err.Error(), result))
 	}

@@ -1,12 +1,12 @@
 package campaign
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/campaign"
-	"github.com/daviddengcn/ljson"
 )
 
 type DaybudgetUpdateRequest struct {
@@ -31,7 +31,7 @@ type DaybudgetUpdateResult struct {
 	Success    bool   `json:"success,omitempty" codec:"success,omitempty"`
 }
 
-//修改计划日限额
+// 修改计划日限额
 func DaybudgetUpdate(req *DaybudgetUpdateRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -48,7 +48,7 @@ func DaybudgetUpdate(req *DaybudgetUpdateRequest) (bool, error) {
 		return false, errors.New("no result info")
 	}
 	var response DaybudgetUpdateResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

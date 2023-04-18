@@ -10,7 +10,6 @@ import (
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/crypto"
 	"github.com/XiBao/jos/sdk/request/voucher"
-	"github.com/daviddengcn/ljson"
 )
 
 type VoucherInfoGetRequest struct {
@@ -73,7 +72,7 @@ func VoucherInfoGet(req *VoucherInfoGetRequest) (voucherData VoucherData, err er
 		return
 	}
 	var response VoucherInfoGetResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return
 	}

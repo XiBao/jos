@@ -1,12 +1,12 @@
 package ware
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/ware"
-	"github.com/daviddengcn/ljson"
 )
 
 type VenderSkusQueryRequest struct {
@@ -45,7 +45,7 @@ func VenderSkusQuery(req *VenderSkusQueryRequest) ([]uint64, int, error) {
 		return nil, 0, errors.New("No result.")
 	}
 	var response VenderSkusQueryResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, 0, err
 	}

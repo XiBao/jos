@@ -1,12 +1,12 @@
 package adkckeyword
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/adkckeyword"
-	"github.com/daviddengcn/ljson"
 )
 
 type CategorypricesuggestQueryRequest struct {
@@ -60,7 +60,7 @@ func CategorypricesuggestQuery(req *CategorypricesuggestQueryRequest) (*Category
 		return nil, errors.New("no result info")
 	}
 	var response CategorypricesuggestQueryResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

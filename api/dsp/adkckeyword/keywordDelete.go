@@ -1,12 +1,12 @@
 package adkckeyword
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/adkckeyword"
-	"github.com/daviddengcn/ljson"
 )
 
 type KeywordDeleteRequest struct {
@@ -30,7 +30,7 @@ type KeywordDeleteResult struct {
 	ErrorMsg   string `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
 }
 
-//删除关键词
+// 删除关键词
 func KeywordDelete(req *KeywordDeleteRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -45,7 +45,7 @@ func KeywordDelete(req *KeywordDeleteRequest) (bool, error) {
 		return false, errors.New("no result info")
 	}
 	var response KeywordDeleteResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

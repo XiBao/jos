@@ -1,12 +1,12 @@
 package campaign
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/campaign"
-	"github.com/daviddengcn/ljson"
 )
 
 type AddRequest struct {
@@ -30,7 +30,7 @@ type AddResult struct {
 	ErrorMsg   string `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
 }
 
-//新建计划
+// 新建计划
 func Add(req *AddRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -48,7 +48,7 @@ func Add(req *AddRequest) (bool, error) {
 	}
 
 	var response AddResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

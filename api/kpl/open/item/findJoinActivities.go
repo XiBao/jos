@@ -1,12 +1,12 @@
 package item
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/kpl/open/item"
-	"github.com/daviddengcn/ljson"
 )
 
 type FindJoinActivitiesRequest struct {
@@ -79,7 +79,7 @@ func FindJoinActivities(req *FindJoinActivitiesRequest) ([]Coupon, error) {
 	}
 
 	var response FindJoinActivitiesResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

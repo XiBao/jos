@@ -1,6 +1,7 @@
 package master
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -9,7 +10,6 @@ import (
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/crypto"
 	"github.com/XiBao/jos/sdk/request/master"
-	"github.com/daviddengcn/ljson"
 )
 
 type MasterKeyGetRequest struct {
@@ -70,7 +70,7 @@ func MasterKeyGet(req *MasterKeyGetRequest) (keyStore *crypto.KeyStore, err erro
 		return
 	}
 	var response MasterKeyGetResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return
 	}

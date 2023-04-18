@@ -1,13 +1,13 @@
 package asset
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/asset"
-	"github.com/daviddengcn/ljson"
 )
 
 type ActivityCreateRequest struct {
@@ -59,7 +59,7 @@ func ActivityCreate(req *ActivityCreateRequest) (string, error) {
 	result = util.RemoveJsonSpace(result)
 
 	var response ActivityCreateResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return "", err
 	}

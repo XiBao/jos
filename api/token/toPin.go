@@ -1,12 +1,12 @@
 package token
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/token"
-	"github.com/daviddengcn/ljson"
 )
 
 type TokenToPinRequest struct {
@@ -46,7 +46,7 @@ func TokenToPin(req *TokenToPinRequest) (string, error) {
 		return "", errors.New("No result.")
 	}
 	var response TokenToPinResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return "", err
 	}

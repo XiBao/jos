@@ -1,12 +1,12 @@
 package jzone
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/jzone"
-	"github.com/daviddengcn/ljson"
 )
 
 type AddCartItemByPinRequest struct {
@@ -31,7 +31,7 @@ type AddCartItemByPinReturnType struct {
 	Code    string `json:"code,omitempty" codec:"code,omitempty"`
 }
 
-//TODO  通过Pin将商品加入用户购物车
+// TODO  通过Pin将商品加入用户购物车
 func AddCartItemByPin(req *AddCartItemByPinRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -51,7 +51,7 @@ func AddCartItemByPin(req *AddCartItemByPinRequest) (bool, error) {
 		return false, errors.New("No result info.")
 	}
 	var response AddCartItemByPinResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

@@ -1,13 +1,13 @@
 package center
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
 	. "github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/interact/center"
-	"github.com/daviddengcn/ljson"
 )
 
 type WritePersonInfoRequest struct {
@@ -75,7 +75,7 @@ func WritePersonInfo(req WritePersonInfoRequest) (bool, error) {
 	}
 
 	var response WritePersonInfoResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

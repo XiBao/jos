@@ -1,12 +1,12 @@
 package adkcunit
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/adkcunit"
-	"github.com/daviddengcn/ljson"
 )
 
 type AdkcunitStatusUpdateRequest struct {
@@ -31,7 +31,7 @@ type AdkcunitStatusUpdateResult struct {
 	Success    bool   `json:"success,omitempty" codec:"success,omitempty"`
 }
 
-//更新单元状态
+// 更新单元状态
 func AdkcunitStatusUpdate(req *AdkcunitStatusUpdateRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -48,7 +48,7 @@ func AdkcunitStatusUpdate(req *AdkcunitStatusUpdateRequest) (bool, error) {
 		return false, errors.New("no result info")
 	}
 	var response AdkcunitStatusUpdateResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

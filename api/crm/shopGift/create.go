@@ -1,12 +1,12 @@
 package crm
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	crm "github.com/XiBao/jos/sdk/request/crm/shopGift"
-	"github.com/daviddengcn/ljson"
 )
 
 type ShopGiftCreateRequest struct {
@@ -89,7 +89,7 @@ func ShopGiftCreate(req *ShopGiftCreateRequest) (uint64, error) {
 		return 0, errors.New("No result info.")
 	}
 	var response ShopGiftCreateResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return 0, err
 	}

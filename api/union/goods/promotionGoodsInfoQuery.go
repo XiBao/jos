@@ -1,6 +1,7 @@
 package goods
 
 import (
+	"encoding/json"
 	"errors"
 	"strconv"
 	"strings"
@@ -8,7 +9,6 @@ import (
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/goods"
-	"github.com/daviddengcn/ljson"
 )
 
 type PromotionGoodsInfoQueryRequest struct {
@@ -73,7 +73,7 @@ func PromotionGoodsInfoQuery(req *PromotionGoodsInfoQueryRequest) ([]PromotionGo
 		return nil, err
 	}
 	var response PromotionGoodsInfoQueryResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func PromotionGoodsInfoQuery(req *PromotionGoodsInfoQueryRequest) ([]PromotionGo
 	}
 
 	var ret PromotionQueryResult
-	err = ljson.Unmarshal([]byte(response.Data.Result), &ret)
+	err = json.Unmarshal([]byte(response.Data.Result), &ret)
 	if err != nil {
 		return nil, err
 	}

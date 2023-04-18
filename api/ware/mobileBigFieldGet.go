@@ -1,13 +1,13 @@
 package ware
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/ware"
-	"github.com/daviddengcn/ljson"
 )
 
 type MobileBigFieldRequest struct {
@@ -39,7 +39,7 @@ func MobileBigField(req *MobileBigFieldRequest) (string, error) {
 	result = util.RemoveJsonSpace(result)
 
 	var response MobileBigFieldResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return "", err
 	}

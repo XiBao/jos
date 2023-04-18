@@ -1,12 +1,12 @@
 package shorturl
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/shorturl"
-	"github.com/daviddengcn/ljson"
 )
 
 type GenerateURLFastestRequest struct {
@@ -50,7 +50,7 @@ func GenerateURLFastest(req *GenerateURLFastestRequest) (*GenerateURLFastestResu
 		return nil, err
 	}
 	var response GenerateURLFastestResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

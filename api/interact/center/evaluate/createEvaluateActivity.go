@@ -1,6 +1,7 @@
 package center
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/davecgh/go-spew/spew"
@@ -10,7 +11,6 @@ import (
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	center "github.com/XiBao/jos/sdk/request/interact/center/evaluate"
-	"github.com/daviddengcn/ljson"
 )
 
 type CreateEvaluateActivityRequest struct {
@@ -45,7 +45,7 @@ func CreateEvaluateActivity(req *CreateEvaluateActivityRequest) (uint64, error) 
 	result = util.RemoveJsonSpace(result)
 
 	var response CreateEvaluateActivityResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return 0, err
 	}

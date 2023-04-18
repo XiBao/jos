@@ -1,12 +1,12 @@
 package fullcoupon
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/fullcoupon"
-	"github.com/daviddengcn/ljson"
 )
 
 // 满额送券促销趋势效果数据
@@ -54,7 +54,7 @@ func GetTrendData(req *FullCouponGetTrendDataRequest) ([]PromoTrendData, error) 
 	}
 
 	var response FullCouponGetTrendDataResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

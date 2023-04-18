@@ -1,13 +1,13 @@
 package goods
 
 import (
+	"encoding/json"
 	"errors"
 	"strconv"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/goods"
-	"github.com/daviddengcn/ljson"
 )
 
 type GoodsLinkQueryRequest struct {
@@ -61,7 +61,7 @@ func GoodsLinkQuery(req *GoodsLinkQueryRequest) ([]LinkGoodsResp, error) {
 		return nil, err
 	}
 	var response GoodsLinkQueryResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

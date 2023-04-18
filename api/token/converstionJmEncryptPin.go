@@ -1,12 +1,12 @@
 package token
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/token"
-	"github.com/daviddengcn/ljson"
 )
 
 type ConverstionJmEncryptPinRequest struct {
@@ -50,7 +50,7 @@ func ConverstionJmEncryptPin(req *ConverstionJmEncryptPinRequest) (*ConverstionJ
 		return nil, errors.New("No result.")
 	}
 	var response ConverstionJmEncryptPinResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

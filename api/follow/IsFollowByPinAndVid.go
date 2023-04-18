@@ -1,12 +1,12 @@
 package follow
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/follow"
-	"github.com/daviddengcn/ljson"
 )
 
 type IsFollowByPinAndVidRequest struct {
@@ -45,7 +45,7 @@ func IsFollowByPinAndVid(req *IsFollowByPinAndVidRequest) (bool, error) {
 		return false, errors.New("No result info.")
 	}
 	var response IsFollowByPinAndVidResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

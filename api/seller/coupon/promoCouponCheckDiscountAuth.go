@@ -1,12 +1,12 @@
 package coupon
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/coupon"
-	"github.com/daviddengcn/ljson"
 )
 
 type PromoCouponCheckDiscountAuthRequest struct {
@@ -57,7 +57,7 @@ func PromoCouponCheckDiscountAuth(req *PromoCouponCheckDiscountAuthRequest) (boo
 		return false, errors.New("no result.")
 	}
 	var response PromoCouponCheckDiscountAuthResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

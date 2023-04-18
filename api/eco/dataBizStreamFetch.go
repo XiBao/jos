@@ -1,12 +1,12 @@
 package eco
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/eco"
-	"github.com/daviddengcn/ljson"
 )
 
 type BizStreamFetchRequest struct {
@@ -106,7 +106,7 @@ func BizStreamFetch(req *BizStreamFetchRequest) ([]map[string]interface{}, error
 	}
 
 	var response BizStreamFetchResponse
-	err = ljson.Unmarshal([]byte(result), &response)
+	err = json.Unmarshal([]byte(result), &response)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func BizStreamFetch(req *BizStreamFetchRequest) ([]map[string]interface{}, error
 	}
 
 	var returnTypeData ReturnTypeData
-	err = ljson.Unmarshal([]byte(response.Res.RT.Data), &returnTypeData)
+	err = json.Unmarshal([]byte(response.Res.RT.Data), &returnTypeData)
 	if err != nil {
 		return nil, err
 	}

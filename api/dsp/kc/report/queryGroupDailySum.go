@@ -1,6 +1,7 @@
 package report
 
 import (
+	"encoding/json"
 	"errors"
 	"sort"
 	"strconv"
@@ -9,7 +10,6 @@ import (
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/report"
-	"github.com/daviddengcn/ljson"
 )
 
 type QueryGroupDailySumRequest struct {
@@ -127,7 +127,7 @@ func QueryGroupDailySum(req *QueryGroupDailySumRequest) ([]*GroupDailyRpt, int, 
 	}
 
 	var response QueryGroupDailySumResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, 0, err
 	}

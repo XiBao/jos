@@ -1,12 +1,12 @@
 package vender
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/vender"
-	"github.com/daviddengcn/ljson"
 )
 
 type CommonQueryRequest struct {
@@ -52,7 +52,7 @@ type CommonQueryResult struct {
 	ParentSaleOrdId  string `json:"parent_sale_ord_id,omitempty" codec:"parent_sale_ord_id,omitempty"`
 }
 
-//通过组件化的方式，提供相关统一的查询方式
+// 通过组件化的方式，提供相关统一的查询方式
 func CommonQuery(req *CommonQueryRequest) (string, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -72,7 +72,7 @@ func CommonQuery(req *CommonQueryRequest) (string, error) {
 	}
 
 	var response CommonQueryResponse
-	err = ljson.Unmarshal([]byte(result), &response)
+	err = json.Unmarshal([]byte(result), &response)
 	if err != nil {
 		return "", err
 	}

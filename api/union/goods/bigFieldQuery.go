@@ -1,13 +1,13 @@
 package goods
 
 import (
+	"encoding/json"
 	"errors"
 	"strconv"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/goods"
-	"github.com/daviddengcn/ljson"
 )
 
 type BidFieldQueryRequest struct {
@@ -110,7 +110,7 @@ func BidFieldQuery(req *BidFieldQueryRequest) ([]BidFieldQueryResp, error) {
 		return nil, err
 	}
 	var response BidFieldQueryResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func BidFieldQuery(req *BidFieldQueryRequest) ([]BidFieldQueryResp, error) {
 	}
 
 	var ret BidFieldQueryResult
-	err = ljson.Unmarshal([]byte(response.Data.Result), &ret)
+	err = json.Unmarshal([]byte(response.Data.Result), &ret)
 	if err != nil {
 		return nil, err
 	}

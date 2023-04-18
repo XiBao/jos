@@ -1,12 +1,12 @@
 package crm
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
-	"github.com/daviddengcn/ljson"
 )
 
 type GetCustomerPointsRequest struct {
@@ -39,7 +39,7 @@ func GetCustomerPoints(req *GetCustomerPointsRequest) (int64, error) {
 		return 0, errors.New("No result info.")
 	}
 	var response GetCustomerPointsResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return 0, err
 	}

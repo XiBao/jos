@@ -1,12 +1,12 @@
 package campaign
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/campaign"
-	"github.com/daviddengcn/ljson"
 )
 
 type DeleteRequest struct {
@@ -29,7 +29,7 @@ type DeleteResult struct {
 	Success    bool   `json:"success,omitempty" codec:"success,omitempty"`
 }
 
-//删除计划
+// 删除计划
 func Delete(req *DeleteRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -44,7 +44,7 @@ func Delete(req *DeleteRequest) (bool, error) {
 		return false, errors.New("no result info")
 	}
 	var response DeleteResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

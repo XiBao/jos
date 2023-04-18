@@ -8,7 +8,6 @@ import (
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/promotion"
-	"github.com/daviddengcn/ljson"
 )
 
 type UnionPromotionBySubUnionIdGetResponse struct {
@@ -38,7 +37,7 @@ func UnionPromotionBySubUnionIdGet(req *UnionPromotionCodeRequest) (*PromotionCo
 		return nil, err
 	}
 	var response UnionPromotionBySubUnionIdGetResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +46,7 @@ func UnionPromotionBySubUnionIdGet(req *UnionPromotionCodeRequest) (*PromotionCo
 		return nil, errors.New("no data")
 	}
 	var ret UnionPromotioncodeResult
-	err = ljson.Unmarshal([]byte(response.Data.Result), &ret)
+	err = json.Unmarshal([]byte(response.Data.Result), &ret)
 	if err != nil {
 		return nil, err
 	}

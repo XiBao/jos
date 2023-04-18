@@ -1,12 +1,12 @@
 package client
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	clt "github.com/XiBao/jos/sdk/request/brand/client"
-	"github.com/daviddengcn/ljson"
 )
 
 type QueryBrandsIdByVenderIdRequest struct {
@@ -26,7 +26,7 @@ type QueryBrandsIdByVenderIdResult struct {
 	BrandsId uint64 `json:"brandsId,omitempty" codec:"brandsId,omitempty"`
 }
 
-//TODO 根据商家id 查询品牌id
+// TODO 根据商家id 查询品牌id
 func QueryBrandsIdByVenderId(req *QueryBrandsIdByVenderIdRequest) (uint64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -40,7 +40,7 @@ func QueryBrandsIdByVenderId(req *QueryBrandsIdByVenderIdRequest) (uint64, error
 		return 0, errors.New("no result info")
 	}
 	var response QueryBrandsIdByVenderIdResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return 0, err
 	}

@@ -1,13 +1,13 @@
 package coupon
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/coupon"
-	"github.com/daviddengcn/ljson"
 )
 
 type CouponWriteCreateRequest struct {
@@ -120,7 +120,7 @@ func CouponWriteCreate(req *CouponWriteCreateRequest) (uint64, error) {
 	result = util.RemoveJsonSpace(result)
 
 	var response CouponWriteCreateResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return 0, err
 	}

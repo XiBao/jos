@@ -1,12 +1,12 @@
 package asc
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/asc"
-	"github.com/daviddengcn/ljson"
 )
 
 type ServiceAndRefundViewRequest struct {
@@ -103,7 +103,7 @@ func ServiceAndRefundView(req *ServiceAndRefundViewRequest) (*ServiceAndRefundVi
 		return nil, errors.New("no result info")
 	}
 	var response ServiceAndRefundViewResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

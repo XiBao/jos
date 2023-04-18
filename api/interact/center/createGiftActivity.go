@@ -1,13 +1,13 @@
 package center
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/interact/center"
-	"github.com/daviddengcn/ljson"
 )
 
 type CreateGiftActivityRequest struct {
@@ -94,7 +94,7 @@ func CreateGiftActivity(req *CreateGiftActivityRequest) (*CreateGiftActivityResu
 	result = util.RemoveJsonSpace(result)
 
 	var response CreateGiftActivityResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

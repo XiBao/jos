@@ -1,12 +1,12 @@
 package vender
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/vender"
-	"github.com/daviddengcn/ljson"
 )
 
 type GetVenderStatusRequest struct {
@@ -28,7 +28,7 @@ type VenderStatusReturnType struct {
 	Desc   string `json:"desc"`   //成功，信息不存在，参数错误，服务端异常
 }
 
-//TODO 查询会员体系状态
+// TODO 查询会员体系状态
 func GetVenderStatus(req *GetVenderStatusRequest) (uint, error) {
 
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
@@ -43,7 +43,7 @@ func GetVenderStatus(req *GetVenderStatusRequest) (uint, error) {
 		return 0, errors.New("no result info")
 	}
 	var response GetVenderStatusResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return 0, err
 	}

@@ -1,13 +1,13 @@
 package category
 
 import (
+	"encoding/json"
 	"errors"
 	"strings"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/category"
-	"github.com/daviddengcn/ljson"
 )
 
 type FindCateByPidRequest struct {
@@ -45,7 +45,7 @@ func FindCateByPid(req *FindCateByPidRequest) ([]*Category, error) {
 		return nil, errors.New("No cates info.")
 	}
 	var response FindCateByPidResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

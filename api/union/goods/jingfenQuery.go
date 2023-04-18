@@ -1,13 +1,13 @@
 package goods
 
 import (
+	"encoding/json"
 	"errors"
 	"strconv"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/goods"
-	"github.com/daviddengcn/ljson"
 )
 
 type JingfenQueryRequest struct {
@@ -163,7 +163,7 @@ func JingfenQuery(req *JingfenQueryRequest) (*JingfenQueryResult, error) {
 		return nil, err
 	}
 	var response JingfenQueryResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +171,7 @@ func JingfenQuery(req *JingfenQueryRequest) (*JingfenQueryResult, error) {
 		return nil, errors.New("no result")
 	}
 	var resp JingfenQueryResult
-	err = ljson.Unmarshal([]byte(response.Data.Result), &resp)
+	err = json.Unmarshal([]byte(response.Data.Result), &resp)
 	if err != nil {
 		return nil, err
 	}

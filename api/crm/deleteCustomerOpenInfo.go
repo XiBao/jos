@@ -1,12 +1,12 @@
 package crm
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
-	"github.com/daviddengcn/ljson"
 )
 
 type DeleteCustomerOpenInfoRequest struct {
@@ -43,7 +43,7 @@ func DeleteCustomerOpenInfo(req *DeleteCustomerOpenInfoRequest) (bool, error) {
 		return false, errors.New("no result info")
 	}
 	var response DeleteCustomerOpenInfoResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

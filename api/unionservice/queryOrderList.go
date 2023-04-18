@@ -1,13 +1,13 @@
 package unionservice
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ware"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/unionservice"
-	"github.com/daviddengcn/ljson"
 )
 
 type QueryOrderListRequest struct {
@@ -46,7 +46,7 @@ func QueryOrderList(req *QueryOrderListRequest) (*ware.Sku, error) {
 		return nil, errors.New("No sku info.")
 	}
 	var response QueryOrderListResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

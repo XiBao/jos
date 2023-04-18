@@ -1,12 +1,12 @@
 package vender
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/vender"
-	"github.com/daviddengcn/ljson"
 )
 
 type InfoGetRequest struct {
@@ -37,7 +37,7 @@ func InfoGet(req *InfoGetRequest) (*VenderInfo, error) {
 	}
 
 	var response InfoGetResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

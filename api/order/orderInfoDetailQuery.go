@@ -1,12 +1,12 @@
 package order
 
 import (
+	"encoding/json"
 	"fmt"
 
 	. "github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/order"
-	"github.com/bububa/ljson"
 
 	"github.com/XiBao/jos/api/util"
 )
@@ -74,7 +74,7 @@ func OrderInfoDetailQuery(req *OrderInfoDetailQueryRequest) ([]OrderInfoDetailQu
 	result = util.RemoveJsonSpace(result)
 
 	var response OrderInfoDetailQueryResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

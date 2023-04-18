@@ -8,7 +8,6 @@ import (
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/promotion"
-	"github.com/daviddengcn/ljson"
 )
 
 type UnionPromotionCodeRequest struct {
@@ -64,7 +63,7 @@ func UnionPromotionCodeGet(req *UnionPromotionCodeRequest) (string, error) {
 		return "", err
 	}
 	var response UnionPromotionCodeResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return "", err
 	}
@@ -73,7 +72,7 @@ func UnionPromotionCodeGet(req *UnionPromotionCodeRequest) (string, error) {
 		return "", errors.New("no data")
 	}
 	var ret UnionPromotioncodeResult
-	err = ljson.Unmarshal([]byte(response.Data.Result), &ret)
+	err = json.Unmarshal([]byte(response.Data.Result), &ret)
 	if err != nil {
 		return "", err
 	}

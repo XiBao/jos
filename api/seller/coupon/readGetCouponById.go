@@ -1,12 +1,12 @@
 package coupon
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/coupon"
-	"github.com/daviddengcn/ljson"
 )
 
 type CouponReadGetCouponByIdRequest struct {
@@ -50,7 +50,7 @@ func CouponReadGetCouponById(req *CouponReadGetCouponByIdRequest) (*Coupon, erro
 	}
 
 	var response CouponReadGetCouponByIdResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

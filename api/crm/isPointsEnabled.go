@@ -1,12 +1,12 @@
 package crm
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
-	"github.com/daviddengcn/ljson"
 )
 
 type IsPointsEnabledRequest struct {
@@ -23,7 +23,7 @@ type IsPointsEnabledData struct {
 	Code   string `json:"code,omitempty" codec:"code,omitempty"`
 }
 
-//是否开启店铺积分功能
+// 是否开启店铺积分功能
 func IsPointsEnabled(req *IsPointsEnabledRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -37,7 +37,7 @@ func IsPointsEnabled(req *IsPointsEnabledRequest) (bool, error) {
 		return false, errors.New("no result info")
 	}
 	var response IsPointsEnabledResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

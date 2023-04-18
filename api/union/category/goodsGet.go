@@ -1,13 +1,13 @@
 package category
 
 import (
+	"encoding/json"
 	"errors"
 	"strconv"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/category"
-	"github.com/daviddengcn/ljson"
 )
 
 type GoodsGetRequest struct {
@@ -38,7 +38,7 @@ type CategoryResp struct {
 	ParentId uint64 `json:"parentId,omitempty"` // 父类目Id
 }
 
-//  商品类目查询
+// 商品类目查询
 func GoodsGet(req *GoodsGetRequest) ([]CategoryResp, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -54,7 +54,7 @@ func GoodsGet(req *GoodsGetRequest) ([]CategoryResp, error) {
 		return nil, err
 	}
 	var response GoodsGetResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func GoodsGet(req *GoodsGetRequest) ([]CategoryResp, error) {
 		return nil, errors.New("no result")
 	}
 	var resp GoodsGetResult
-	err = ljson.Unmarshal([]byte(response.Data.Result), &resp)
+	err = json.Unmarshal([]byte(response.Data.Result), &resp)
 	if err != nil {
 		return nil, err
 	}

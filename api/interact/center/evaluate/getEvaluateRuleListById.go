@@ -1,6 +1,7 @@
 package center
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api/util"
@@ -8,7 +9,6 @@ import (
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	center "github.com/XiBao/jos/sdk/request/interact/center/evaluate"
-	"github.com/daviddengcn/ljson"
 )
 
 type GetEvaluateRuleListByIdRequest struct {
@@ -61,7 +61,7 @@ func GetEvaluateRuleListById(req *GetEvaluateRuleListByIdRequest) ([]*EvaluateRu
 	result = util.RemoveJsonSpace(result)
 
 	var response GetEvaluateRuleListByIdResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,7 @@
 package center
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api/util"
@@ -8,7 +9,6 @@ import (
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	center "github.com/XiBao/jos/sdk/request/interact/center/evaluate"
-	"github.com/daviddengcn/ljson"
 )
 
 type GetEvaluateActivityListRequest struct {
@@ -68,7 +68,7 @@ func GetEvaluateActivityList(req *GetEvaluateActivityListRequest) ([]*GetEvaluat
 	result = util.RemoveJsonSpace(result)
 
 	var response GetEvaluateActivityListResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

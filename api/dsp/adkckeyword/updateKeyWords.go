@@ -1,12 +1,12 @@
 package adkckeyword
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/adkckeyword"
-	"github.com/daviddengcn/ljson"
 )
 
 type UpdateKeyWordsRequest struct {
@@ -54,7 +54,7 @@ func UpdateKeyWords(req *UpdateKeyWordsRequest) (bool, error) {
 		return false, errors.New("no result info")
 	}
 	var response UpdateKeyWordsResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

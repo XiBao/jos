@@ -1,12 +1,12 @@
 package points
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/points"
-	"github.com/daviddengcn/ljson"
 )
 
 type GetPointsRuleRequest struct {
@@ -42,7 +42,7 @@ func GetPointsRule(req *GetPointsRuleRequest) ([]*PointsRule, error) {
 	}
 
 	var response GetPointsRuleResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

@@ -1,12 +1,12 @@
 package areas
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/areas"
-	"github.com/daviddengcn/ljson"
 )
 
 type CountyGetRequest struct {
@@ -38,7 +38,7 @@ func CountyGet(req *CountyGetRequest) ([]*Result, error) {
 	}
 
 	var response CountyGetResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

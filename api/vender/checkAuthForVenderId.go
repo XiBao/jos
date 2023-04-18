@@ -1,12 +1,12 @@
 package vender
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/vender"
-	"github.com/daviddengcn/ljson"
 )
 
 type CheckAuthForVenderIdRequest struct {
@@ -43,7 +43,7 @@ func CheckAuthForVenderId(req *CheckAuthForVenderIdRequest) (bool, error) {
 		return false, errors.New("no result.")
 	}
 	var response CheckAuthForVenderIdResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

@@ -1,6 +1,7 @@
 package report
 
 import (
+	"encoding/json"
 	"errors"
 	"sort"
 	"strconv"
@@ -9,7 +10,6 @@ import (
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/report"
-	"github.com/daviddengcn/ljson"
 )
 
 type QueryCampDailySumRequest struct {
@@ -99,7 +99,7 @@ type CampaignDailyRpt struct {
 	GoodsAttentionCnt   uint64    `json:"goods_attention_cnt,omitempty" codec:"goods_attention_cnt,omitempty"`     //商品关注数
 }
 
-//查询.快车.计划报表数据
+// 查询.快车.计划报表数据
 func QueryCampDailySum(req *QueryCampDailySumRequest) ([]*CampaignDailyRpt, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -134,7 +134,7 @@ func QueryCampDailySum(req *QueryCampDailySumRequest) ([]*CampaignDailyRpt, erro
 	}
 
 	var response QueryCampDailySumResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

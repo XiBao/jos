@@ -1,6 +1,7 @@
 package ware
 
 import (
+	"encoding/json"
 	"errors"
 	"strconv"
 	"strings"
@@ -8,7 +9,6 @@ import (
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/ware"
-	"github.com/daviddengcn/ljson"
 )
 
 type WareBaseProductGetRequest struct {
@@ -47,7 +47,7 @@ func WareBaseProductGet(req *WareBaseProductGetRequest) ([]*ProductsBase, error)
 		return nil, errors.New("No result.")
 	}
 	var response WareBaseProductGetResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

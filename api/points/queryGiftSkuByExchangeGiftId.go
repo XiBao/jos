@@ -1,12 +1,12 @@
 package points
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/points"
-	"github.com/daviddengcn/ljson"
 )
 
 type QueryGiftSkuByExchangeGiftIdRequest struct {
@@ -66,7 +66,7 @@ func QueryGiftSkuByExchangeGiftId(req *QueryGiftSkuByExchangeGiftIdRequest) ([]*
 		return nil, errors.New("no result info")
 	}
 	var response QueryGiftSkuByExchangeGiftIdResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

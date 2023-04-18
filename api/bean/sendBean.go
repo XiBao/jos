@@ -1,13 +1,13 @@
 package bean
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/bean"
-	"github.com/daviddengcn/ljson"
 )
 
 type SendBeanRequest struct {
@@ -69,7 +69,7 @@ func SendBean(req *SendBeanRequest) (*SendBeanResult, error) {
 	result = util.RemoveJsonSpace(result)
 
 	var response SendBeanResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

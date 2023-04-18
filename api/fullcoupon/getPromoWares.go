@@ -1,12 +1,12 @@
 package fullcoupon
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/fullcoupon"
-	"github.com/daviddengcn/ljson"
 )
 
 // 查询活动SPU信息 每页只支持查10条
@@ -58,7 +58,7 @@ func GetPromoWares(req *FullCouponGetPromoWaresRequest) ([]PromoWare, int, error
 	}
 
 	var response FullCouponGetPromoWaresResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, 0, err
 	}

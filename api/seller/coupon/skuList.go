@@ -1,12 +1,12 @@
 package coupon
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	coupon "github.com/XiBao/jos/sdk/request/seller/coupon"
-	"github.com/daviddengcn/ljson"
 )
 
 type SkuListRequest struct {
@@ -74,7 +74,7 @@ func SkuList(req *SkuListRequest) ([]*CouponSkuList, error) {
 	}
 
 	var response SkuListResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

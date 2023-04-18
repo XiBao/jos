@@ -1,13 +1,13 @@
 package sku
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ware"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/sku"
-	"github.com/daviddengcn/ljson"
 )
 
 type SearchSkuListRequest struct {
@@ -90,7 +90,7 @@ func SearchSkuList(req *SearchSkuListRequest) (*SearchSkuListPage, error) {
 	}
 
 	var response SearchSkuListResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

@@ -1,11 +1,11 @@
 package helper
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
-	"github.com/daviddengcn/ljson"
 )
 
 type GetAccessTokenNewRequest struct {
@@ -39,7 +39,7 @@ func GetAccessTokenNew(req *GetAccessTokenNewRequest) (*GetAccessTokenNewRespons
 		return nil, errors.New("No result.")
 	}
 	var response GetAccessTokenNewResponse
-	err = ljson.Unmarshal([]byte(result), &response)
+	err = json.Unmarshal([]byte(result), &response)
 	if err != nil {
 		return nil, err
 	}

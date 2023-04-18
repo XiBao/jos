@@ -1,13 +1,13 @@
 package ware
 
 import (
+	"encoding/json"
 	"errors"
 	"strings"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/ware"
-	"github.com/daviddengcn/ljson"
 )
 
 type SkusGetRequest struct {
@@ -43,7 +43,7 @@ func SkusGet(req *SkusGetRequest) ([]*Sku2, error) {
 	}
 
 	var response SkusGetResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

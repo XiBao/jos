@@ -1,12 +1,12 @@
 package order
 
 import (
+	"encoding/json"
 	"strconv"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/order"
-	"github.com/daviddengcn/ljson"
 )
 
 type UnionOrderQueryRequest struct {
@@ -102,7 +102,7 @@ func UnionOrderQuery(req *UnionOrderQueryRequest) (bool, []OrderResp, error) {
 		return false, nil, err
 	}
 	var response UnionOrderQueryResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, nil, err
 	}
@@ -110,7 +110,7 @@ func UnionOrderQuery(req *UnionOrderQueryRequest) (bool, []OrderResp, error) {
 		return false, nil, nil
 	}
 	var ret UnionOrderQueryResult
-	err = ljson.Unmarshal([]byte(response.Data.Result), &ret)
+	err = json.Unmarshal([]byte(response.Data.Result), &ret)
 	if err != nil {
 		return false, nil, err
 	}

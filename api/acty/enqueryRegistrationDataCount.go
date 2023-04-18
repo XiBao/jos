@@ -1,12 +1,12 @@
 package acty
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/acty"
-	"github.com/daviddengcn/ljson"
 )
 
 type EnqueryRegistrationDataCountRequest struct {
@@ -51,7 +51,7 @@ func EnqueryRegistrationDataCount(req *EnqueryRegistrationDataCountRequest) (*En
 	}
 
 	var response EnqueryRegistrationDataCountResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

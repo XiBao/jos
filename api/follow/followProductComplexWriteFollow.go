@@ -1,12 +1,12 @@
 package follow
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/follow"
-	"github.com/daviddengcn/ljson"
 )
 
 type FollowProductRequest struct {
@@ -31,7 +31,7 @@ type FollowProductResult struct {
 	Data bool   `json:"data,omitempty" codec:"data,omitempty"` //是否成功
 }
 
-//TODO  通过pin将商品加入用户关注栏
+// TODO  通过pin将商品加入用户关注栏
 func FollowProduct(req *FollowProductRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -47,7 +47,7 @@ func FollowProduct(req *FollowProductRequest) (bool, error) {
 		return false, errors.New("No result info.")
 	}
 	var response FollowProductResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

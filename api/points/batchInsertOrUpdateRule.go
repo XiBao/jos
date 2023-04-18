@@ -1,12 +1,12 @@
 package points
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/points"
-	"github.com/daviddengcn/ljson"
 )
 
 type BatchInsertOrUpdateRuleRequest struct {
@@ -31,7 +31,7 @@ type BatchInsertOrUpdateRuleJsfResult struct {
 	Result bool   `json:"result,omitempty" codec:"result,omitempty"` //是否成功
 }
 
-//TODO 设置积分规则   按商家后台规则进行设置
+// TODO 设置积分规则   按商家后台规则进行设置
 func BatchInsertOrUpdateRule(req *BatchInsertOrUpdateRuleRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -57,7 +57,7 @@ func BatchInsertOrUpdateRule(req *BatchInsertOrUpdateRuleRequest) (bool, error) 
 		return false, errors.New("no result info")
 	}
 	var response BatchInsertOrUpdateRuleResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

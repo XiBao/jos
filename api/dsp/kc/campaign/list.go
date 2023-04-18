@@ -1,13 +1,13 @@
 package campaign
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/dsp"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/campaign"
-	"github.com/daviddengcn/ljson"
 )
 
 type ListRequest struct {
@@ -67,7 +67,7 @@ func List(req *ListRequest) ([]*Query, int, error) {
 		return nil, 0, errors.New("no result info")
 	}
 	var response ListResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, 0, err
 	}

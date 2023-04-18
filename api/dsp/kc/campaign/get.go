@@ -1,12 +1,12 @@
 package campaign
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/campaign"
-	"github.com/daviddengcn/ljson"
 )
 
 type GetRequest struct {
@@ -57,7 +57,7 @@ func Get(req *GetRequest) (*GetValue, error) {
 		return nil, errors.New("no result info")
 	}
 	var response GetResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

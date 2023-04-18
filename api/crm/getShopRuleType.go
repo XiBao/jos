@@ -1,12 +1,12 @@
 package crm
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
-	"github.com/daviddengcn/ljson"
 )
 
 type GetShopRuleTypeRequest struct {
@@ -28,7 +28,7 @@ type GetShopRuleTypeReturnResult struct {
 	Data uint8  `json:"data,omitempty" codec:"data,omitempty"` //会员类型 0-未开启会员规则 1-店铺已购即会员规则 2-店铺开卡规则 3- 品牌开卡规则
 }
 
-//TODO 查询商家是否开通会 员开卡功能/开卡类 型
+// TODO 查询商家是否开通会 员开卡功能/开卡类 型
 func GetShopRuleType(req *GetShopRuleTypeRequest) (uint8, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -42,7 +42,7 @@ func GetShopRuleType(req *GetShopRuleTypeRequest) (uint8, error) {
 		return 0, errors.New("no result info")
 	}
 	var response GetShopRuleTypeResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return 0, err
 	}

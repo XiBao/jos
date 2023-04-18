@@ -1,13 +1,13 @@
 package promotion
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
-	"github.com/daviddengcn/ljson"
 )
 
 type RemoveRequest struct {
@@ -50,7 +50,7 @@ func Remove(req *RemoveRequest) (bool, error) {
 	result = util.RemoveJsonSpace(result)
 
 	var response RemoveResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

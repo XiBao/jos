@@ -1,13 +1,13 @@
 package coupon
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/coupon"
-	"github.com/daviddengcn/ljson"
 )
 
 type CouponWriteCloseRequest struct {
@@ -44,7 +44,7 @@ func CouponWriteClose(req *CouponWriteCloseRequest) (bool, error) {
 	result = util.RemoveJsonSpace(result)
 
 	var response CouponWriteCloseResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

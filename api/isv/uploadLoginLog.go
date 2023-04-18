@@ -1,12 +1,12 @@
 package isv
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/isv"
-	"github.com/daviddengcn/ljson"
 )
 
 type UploadLoginLogRequest struct {
@@ -56,7 +56,7 @@ func UploadLoginLog(req *UploadLoginLogRequest) (int, error) {
 		return -1, errors.New("no result info")
 	}
 	var response UploadLoginLogResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return -1, err
 	}

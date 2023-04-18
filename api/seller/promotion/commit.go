@@ -1,12 +1,12 @@
 package promotion
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
-	"github.com/daviddengcn/ljson"
 )
 
 type CommitRequest struct {
@@ -39,7 +39,7 @@ func Commit(req *CommitRequest) (bool, error) {
 	}
 
 	var response CommitResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

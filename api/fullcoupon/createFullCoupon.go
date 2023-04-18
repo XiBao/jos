@@ -1,12 +1,12 @@
 package fullcoupon
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/fullcoupon"
-	"github.com/daviddengcn/ljson"
 )
 
 // 创建满额返券
@@ -46,7 +46,7 @@ func CreateFullCoupon(req *CreateFullCouponRequest) (*CreateFullCouponResponseRe
 	}
 
 	var response CreateFullCouponResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

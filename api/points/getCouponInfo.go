@@ -1,12 +1,12 @@
 package points
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/points"
-	"github.com/daviddengcn/ljson"
 )
 
 type GetCouponInfoRequest struct {
@@ -49,7 +49,7 @@ type PointsCouponInfo struct {
 	RealCouponId      uint64   `json:"realCouponId,omitempty" codec:"realCouponId,omitempty"`           //卡券组ID
 }
 
-//TODO 通过venderId查询商家设置的积分可兑换优惠券信息
+// TODO 通过venderId查询商家设置的积分可兑换优惠券信息
 func GetCouponInfo(req *GetCouponInfoRequest) ([]*PointsCouponInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -63,7 +63,7 @@ func GetCouponInfo(req *GetCouponInfoRequest) ([]*PointsCouponInfo, error) {
 		return nil, errors.New("no result info")
 	}
 	var response GetCouponInfoResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

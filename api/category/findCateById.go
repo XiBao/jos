@@ -1,12 +1,12 @@
 package category
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/category"
-	"github.com/daviddengcn/ljson"
 )
 
 type FindCateByIdRequest struct {
@@ -44,7 +44,7 @@ func FindCateById(req *FindCateByIdRequest) (*Category, error) {
 		return nil, errors.New("No sku info.")
 	}
 	var response FindCateByIdResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

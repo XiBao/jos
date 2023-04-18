@@ -1,13 +1,13 @@
 package report
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/report"
-	"github.com/daviddengcn/ljson"
 )
 
 type QueryAccountReportRequest struct {
@@ -109,7 +109,7 @@ func QueryAccountReport(req *QueryAccountReportRequest) ([]*AccountReport, error
 	result = util.RemoveJsonSpace(result)
 
 	var response QueryAccountReportResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,7 @@
 package points
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -8,7 +9,6 @@ import (
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/points"
-	"github.com/daviddengcn/ljson"
 )
 
 type JosSendPointsRequest struct {
@@ -62,7 +62,7 @@ func JosSendPoints(req *JosSendPointsRequest) (bool, error) {
 		return false, errors.New("no result info")
 	}
 	var response JosSendPointsResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return false, err
 	}

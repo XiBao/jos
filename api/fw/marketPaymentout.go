@@ -1,12 +1,12 @@
 package fw
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/fw"
-	"github.com/daviddengcn/ljson"
 )
 
 type MarketPaymentoutRequest struct {
@@ -104,7 +104,7 @@ func MarketPaymentout(req *MarketPaymentoutRequest) (*MarketPaymentoutReturnType
 		return nil, errors.New("No result info.")
 	}
 	var response MarketPaymentoutResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

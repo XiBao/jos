@@ -1,12 +1,12 @@
 package crm
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
-	"github.com/daviddengcn/ljson"
 )
 
 type MemberSearchNewRequest struct {
@@ -87,7 +87,7 @@ func MemberSearchNew(req *MemberSearchNewRequest) (*MemberSearchNewResult, error
 		return nil, errors.New("No result info.")
 	}
 	var response MemberSearchNewResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

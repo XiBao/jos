@@ -1,12 +1,12 @@
 package vender
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/vender"
-	"github.com/daviddengcn/ljson"
 )
 
 type GetMemberLevelRequest struct {
@@ -47,7 +47,7 @@ type MemberLevelInfo struct {
 	BindingType        uint8   `json:"bindingType,omitempty" codec:"bindingType,omitempty"`               //绑定类型
 }
 
-//TODO 查询会员等级及会员信息  交易数据 T+1 更新
+// TODO 查询会员等级及会员信息  交易数据 T+1 更新
 func GetMemberLevel(req *GetMemberLevelRequest) (*MemberLevelInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -65,7 +65,7 @@ func GetMemberLevel(req *GetMemberLevelRequest) (*MemberLevelInfo, error) {
 		return nil, errors.New("no result info")
 	}
 	var response GetMemberLevelResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

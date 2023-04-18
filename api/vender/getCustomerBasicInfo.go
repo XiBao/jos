@@ -1,12 +1,12 @@
 package vender
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/vender"
-	"github.com/daviddengcn/ljson"
 )
 
 type GetCustomerBasicInfoRequest struct {
@@ -63,7 +63,7 @@ func GetCustomerBasicInfo(req *GetCustomerBasicInfoRequest) (*CardMemberInfo, er
 		return nil, errors.New("no result info")
 	}
 	var response GetCustomerBasicInfoResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}

@@ -1,12 +1,12 @@
 package fullcoupon
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/fullcoupon"
-	"github.com/daviddengcn/ljson"
 )
 
 // 分页查询满额返券活动列表，限制每页最多查询20条数据
@@ -86,7 +86,7 @@ func GetPromoListInfo(req *FullCouponGetPromoListInfoRequest) ([]PromoListInfo, 
 	}
 
 	var response FullCouponGetPromoListInfoResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, 0, err
 	}

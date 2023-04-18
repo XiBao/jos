@@ -1,12 +1,12 @@
 package adkckeyword
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/adkckeyword"
-	"github.com/daviddengcn/ljson"
 )
 
 type RecommendkeywordGetRequest struct {
@@ -45,7 +45,7 @@ type KeyWordRecommendQuery struct {
 	KeyWord     string  `json:"keyWord,omitempty" codec:"keyWord,omitempty"`         //三十访问量
 }
 
-//获取推荐关键词
+// 获取推荐关键词
 func RecommendkeywordGet(req *RecommendkeywordGetRequest) ([]*KeyWordRecommendQuery, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -63,7 +63,7 @@ func RecommendkeywordGet(req *RecommendkeywordGetRequest) ([]*KeyWordRecommendQu
 		return nil, errors.New("no result info")
 	}
 	var response RecommendkeywordGetResponse
-	err = ljson.Unmarshal(result, &response)
+	err = json.Unmarshal(result, &response)
 	if err != nil {
 		return nil, err
 	}
