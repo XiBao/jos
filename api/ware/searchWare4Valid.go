@@ -29,7 +29,7 @@ type SearchWare4ValidRequest struct {
 	ColType              int      `json:"colType,omitempty" codec:"colType,omitempty"`                           // 合作类型
 	StartCreatedTime     int64    `json:"startCreatedTime,omitempty" codec:"startCreatedTime,omitempty"`         // 开始创建时间
 	EndCreatedTime       int64    `json:"endCreatedTime,omitempty" codec:"endCreatedTime,omitempty"`             // 结束创建时间
-	StartJdPrice         float64  `json:"startJdPrice,omitempty" codec:"startJdPrice,omitempty"`                 // 	开始京东价
+	StartJdPrice         float64  `json:"startJdPrice,omitempty" codec:"startJdPrice,omitempty"`                 // 开始京东价
 	EndJdPrice           float64  `json:"endJdPrice,omitempty" codec:"endJdPrice,omitempty"`                     // 结束京东价
 	StartOnlineTime      int64    `json:"startOnlineTime,omitempty" codec:"startOnlineTime,omitempty"`           // 开始上架时间
 	EndOnlineTime        int64    `json:"endOnlineTime,omitempty" codec:"endOnlineTime,omitempty"`               // 结束上架时间

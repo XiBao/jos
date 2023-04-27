@@ -4,7 +4,7 @@ type Ware struct {
 	WareId               uint64      `json:"wareId,omitempty" codec:"wareId,omitempty"`                             // 商品id
 	Title                string      `json:"title,omitempty" codec:"title,omitempty"`                               // 商品名称
 	CategoryId           uint64      `json:"categoryId,omitempty" codec:"categoryId,omitempty"`                     // 类目ID
-	BrandId              uint64      `json:"brandId,omitempty" codec:"brandId,omitempty"`                           // 	品牌ID
+	BrandId              uint64      `json:"brandId,omitempty" codec:"brandId,omitempty"`                           // 品牌ID
 	TemplateId           uint64      `json:"templateId,omitempty" codec:"templateId,omitempty"`                     // 关联板式id
 	TransportId          uint64      `json:"transportId,omitempty" codec:"transportId,omitempty"`                   // 运费模板ID
 	WareStatus           int         `json:"wareStatus,omitempty" codec:"wareStatus,omitempty"`                     // 商品状态 1:从未上架 2:自主下架 4:系统下架 8:上架 513:从未上架待审 514:自主下架待审 516:系统下架待审 520:上架待审核 1028:系统下架审核失败
@@ -21,7 +21,7 @@ type Ware struct {
 	AdWords              *AdWords    `json:"adWords,omitempty" codec:"adWords,omitempty"`                           // 商品广告词
 	Wrap                 string      `json:"wrap,omitempty" codec:"wrap,omitempty"`                                 // 包装规格
 	PackListing          string      `json:"packListing,omitempty" codec:"packListing,omitempty"`                   // 包装清单
-	Weight               float64     `json:"weight,omitempty" codec:"weight,omitempty"`                             // 	重
+	Weight               float64     `json:"weight,omitempty" codec:"weight,omitempty"`                             // 重
 	Width                float64     `json:"width,omitempty" codec:"width,omitempty"`                               // 宽
 	Height               float64     `json:"height,omitempty" codec:"height,omitempty"`                             // 高度
 	Length               float64     `json:"length,omitempty" codec:"length,omitempty"`                             // 长
@@ -30,16 +30,16 @@ type Ware struct {
 	Images               []*Image    `json:"images,omitempty" codec:"images,omitempty"`                             // 商品图片
 	ShopCategorys        []int       `json:"shopCategorys,omitempty" codec:"shopCategorys,omitempty"`               // 店内分类
 	MobileDesc           string      `json:"mobileDesc,omitempty" codec:"mobileDesc,omitempty"`                     // 移动端详情
-	Introduction         string      `json:"introduction,omitempty" codec:"introduction,omitempty"`                 // 	PC端详情
+	Introduction         string      `json:"introduction,omitempty" codec:"introduction,omitempty"`                 // PC端详情
 	ZhuangBaIntroduction string      `json:"zhuangBaIntroduction,omitempty" codec:"zhuangBaIntroduction,omitempty"` // 装吧详情
 	ZhuangBaId           string      `json:"zhuangBaId,omitempty" codec:"zhuangBaId,omitempty"`                     // 商品描述装吧实例ID
 	IntroductionUseFlag  string      `json:"introductionUseFlag,omitempty" codec:"introductionUseFlag,omitempty"`   // 商品描述使用标识 ,0：使用默认的商品描述,1：使用装吧商详
-	AfterSales           string      `json:"afterSales,omitempty" codec:"afterSales,omitempty"`                     // 	售后服务
-	Logo                 string      `json:"logo,omitempty" codec:"logo,omitempty"`                                 // 	商品主图
-	MarketPrice          float64     `json:"marketPrice,omitempty" codec:"marketPrice,omitempty"`                   // 	市场价
-	CostPrice            float64     `json:"costPrice,omitempty" codec:"costPrice,omitempty"`                       // 	成本价
+	AfterSales           string      `json:"afterSales,omitempty" codec:"afterSales,omitempty"`                     // 售后服务
+	Logo                 string      `json:"logo,omitempty" codec:"logo,omitempty"`                                 // 商品主图
+	MarketPrice          float64     `json:"marketPrice,omitempty" codec:"marketPrice,omitempty"`                   // 市场价
+	CostPrice            float64     `json:"costPrice,omitempty" codec:"costPrice,omitempty"`                       // 成本价
 	JdPrice              float64     `json:"jdPrice,omitempty" codec:"jdPrice,omitempty"`                           // 京东价
-	BrandName            string      `json:"brandName,omitempty" codec:"brandName,omitempty"`                       // 	品牌名称
+	BrandName            string      `json:"brandName,omitempty" codec:"brandName,omitempty"`                       // 品牌名称
 	StockNum             int         `json:"stockNum,omitempty" codec:"stockNum,omitempty"`                         // 总库存数
 	CategorySecId        int         `json:"categorySecId,omitempty" codec:"categorySecId,omitempty"`               // 二级叶子类目
 	ShopId               int         `json:"shopId,omitempty" codec:"shopId,omitempty"`                             // 商家对应的shopID，只读属性
@@ -52,13 +52,13 @@ type Ware struct {
 	ZhuangBaMobileDesc   string      `json:"zhuangBaMobileDesc,omitempty" codec:"zhuangBaMobileDesc,omitempty"`     // 移动版装吧商详
 	MobileZhuangBaId     string      `json:"mobileZhuangBaId,omitempty" codec:"mobileZhuangBaId,omitempty"`         // 移动版装吧实例ID
 	MobileDescUseFlag    string      `json:"mobileDescUseFlag,omitempty" codec:"mobileDescUseFlag,omitempty"`       // 移动版商品描述使用标识,0：使用默认的移动商详；1：使用装吧移动版商详
-	FitCaseHtmlPc        string      `json:"fitCaseHtmlPc,omitempty" codec:"fitCaseHtmlPc,omitempty"`               // 	装修案例PC版描述
+	FitCaseHtmlPc        string      `json:"fitCaseHtmlPc,omitempty" codec:"fitCaseHtmlPc,omitempty"`               // 装修案例PC版描述
 	FitCaseHtmlApp       string      `json:"fitCaseHtmlApp,omitempty" codec:"fitCaseHtmlApp,omitempty"`             // 装修案例移动版描述
 	SpecialServices      []string    `json:"specialServices,omitempty" codec:"specialServices,omitempty"`           // 特色服务,装修类目才可填写,装修类必填,最大为5,每个值最长为8个字符
 	ParentId             uint64      `json:"parentId,omitempty" codec:"parentId,omitempty"`                         // 商品父ID
 	WareGroupId          uint64      `json:"wareGroupId,omitempty" codec:"wareGroupId,omitempty"`                   // 商品分组ID
-	BusinessType         string      `json:"businessType,omitempty" codec:"businessType,omitempty"`                 // 	商品业务类型
-	DesignConcept        string      `json:"designConcept,omitempty" codec:"designConcept,omitempty"`               // 	商品设计理念,适用范围是toplife类目
+	BusinessType         string      `json:"businessType,omitempty" codec:"businessType,omitempty"`                 // 商品业务类型
+	DesignConcept        string      `json:"designConcept,omitempty" codec:"designConcept,omitempty"`               // 商品设计理念,适用范围是toplife类目
 	IsArchival           bool        `json:"isArchival,omitempty" codec:"isArchival,omitempty"`                     // 是否归档商品
 	TemplateIds          string      `json:"templateIds,omitempty" codec:"templateIds,omitempty"`                   // 关联版式
 

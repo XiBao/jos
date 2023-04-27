@@ -112,3 +112,15 @@ func (req *SearchSkuListRequest) GetOrderType() []string {
 	}
 	return nil
 }
+
+func (req *SearchSkuListRequest) SetWareTitle(wareTitle string) {
+	req.Request.Params["wareTitle"] = wareTitle
+}
+
+func (req *SearchSkuListRequest) GetWareTitle() string {
+	wareTitle, found := req.Request.Params["wareTitle"]
+	if found {
+		return wareTitle.(string)
+	}
+	return ""
+}

@@ -20,7 +20,7 @@ type SearchSkuListRequest struct {
 	EndCreatedTime    int64    `json:"endCreatedTime,omitempty" codec:"endCreatedTime,omitempty"`       // 创建时间范围
 	EndModifiedTime   int64    `json:"endModifiedTime,omitempty" codec:"endModifiedTime,omitempty"`     // 创建时间范围
 	StartCreatedTime  int64    `json:"startCreatedTime,omitempty" codec:"startCreatedTime,omitempty"`   // 修改时间范围
-	StartModifiedTime int64    `json:"startModifiedTime,omitempty" codec:"startModifiedTime,omitempty"` // 	修改时间范围
+	StartModifiedTime int64    `json:"startModifiedTime,omitempty" codec:"startModifiedTime,omitempty"` // 修改时间范围
 	OutId             []string `json:"outId,omitempty" codec:"outId,omitempty"`                         // 外部ID
 	ColType           []string `json:"colType,omitempty" codec:"colType,omitempty"`                     // 合作类型
 	ItemNum           string   `json:"itemNum,omitempty" codec:"itemNum,omitempty"`                     // 货号
@@ -29,7 +29,7 @@ type SearchSkuListRequest struct {
 	OrderType         []string `json:"orderType,omitempty" codec:"orderType,omitempty"`                 // 排序类型：asc、desc
 	PageNo            int      `json:"pageNo,omitempty" codec:"pageNo,omitempty"`                       // 页码
 	PageSize          int      `json:"page_size,omitempty" codec:"page_size,omitempty"`                 // 每页条数
-	Field             string   `json:"field,omitempty" codec:"field,omitempty"`                         // 	自定义返回字段
+	Field             string   `json:"field,omitempty" codec:"field,omitempty"`                         // 自定义返回字段
 }
 
 type SearchSkuListResponse struct {
@@ -70,7 +70,6 @@ func SearchSkuList(req *SearchSkuListRequest) (*SearchSkuListPage, error) {
 	if req.PageSize > 0 {
 		r.SetPageSize(req.PageSize)
 	}
-
 	if len(req.OrderField) > 0 {
 		r.SetOrderField(req.OrderField)
 	}
@@ -79,6 +78,9 @@ func SearchSkuList(req *SearchSkuListRequest) (*SearchSkuListPage, error) {
 	}
 	if len(req.SkuStatuValue) > 0 {
 		r.SetSkuStatusValue(req.SkuStatuValue)
+	}
+	if len(req.WareTitle) > 0 {
+		r.SetWareTitle(req.WareTitle)
 	}
 
 	result, err := client.Execute(r.Request, req.Session)
