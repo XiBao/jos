@@ -150,7 +150,7 @@ type CreativeData struct {
 	ActivityId     uint64                  `json:"activityId"`     // 联合活动id
 	NewAreaId      string                  `json:"newAreaId"`      // 地域id
 	PutType        uint                    `json:"putType"`        // 投放类型
-	Status         uint                    `json:"status"`         // 计划状态
+	Status         int                     `json:"status"`         // 计划状态
 	GrouId         uint64                  `json:"groupId"`        // 投放类型
 	GroupName      string                  `json:"groupName"`      // 单元名称
 	Device         uint                    `json:"device"`         // 设备类型
@@ -252,4 +252,92 @@ type KeywordData struct {
 	GroupId                      uint64  `json:"groupId"`                      // 单元id
 	GroupName                    string  `json:"groupName"`                    // 单元名称
 	KeyWordType                  uint    `json:"keyWordType"`                  // 词类型：1，关键词；2，意图词，注意：若是绑定了意图词，查询时返回的数据量会大于请求分页的数量，ex:查询10条，返回数据12条，其中2条是意图词信息
+}
+
+// 定向数据
+type DeliveryData struct {
+	CPC                         string  `json:"CPC"`                         // CPC
+	CPM                         string  `json:"CPM"`                         // CPM
+	CTR                         string  `json:"CTR"`                         // CTR
+	CampaignId                  uint64  `json:"campaignId"`                  // 计划id
+	CampaignName                string  `json:"campaignName"`                // 计划名称
+	CampaignType                uint    `json:"campaignType"`                // 计划类型
+	ClickDate                   string  `json:"clickDate"`                   // 点击时间
+	Clicks                      uint    `json:"clicks"`                      // clicks
+	Cost                        string  `json:"cost"`                        // cost
+	DeliveryType                uint    `json:"deliveryType"`                // 资源位0:汇总 1:推荐 ，2:搜索， 3：商品
+	DirectCartCnt               uint    `json:"directCartCnt"`               // 直接加购数
+	DirectOrderCnt              uint    `json:"directOrderCnt"`              // 直接订单数
+	DirectOrderSum              string  `json:"directOrderSum"`              // 直接订单金额
+	EffectCartCnt               uint    `json:"effectCartCnt"`               // 影响加购数
+	EffectOrderCnt              uint    `json:"effectOrderCnt"`              // 影响订单数
+	EffectOrderSum              string  `json:"effectOrderSum"`              // 影响订单金额
+	GroupId                     uint64  `json:"groupId"`                     // 单元id
+	GroupName                   string  `json:"groupName"`                   // 推广单元名称
+	Impressions                 uint    `json:"impressions"`                 // 展现数
+	IndirectCartCnt             uint    `json:"indirectCartCnt"`             // 间接加购数
+	IndirectOrderCnt            uint    `json:"indirectOrderCnt"`            // 间接订单数
+	IndirectOrderSum            string  `json:"indirectOrderSum"`            // 间接订单金额
+	IsDefaultPrice              bool    `json:"isDefaultPrice"`              // 否独立出价，true:系数出价，false:独立出价
+	PcPrice                     float64 `json:"pcPrice"`                     // PC出价
+	ProductDeliveryMatchingId   uint64  `json:"productDeliveryMatchingId"`   // 定向条件id
+	ProductDeliveryMatchingType uint    `json:"productDeliveryMatchingType"` // 定向条件匹配类型：1：sku定向，2：spu定向，3：类目定向
+	SkuBrandId                  uint64  `json:"skuBrandId"`                  // 品牌id
+	SkuBrandNameCn              string  `json:"skuBrandNameCn"`              // 品牌中文名
+	SkuCName3                   string  `json:"skuCName3"`                   // 三级类目中文名
+	SkuCid3                     uint64  `json:"skuCid3"`                     // 三级类目ID
+	SkuId                       uint64  `json:"skuId"`                       // skuId
+	TotalCartCnt                uint    `json:"totalCartCnt"`                // 总加购数
+	TotalOrderCVS               string  `json:"totalOrderCVS"`               // 转化率
+	TotalOrderCnt               uint    `json:"totalOrderCnt"`               // 总订单数
+	TotalOrderROI               string  `json:"totalOrderROI"`               // ROI
+	TotalOrderSum               string  `json:"totalOrderSum"`               // 总订单金额
+	WlPrice                     float64 `json:"wlPrice"`                     // 无线出价
+	WlPriceSource               string  `json:"wlPriceSource"`               // 无线出价系数
+}
+
+type DmpExtData struct {
+	CTR              string `json:"CTR"`
+	CPM              string `json:"CPM"`
+	Cost             string `json:"cost"`
+	TotalOrderSum    string `json:"totalOrderSum"`
+	TotalCartCnt     uint   `json:"totalCartCnt"`
+	TotalOrderROI    string `json:"totalOrderROI"`
+	Impressions      uint   `json:"impressions"`
+	IndirectOrderSum string `json:"indirectOrderSum"`
+	DirectOrderSum   string `json:"directOrderSum"`
+	IndirectOrderCnt uint   `json:"indirectOrderCnt"`
+	DirectOrderCnt   uint   `json:"directOrderCnt"`
+	IndirectCartCnt  uint   `json:"indirectCartCnt"`
+	TotalOrderCVS    string `json:"totalOrderCVS"`
+	CPC              string `json:"CPC"`
+	Clicks           uint   `json:"clicks"`
+	TotalOrderCnt    uint   `json:"totalOrderCnt"`
+	DirectCartCnt    uint   `json:"directCartCnt"`
+}
+
+type DmpData struct {
+	Impressions      uint   `json:"impressions"`      // 展现数
+	Clicks           uint   `json:"clicks"`           // clicks
+	CTR              string `json:"CTR"`              // CTR
+	Cost             string `json:"cost"`             // cost
+	CPM              string `json:"CPM"`              // CPM
+	CPC              string `json:"CPC"`              // CPC
+	DirectOrderCnt   uint   `json:"directOrderCnt"`   // 直接订单数
+	DirectOrderSum   string `json:"directOrderSum"`   // 直接订单金额
+	IndirectOrderCnt uint   `json:"indirectOrderCnt"` // 间接订单数
+	IndirectOrderSum string `json:"indirectOrderSum"` // 间接订单金额
+	TotalOrderCnt    uint   `json:"totalOrderCnt"`    // 总订单数
+	TotalOrderSum    string `json:"totalOrderSum"`    // 总订单金额
+	DirectCartCnt    uint   `json:"directCartCnt"`    // 直接加购数
+	IndirectCartCnt  uint   `json:"indirectCartCnt"`  // 间接加购数
+	TotalCartCnt     uint   `json:"totalCartCnt"`     // 总加购数
+	TotalOrderCVS    string `json:"totalOrderCVS"`    // 转化率
+	TotalOrderROI    string `json:"totalOrderROI"`    // ROI
+	DmpId            uint64 `json:"dmpId"`            // 人群id
+	DmpName          string `json:"dmpName"`          // 人群名称
+	DmpStatus        uint   `json:"dmpStatus"`        // 人群状态 0未启用 1 启用
+	DmpFactor        uint   `json:"dmpFactor"`        // 人群溢价系数
+	CampaignId       uint64 `json:"campaignId"`       // 计划id
+	GroupId          uint64 `json:"groupId"`          // 单元id
 }

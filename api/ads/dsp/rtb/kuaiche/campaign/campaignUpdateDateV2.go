@@ -3,7 +3,6 @@ package campaign
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
@@ -44,7 +43,6 @@ func KuaicheCampaignUpdateDateV2(req *KuaicheCampaignUpdateDateV2Request) (bool,
 	}
 
 	result, err := client.Execute(r.Request, req.Session)
-	fmt.Println(string(result))
 	if err != nil {
 		return false, err
 	}

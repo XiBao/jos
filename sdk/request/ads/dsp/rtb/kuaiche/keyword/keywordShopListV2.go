@@ -13,7 +13,6 @@ type KuaicheKeywordShopListRequestData struct {
 	ClickOrOrderDay      uint   `json:"clickOrOrderDay"`                // 当天:0;昨天：1;最近15天：15
 	GiftFlag             uint   `json:"giftFlag"`                       // 包含赠品 0不含赠品 1含赠品
 	CampaignId           uint64 `json:"campaignId,omitempty"`           // 计划id
-	PutType              uint   `json:"putType,omitempty"`              // 投放类型 3商品 4活动
 	EndDay               string `json:"endDay"`                         // 结束时间
 	GroupId              uint64 `json:"groupId,omitempty"`              // 单元id
 	StartDay             string `json:"startDay"`                       // 开始时间

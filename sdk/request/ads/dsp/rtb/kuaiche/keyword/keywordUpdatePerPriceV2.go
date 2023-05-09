@@ -12,7 +12,7 @@ type KuaicheKeywordUpdatePerPriceV2Request struct {
 type KuaicheKeywordUpdatePerPriceV2RequestData struct {
 	KeywordMobilePrice float64 `json:"keywordMobilePrice"` // 关键词无线出价
 	KeywordPrice       float64 `json:"keywordPrice"`       // 关键词pc出价
-	AdGroupId          uint64  `json:"adGroupId"`          // 单元id
+	AdgroupId          uint64  `json:"adGroupId"`          // 单元id
 	Id                 uint64  `json:"id"`                 // 关键词id
 	CampaignType       uint    `json:"campaignType"`       // 计划类型
 }
