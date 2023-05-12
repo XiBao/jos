@@ -12,7 +12,7 @@ type KuaicheDmpUpdateStatusV2Request struct {
 type KuaicheDmpUpdateStatusV2RequestData struct {
 	Ids         []uint64 `json:"ids"`         // 计划id集合
 	AdgroupId   uint64   `json:"adGroupId"`   // 单元id
-	OperateType uint     `json:"OperateType"` // 状态值 1暂停；2启动
+	OperateType uint     `json:"operateType"` // 状态值 1暂停；2启动
 }
 
 // create new request

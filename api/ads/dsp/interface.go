@@ -341,3 +341,35 @@ type DmpData struct {
 	CampaignId       uint64 `json:"campaignId"`       // 计划id
 	GroupId          uint64 `json:"groupId"`          // 单元id
 }
+
+type DmpCommonCrowdQuery struct {
+	CrowdId            uint64   `json:"crowdId"`            // 人群id
+	CrowdName          string   `json:"crowdName"`          // 人群名称
+	CrowdType          uint     `json:"crowdType"`          // 人群类型:1标签人群,2种子包人群,3扩展人群，4场景人群，5只能定向人群，6动态规则人群,7推荐促点击人群,8兴趣定向人群,9营销策略人群
+	SenceFirstCategory string   `json:"senceFirstCategory"` // 京选人群一级分类
+	EstimateUv         uint     `json:"estimateUv"`         // 曝光人数(默认人群为null)
+	EstimatePv         uint     `json:"estimatePv"`         // 曝光量(默认人群为-1)
+	SenceCrowdDesc     string   `json:"senceCrowdDesc"`     // 人群的描述信息
+	IsNewTagCompose    uint     `json:"isNewTagCompose"`    // 是否是新标题体系人群:0不是;1是
+	CrowdTabType       uint     `json:"crowdTabType"`       // 按照人群快车投放端tab的分类枚举:1.DMP，2定向，3京选,4智能定向人群
+	ExpiredTime        uint64   `json:"expiredTime"`        // 过期时间
+	CrowdKeyWordDesc   []string `json:"crowdKeyWordDesc"`   // 人群tag描述：对应应用情景及人群特点列
+}
+
+type TagVO struct {
+	TagId                uint64 `json:"tagId"`                // 标签ID
+	TagName              string `json:"tagName"`              // 标签名称
+	TagDesc              string `json:"tagDesc"`              // 标签描述
+	FilterDemo           string `json:"filterDemo"`           // 筛选项示例
+	IndustryHot          string `json:"industryHot"`          // 行业热度
+	CoverageRate         string `json:"coverageRate"`         // 覆盖率
+	IsFavorite           uint   `json:"isFavorite"`           // 是否收藏，1收藏
+	NewTag               bool   `json:"newTag"`               // 是否为新上标签
+	ExtInfo              string `json:"extInfo"`              // 扩展信息，Json串
+	TagSourceId          uint   `json:"tagSourceId"`          // 标签来源ID
+	ImpUrl               string `json:"impUrl"`               // 曝光url
+	ViewDetailsClickUrl  string `json:"viewDetailsClickUrl"`  // 点击url
+	AddIntoBoardClickUrl string `json:"addIntoBoardClickUrl"` // 添加看板点击url
+	OfflineTag           bool   `json:"offlineTag"`           // 是否是即将下线标签
+	ValidNum             uint   `json:"validNum"`             // 有效种子包数量
+}

@@ -20,7 +20,7 @@ type KuaicheCreativeAddV2Request struct {
 }
 
 type KuaicheCreativeAddV2Response struct {
-	Responce  *KuaicheCreativeAddV2Responce `json:"jingdong_ads_dsp_rtb_kc_ad_edit_v2_responce,omitempty" codec:"jingdong_ads_dsp_rtb_kc_ad_edit_v2_responce,omitempty"`
+	Responce  *KuaicheCreativeAddV2Responce `json:"jingdong_ads_dsp_rtb_kc_ad_add_v2_responce,omitempty" codec:"jingdong_ads_dsp_rtb_kc_ad_add_v2_responce,omitempty"`
 	ErrorResp *api.ErrorResponnse           `json:"error_response,omitempty" codec:"error_response,omitempty"`
 }
 
