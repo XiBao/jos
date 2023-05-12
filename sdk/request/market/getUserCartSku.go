@@ -1,4 +1,4 @@
-package sku
+package market
 
 import (
 	"github.com/XiBao/jos/sdk"
@@ -42,7 +42,7 @@ func (req *GetUserCartSkuRequest) GetOpenIdBuyer() string {
 }
 
 func (req *GetUserCartSkuRequest) SetXidBuyer(xidBuyer string) {
-	req.Request.Params["xid_buyer"] = xidIdBuyer
+	req.Request.Params["xid_buyer"] = xidBuyer
 }
 
 func (req *GetUserCartSkuRequest) GetXidIdBuyer() string {
