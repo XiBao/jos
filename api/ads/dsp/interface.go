@@ -373,3 +373,144 @@ type TagVO struct {
 	OfflineTag           bool   `json:"offlineTag"`           // 是否是即将下线标签
 	ValidNum             uint   `json:"validNum"`             // 有效种子包数量
 }
+
+type TagDetail struct {
+	TemplateId         string                        `json:"templateId"`         // 模版id
+	TemplateDesc       string                        `json:"templateDesc"`       // 模版描述
+	IndustryHot        string                        `json:"industryHot"`        // 热度
+	CoverageRate       string                        `json:"coverageRate"`       // 覆盖分
+	TemplateSearchDesc string                        `json:"templateSearchDesc"` // 搜索文案
+	DimensionType      uint                          `json:"dimensionType"`      // 标签类型，根据不同的标签类型从不同的属性中取筛选项
+	TagId              uint64                        `json:"tagId"`              // 标签id
+	TagName            string                        `json:"tagName"`            // 标签名称
+	CommitAttribute    []string                      `json:"commitAttribute"`    // 设置标签时提交的属性名称
+	ChoosedItems       []TagDetailChoosedItem        `json:"choosedItems"`       // 已经勾选的筛选项
+	CategoryNodes      []TagDetailCategoryNode       `json:"categoryNodes"`      // 三级类目筛选项，仅当dimenType为2时有效
+	Level2data         []TagDetailLevel2data         `json:"level2data"`         // level2data 筛选项数据
+	Level2Type         uint                          `json:"level2Type"`         // level2Type筛选项数据类型
+	PriceAttributes    []TagDetailPriceAttribute     `json:"priceAttributes"`    // 价格属性信息
+	BaseDimenId        uint64                        `json:"baseDimenId"`        // 后台维度id
+	DimenStatus        uint                          `json:"dimenStatus"`        // 标签状态
+	FrequencyAttribute []TagDetailFrequencyAttribute `json:"frequencyAttribute"` // 频率相关属性配置
+	CategoryLimit      uint                          `json:"categoryLimit"`      // 筛选项个数限制，通常为200
+	IsActionComplexTag uint                          `json:"isActionComplexTag"` // 是否是行为复合标签：0不是;1是
+	CompeteGoodsType   uint                          `json:"competeGoodsType"`   // 竞品圈选程度：高、中、低
+	HasCompeteGoods    bool                          `json:"hasCompeteGoods"`    // 判断用户是否有竞品数据
+	BoardId            int64                         `json:"boardId"`            // 看板id
+	RelevantDegreeType uint                          `json:"relevantDegreeType"` // 关联度选择：高中低
+	ResourceType       string                        `json:"resourceType"`       // 资源类型 0：全部 1：主站 2：京喜
+	ExtendInfo         *TagDetailExtendInfo          `json:"extendInfo"`         // 扩展属性对象
+	SelectedData       []TagDetailSelectedData       `json:"selectedData"`       // 扩展属性
+}
+
+type TagDetailSelectedData struct {
+	Wid              uint64                 `json:"wid"`                   // 当前记录ID
+	Pid              uint64                 `json:"pid"`                   // 父ID
+	Name             string                 `json:"name"`                  // 名称
+	Level            uint                   `json:"level"`                 // 层级
+	CidLevel         uint                   `json:"cidLevel"`              // 类目层级
+	CategoryName     string                 `json:"categoryName"`          // 类目名称
+	Yn               uint                   `json:"yn"`                    // yn
+	SonTreeNode      *TagDetailSelectedData `json:"sonTreeNode,omitempty"` // 嵌套子节点
+	JointCampaignIds []uint64               `json:"jointCampaignIds"`      // 计划ID
+}
+
+type TagDetailExtendInfo struct {
+	ResourceTypes  []TagDetailExtendInfoResourceType  `json:"resourceTypes"`  // 数据范围
+	CategoryLevels []TagDetailExtendInfoCategoryLevel `json:"categoryLevels"` // 类目级别
+	Attribute      []TagDetailExtendInfoAttribute     `json:"attribute"`      // 标签属性
+	ComplexActions []TagDetailExtendInfoComplexAction `json:"complexActions"` // 复合行为标签里面的行为信息
+}
+
+type TagDetailExtendInfoComplexAction struct {
+	Id             string `json:"id"`             // id
+	Name           string `json:"name"`           // name
+	Checked        uint   `json:"checked"`        // checked
+	Type           uint   `json:"type"`           // type
+	TagValueValid  uint   `json:"tagValueValid"`  // 标签值是否有效，默认有效
+	IsCompeteGoods uint   `json:"isCompeteGoods"` // 标签是否为竞品，默认不是
+}
+
+type TagDetailExtendInfoAttribute struct {
+	DefineId  uint64                               `json:"defineId"`  // 属性主键
+	CommitKey string                               `json:"commitKey"` // 提交英文属性名称
+	CnName    string                               `json:"cnName"`    // 属性中文名称
+	Config    []TagDetailExtendInfoAttributeConfig `json:"config"`    // 选中的具体属性值
+}
+
+type TagDetailExtendInfoAttributeConfig struct {
+	Name                string                                        `json:"name"`                // 前台属性中文名称
+	Wid                 string                                        `json:"wid"`                 // 值
+	Checked             bool                                          `json:"checked"`             // 是否勾选
+	Configured          bool                                          `json:"configured"`          // 是否显示此属性
+	PriceBeginValue     float64                                       `json:"priceBeginValue"`     // 价格区间
+	PriceEndValue       float64                                       `json:"priceEndValue"`       // 价格区间
+	FrequencyBeginValue uint                                          `json:"frequencyBeginValue"` // 频次区间
+	FrequencyEndValue   uint                                          `json:"frequencyEndValue"`   // 频次区间
+	CommonDays          []TagDetailExtendInfoAttributeConfigCommonDay `json:"commonDays"`          // 复合类目行为时间
+}
+
+type TagDetailExtendInfoAttributeConfigCommonDay struct {
+	CommitKey string `json:"commitKey"` // 提交英文属性名称
+}
+
+type TagDetailExtendInfoCategoryLevel struct {
+	Pid        uint64 `json:"pid"`        // 父ID
+	Id         uint64 `json:"id"`         // id
+	Name       string `json:"name"`       // 商品名称
+	Wid        uint64 `json:"wid"`        // 当前ID
+	IsParent   bool   `json:"isParent"`   // 是否为父节点
+	Checked    bool   `json:"checked"`    // 是否选中
+	Nocheck    bool   `json:"nocheck"`    // 是否显示复选框
+	Configured bool   `json:"configured"` // 后台是否配置
+}
+
+type TagDetailExtendInfoResourceType struct {
+	Pid        uint64 `json:"pid"`        // 父ID
+	Id         uint64 `json:"id"`         // id
+	Name       string `json:"name"`       // 商品名称
+	Wid        uint64 `json:"wid"`        // 当前ID
+	IsParent   bool   `json:"isParent"`   // 是否为父节点
+	Checked    bool   `json:"checked"`    // 是否选中
+	Nocheck    bool   `json:"nocheck"`    // 是否显示复选框
+	Configured bool   `json:"configured"` // 后台是否配置
+}
+
+type TagDetailFrequencyAttribute struct {
+	BeginValue uint `json:"beginValue"` // 频率的起始值
+	EndValue   uint `json:"endValue"`   // 频率的结束值
+}
+
+type TagDetailPriceAttribute struct {
+	AttributeId   string  `json:"attributeId"`   // attributeId
+	AttributeName string  `json:"attributeName"` // attributeName
+	Checked       uint    `json:"checked"`       // 是否选中，1选中，0不选中
+	EndPrice      float64 `json:"endPrice"`      // 结束价格
+	StartPrice    float64 `json:"startPrice"`    // 起始价格
+}
+
+type TagDetailLevel2data struct {
+	Id               string                `json:"id"`                 // id
+	Pid              string                `json:"pid"`                // pid
+	Name             string                `json:"name"`               // name
+	CommitId         uint64                `json:"commitId"`           // commitId
+	Type             uint                  `json:"type"`               // 表示通天塔or联合活动，1：通天塔；2：联合活动
+	JointCampaignIds []uint64              `json:"jointCampaignIds"`   // 如果type=2,此字段有值，表示联合活动对应的通天塔活动id
+	SonNodes         []TagDetailLevel2data `json:"sonNodes,omitempty"` // sonNodes
+}
+
+type TagDetailCategoryNode struct {
+	Wid          uint64 `json:"wid"`          // 当前记录id
+	Pid          uint64 `json:"pid"`          // 父记录id
+	Name         string `json:"name`          // 名称
+	Level        uint   `json:"level"`        // 层级
+	CidLevel     uint   `json:"cidLevel"`     // 子节点层级
+	CategoryName string `json:"categoryName"` // 类目名称
+}
+
+type TagDetailChoosedItem struct {
+	Id      string `json:"id"`      // 筛选项id
+	Name    string `json:"name"`    // 筛选项名称
+	Checked uint   `json:"checked"` // 	是否被选中
+	Type    uint   `json:"type"`    // 类型
+}
