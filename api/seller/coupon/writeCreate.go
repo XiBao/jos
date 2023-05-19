@@ -13,7 +13,7 @@ import (
 type CouponWriteCreateRequest struct {
 	api.BaseRequest
 	Ip            string   `json:"ip,omitempty" codec:"ip,omitempty"`                       // 调用方IP
-	Port          string   `json:"string,omitempty" codec:"string,omitempty"`               // 调用方端口
+	Port          string   `json:"port,omitempty" codec:"port,omitempty"`                   // 调用方端口
 	Name          string   `json:"name,omitempty" codec:"name,omitempty"`                   // 优惠券名称（长度小于30）
 	Type          uint8    `json:"type,omitempty" codec:"type,omitempty"`                   // 优惠券类型 0京券 1东券
 	BindType      uint8    `json:"bindType,omitempty" codec:"bindType,omitempty"`           // 绑定类型 1全店参加 2指定sku参加
@@ -55,7 +55,7 @@ type CouponWriteCreateData struct {
 	Code      string `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
 
-	CouponId uint64 `json:"coupon_id,omitempty" codec:"coupon_id,omitempty"`
+	CouponId uint64 `json:"couponId,omitempty" codec:"couponId,omitempty"`
 }
 
 func CouponWriteCreate(req *CouponWriteCreateRequest) (uint64, error) {
