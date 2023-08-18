@@ -1,28 +1,27 @@
-// +build debug
-
-package debug
+package logger
 
 import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"log"
 )
 
-func DebugPrintError(err error) {
+type DebugLogger struct{}
+
+func (l DebugLogger) DebugPrintError(err error) {
 	log.Println("[JOS_DEBUG] [ERROR]", err)
 }
 
-func DebugPrintStringResponse(str string) {
+func (l DebugLogger) DebugPrintStringResponse(str string) {
 	log.Println("[JOS_DEBUG] [RESPONSE]", str)
 }
 
-func DebugPrintGetRequest(url string) {
+func (l DebugLogger) DebugPrintGetRequest(url string) {
 	log.Println("[JOS_DEBUG] [API] GET", url)
 }
 
-func DebugPrintPostJSONRequest(url string, body []byte) {
+func (l DebugLogger) DebugPrintPostJSONRequest(url string, body []byte) {
 	const format = "[JOS_DEBUG] [API] JSON POST %s\n" +
 		"http request body:\n%s\n"
 
@@ -33,12 +32,12 @@ func DebugPrintPostJSONRequest(url string, body []byte) {
 	log.Printf(format, url, body)
 }
 
-func DebugPrintPostMultipartRequest(url string, body []byte) {
+func (l DebugLogger) DebugPrintPostMultipartRequest(url string, body []byte) {
 	log.Println("[JOS_DEBUG] [API] multipart/form-data POST", url)
 }
 
-func DecodeJSONHttpResponse(r io.Reader, v interface{}) error {
-	body, err := ioutil.ReadAll(r)
+func (l DebugLogger) DecodeJSONHttpResponse(r io.Reader, v interface{}) error {
+	body, err := io.ReadAll(r)
 	if err != nil {
 		return err
 	}
