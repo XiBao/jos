@@ -144,10 +144,6 @@ func (c *Client) Execute(req *Request, token string) (result []byte, err error) 
 	debug := c.Logger()
 	debug.DebugPrintPostJSONRequest(gwURL, Json(sysParams))
 	gatewayUrl := fmt.Sprintf(`%s?%s`, gwURL, values.Encode())
-	if c.Debug {
-		unescapeUrl, _ := url.QueryUnescape(gatewayUrl)
-		fmt.Println(unescapeUrl)
-	}
 	debug.DebugPrintGetRequest(gatewayUrl)
 	var (
 		response *http.Response
@@ -205,7 +201,7 @@ func (c *Client) PostExecute(req *Request, token string) (result []byte, err err
 		values.Add(k, v)
 	}
 	gwURL := GATEWAY_URL
-	if c.Debug {
+	if c.Dev {
 		gwURL = GATEWAY_DEV_URL
 	} else if req.IsLogGW {
 		gwURL = LOG_GATEWAY_URL
