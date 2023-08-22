@@ -6,14 +6,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"sort"
 	"strings"
 	"time"
 
-	"github.com/XiBao/jos/sdk/internal/debug"
+	"github.com/XiBao/jos/sdk/internal/logger"
 )
 
 type Request struct {
@@ -32,6 +31,7 @@ type Client struct {
 	AppKey    string
 	SecretKey string
 
+	Dev   bool
 	Debug bool
 }
 
@@ -47,8 +47,16 @@ func NewClient(appKey string, secretKey string) *Client {
 	}
 }
 
+func (c *Client) Logger() logger.Logger {
+	if c.Debug {
+		return logger.Debug
+	}
+	return logger.Default
+}
+
 func (c *Client) GetAccessTokenNew(code string) (string, error) {
 	gatewayUrl := fmt.Sprintf("https://open-oauth.jd.com/oauth2/access_token?app_key=%s&app_secret=%s&grant_type=authorization_code&code=%s", c.AppKey, c.SecretKey, code)
+	debug := c.Logger()
 	debug.DebugPrintGetRequest(gatewayUrl)
 	response, err := http.DefaultClient.Get(gatewayUrl)
 	if err != nil {
@@ -56,7 +64,7 @@ func (c *Client) GetAccessTokenNew(code string) (string, error) {
 		return "", err
 	}
 	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		debug.DebugPrintError(err)
 		return "", err
@@ -76,6 +84,7 @@ func (c *Client) GetAccessToken(code, state, redirectUri string) (string, error)
 	values.Add("client_secret", c.SecretKey)
 
 	gatewayUrl := fmt.Sprintf(`%s?%s`, `https://oauth.jd.com/oauth/token`, values.Encode())
+	debug := c.Logger()
 	debug.DebugPrintGetRequest(gatewayUrl)
 	response, err := http.DefaultClient.Get(gatewayUrl)
 	if err != nil {
@@ -83,7 +92,7 @@ func (c *Client) GetAccessToken(code, state, redirectUri string) (string, error)
 		return "", err
 	}
 	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		debug.DebugPrintError(err)
 		return "", err
@@ -91,6 +100,10 @@ func (c *Client) GetAccessToken(code, state, redirectUri string) (string, error)
 	res := string(body)
 	debug.DebugPrintStringResponse(res)
 	return res, nil
+}
+
+func (c *Client) SetDev(dev bool) {
+	c.Dev = dev
 }
 
 func (c *Client) Execute(req *Request, token string) (result []byte, err error) {
@@ -121,19 +134,16 @@ func (c *Client) Execute(req *Request, token string) (result []byte, err error) 
 		values.Add(k, v)
 	}
 	gwURL := GATEWAY_URL
-	if c.Debug {
+	if c.Dev {
 		gwURL = GATEWAY_DEV_URL
 	} else if req.IsLogGW {
 		gwURL = LOG_GATEWAY_URL
 	} else if req.IsUnionGW {
 		gwURL = UNION_GATEWAY_URL
 	}
+	debug := c.Logger()
 	debug.DebugPrintPostJSONRequest(gwURL, Json(sysParams))
 	gatewayUrl := fmt.Sprintf(`%s?%s`, gwURL, values.Encode())
-	if c.Debug {
-		unescapeUrl, _ := url.QueryUnescape(gatewayUrl)
-		fmt.Println(unescapeUrl)
-	}
 	debug.DebugPrintGetRequest(gatewayUrl)
 	var (
 		response *http.Response
@@ -154,7 +164,7 @@ func (c *Client) Execute(req *Request, token string) (result []byte, err error) 
 		break
 	}
 	defer response.Body.Close()
-	res, e := ioutil.ReadAll(response.Body)
+	res, e := io.ReadAll(response.Body)
 	if e != nil {
 		debug.DebugPrintError(err)
 		return nil, Error{Code: 0, Msg: fmt.Sprintf("ReadAll on response.Body: %v", e)}
@@ -191,13 +201,14 @@ func (c *Client) PostExecute(req *Request, token string) (result []byte, err err
 		values.Add(k, v)
 	}
 	gwURL := GATEWAY_URL
-	if c.Debug {
+	if c.Dev {
 		gwURL = GATEWAY_DEV_URL
 	} else if req.IsLogGW {
 		gwURL = LOG_GATEWAY_URL
 	} else if req.IsUnionGW {
 		gwURL = UNION_GATEWAY_URL
 	}
+	debug := c.Logger()
 	debug.DebugPrintPostJSONRequest(gwURL, Json(sysParams))
 
 	response, e := http.PostForm(gwURL, values)
@@ -206,7 +217,7 @@ func (c *Client) PostExecute(req *Request, token string) (result []byte, err err
 		return nil, Error{Code: 0, Msg: "HTTP Response Error"}
 	}
 	defer response.Body.Close()
-	res, e := ioutil.ReadAll(response.Body)
+	res, e := io.ReadAll(response.Body)
 	if e != nil {
 		debug.DebugPrintError(err)
 		return nil, Error{Code: 0, Msg: fmt.Sprintf("ReadAll on response.Body: %v", e)}
