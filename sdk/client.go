@@ -39,7 +39,7 @@ func GetOauthURL(appKey, rURI, state, scope string) string {
 	return fmt.Sprintf("https://open-oauth.jd.com/oauth2/to_login?app_key=%s&response_type=code&redirect_uri=%s&state=%s&scope=%s", appKey, url.QueryEscape(rURI), state, scope)
 }
 
-//create new client
+// create new client
 func NewClient(appKey string, secretKey string) *Client {
 	return &Client{
 		AppKey:    appKey,

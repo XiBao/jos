@@ -3,7 +3,6 @@ package creative
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
@@ -44,7 +43,6 @@ func KuaicheCreativeAddV2(req *KuaicheCreativeAddV2Request) (uint64, error) {
 	}
 
 	result, err := client.Execute(r.Request, req.Session)
-	fmt.Println(string(result))
 	if err != nil {
 		return 0, err
 	}

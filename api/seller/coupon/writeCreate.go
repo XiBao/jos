@@ -42,8 +42,9 @@ type CouponWriteCreateRequest struct {
 	ItemId        uint64   `json:"itemId,omitempty" codec:"itemId,omitempty"`               // 京豆换券项目ID(不赋值)
 	ShareType     uint8    `json:"shareType,omitempty" codec:"shareType,omitempty"`         // 分享类型 1分享 2不分享（如设置京券type=0,此参数必填2不分享）
 	SkuId         []uint64 `json:"skuId,omitempty" codec:"skuId,omitempty"`                 // 商品sku编号(如设置bindType为2，此参数必填,需是有效sku)
-	UserClass     int      `json:"userClass,omitempty" codec:"userClass,omitempty"`         // 会员类别 20000-普通会员，30000-付费会员，60000-新付费会员
-	ActivityLink  string   `json:"activityLink,omitempty" codec:"activityLink,omitempty"`   //活动返回链接
+	UserClass     int      `json:"userClass,omitempty" codec:"userClass,omitempty"`         // 会员类别 20000-普通会员，30000-付费会员，60000-新付费会员,70000-店铺粉丝会员
+	ActivityLink  string   `json:"activityLink,omitempty" codec:"activityLink,omitempty"`   // 活动返回链接
+	NumPerSending string   `json:"numPerSending,omitempty" codec:"numPerSending,omitempty"` // 单次发放张数，值是String，范围[1,10]；必须小于等于券数量num
 }
 
 type CouponWriteCreateResponse struct {
@@ -111,6 +112,10 @@ func CouponWriteCreate(req *CouponWriteCreateRequest) (uint64, error) {
 
 	if len(req.ActivityLink) > 0 {
 		r.SetActivityLink(req.ActivityLink)
+	}
+
+	if req.NumPerSending != "" {
+		r.SetNumPerSending(req.NumPerSending)
 	}
 
 	result, err := client.PostExecute(r.Request, req.Session)
