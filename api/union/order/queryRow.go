@@ -11,7 +11,7 @@ import (
 
 type UnionOrderQueryRowRequest struct {
 	api.BaseRequest
-	PageIndex    uint   `json:"pageIndex`
+	PageIndex    uint   `json:"pageIndex"`
 	PageSize     uint   `json:"pageSize"`               // 每页包含条数，上限为500
 	Type         uint   `json:"type"`                   // 订单时间查询类型(1：下单时间，2：完成时间（购买用户确认收货时间），3：更新时间
 	StartTime    string `json:"startTime"`              // 开始时间 格式yyyy-MM-dd HH:mm:ss，与endTime间隔不超过1小时
@@ -43,7 +43,7 @@ type OrderRowResp struct {
 	ParentId            uint64    `json:"parentId"`                 // 父单的订单号：如一个订单拆成多个子订单时，原订单号会作为父单号，拆分的订单号为子单号存储在orderid中。若未发生拆单，该字段为0
 	OrderTime           string    `json:"orderTime"`                // 下单时间,格式yyyy-MM-dd HH:mm:ss
 	FinishTime          string    `json:"finishTime"`               // 完成时间（购买用户确认收货时间）,格式yyyy-MM-dd HH:mm:ss
-	ModifyTime          string    `json:"modifyTime`                // 更新时间,格式yyyy-MM-dd HH:mm:ss
+	ModifyTime          string    `json:"modifyTime"`               // 更新时间,格式yyyy-MM-dd HH:mm:ss
 	OrderEmt            uint      `json:"orderEmt"`                 // 下单设备 1.pc 2.无线
 	Plus                uint      `json:"plus"`                     // 下单用户是否为PLUS会员 0：否，1：是
 	UnionId             uint64    `json:"unionId"`                  // 推客ID
