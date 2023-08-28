@@ -5,7 +5,7 @@ import (
 )
 
 type BigFieldGoodsReq struct {
-	SkuIds []uint64 `json:"skuIds`
+	SkuIds []uint64 `json:"skuIds"`
 	Fields []string `json:"fields"`
 }
 

@@ -13,7 +13,7 @@ import (
 
 type PromotionGoodsInfoQueryRequest struct {
 	api.BaseRequest
-	SkuIds []uint64 `json:"skuIds` // skuId集合
+	SkuIds []uint64 `json:"skuIds"` // skuId集合
 }
 
 type PromotionGoodsInfoQueryResponse struct {

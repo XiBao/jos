@@ -5,7 +5,7 @@ import (
 )
 
 type OrderReq struct {
-	PageNo       uint   `json:"pageNo`
+	PageNo       uint   `json:"pageNo"`
 	PageSize     uint   `json:"pageSize"`
 	Type         uint   `json:"type"`
 	Time         string `json:"time"`

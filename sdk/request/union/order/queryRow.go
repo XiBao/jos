@@ -5,7 +5,7 @@ import (
 )
 
 type OrderRowReq struct {
-	PageIndex    uint   `json:"pageIndex`
+	PageIndex    uint   `json:"pageIndex"`
 	PageSize     uint   `json:"pageSize"`               // 每页包含条数，上限为500
 	Type         uint   `json:"type"`                   // 订单时间查询类型(1：下单时间，2：完成时间（购买用户确认收货时间），3：更新时间
 	StartTime    string `json:"startTime"`              // 开始时间 格式yyyy-MM-dd HH:mm:ss，与endTime间隔不超过1小时

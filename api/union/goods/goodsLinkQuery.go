@@ -12,7 +12,7 @@ import (
 
 type GoodsLinkQueryRequest struct {
 	api.BaseRequest
-	Url        string `json:"url`         // 链接
+	Url        string `json:"url"`        // 链接
 	SubUnionId string `json:"subUnionId"` // 子联盟ID（需要联系运营开通权限才能拿到数据）
 }
 

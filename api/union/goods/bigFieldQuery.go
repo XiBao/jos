@@ -12,7 +12,7 @@ import (
 
 type BidFieldQueryRequest struct {
 	api.BaseRequest
-	SkuIds []uint64 `json:"skuIds`  // skuId集合
+	SkuIds []uint64 `json:"skuIds"` // skuId集合
 	Fields []string `json:"fields"` // 查询域集合，不填写则查询全部 ('categoryInfo','imageInfo','baseBigFieldInfo','bookBigFieldInfo','videoBigFieldInfo')
 }
 

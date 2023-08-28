@@ -502,7 +502,7 @@ type TagDetailLevel2data struct {
 type TagDetailCategoryNode struct {
 	Wid          uint64 `json:"wid"`          // 当前记录id
 	Pid          uint64 `json:"pid"`          // 父记录id
-	Name         string `json:"name`          // 名称
+	Name         string `json:"name"`         // 名称
 	Level        uint   `json:"level"`        // 层级
 	CidLevel     uint   `json:"cidLevel"`     // 子节点层级
 	CategoryName string `json:"categoryName"` // 类目名称
