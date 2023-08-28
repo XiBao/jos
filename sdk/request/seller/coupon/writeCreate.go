@@ -400,3 +400,15 @@ func (req *SellerCouponWriteCreateRequest) GetActivityLink() string {
 	}
 	return ""
 }
+
+func (req *SellerCouponWriteCreateRequest) SetNumPerSending(numPerSending string) {
+	req.Request.Params["numPerSending"] = numPerSending
+}
+
+func (req *SellerCouponWriteCreateRequest) GetNumPerSending() string {
+	numPerSending, found := req.Request.Params["numPerSending"]
+	if found {
+		return numPerSending.(string)
+	}
+	return ""
+}
