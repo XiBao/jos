@@ -11,7 +11,7 @@ import (
 
 type UnionOrderQueryRequest struct {
 	api.BaseRequest
-	PageNo       uint   `json:"pageNo`                  // 页码，返回第几页结果
+	PageNo       uint   `json:"pageNo"`                 // 页码，返回第几页结果
 	PageSize     uint   `json:"pageSize"`               // 每页包含条数，上限为500
 	Type         uint   `json:"type"`                   // 订单时间查询类型(1：下单时间，2：完成时间，3：更新时间)
 	Time         string `json:"time"`                   // 查询时间，建议使用分钟级查询，格式：yyyyMMddHH、yyyyMMddHHmm或yyyyMMddHHmmss，如201811031212 的查询范围从12:12:00--12:12:59
