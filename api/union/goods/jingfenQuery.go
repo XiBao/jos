@@ -82,7 +82,7 @@ type JFVideo struct {
 	ImageUrl  string `json:"imageUrl,omitempty"`  // 视频图片地址
 	VideoType uint   `json:"videoType,omitempty"` // 1:主图，2：商详
 	PlayUrl   string `json:"playUrl,omitempty"`   // 播放地址
-	playType  string `json:"playType,omitempty"`  // low：标清，high：高清
+	PlayType  string `json:"playType,omitempty"`  // low：标清，high：高清
 }
 
 type JFPingou struct {
