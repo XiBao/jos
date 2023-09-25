@@ -29,7 +29,7 @@ type UnionOrderBonusQueryRequest struct {
 
 type UnionOrderBonusQueryResponse struct {
 	ErrorResp *api.ErrorResponnse               `json:"error_response,omitempty"`
-	Data      *UnionOrderBonusQueryResponseData `json:"jd_union_open_order_bonus_query_response,omitempty"`
+	Data      *UnionOrderBonusQueryResponseData `json:"jd_union_open_order_bonus_query_responce,omitempty"`
 }
 
 type UnionOrderBonusQueryResponseData struct {
