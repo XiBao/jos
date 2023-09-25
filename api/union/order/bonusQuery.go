@@ -33,7 +33,7 @@ type UnionOrderBonusQueryResponse struct {
 }
 
 type UnionOrderBonusQueryResponseData struct {
-	Result string `json:"result,omitempty"`
+	Result string `json:"queryResult,omitempty"`
 }
 
 type UnionOrderBonusQueryResult struct {
