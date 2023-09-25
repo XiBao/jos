@@ -63,7 +63,7 @@ type Url struct {
 }
 
 type BaseBigFieldInfo struct {
-	wdis     string  `json:"wdis,omitempty"`     // 商品介绍
+	Wdis     string  `json:"wdis,omitempty"`     // 商品介绍
 	PropCode string  `json:"propCode,omitempty"` // 规格参数
 	WareQD   float64 `json:"wareQD,omitempty"`   // 包装清单(仅自营商品)
 }
