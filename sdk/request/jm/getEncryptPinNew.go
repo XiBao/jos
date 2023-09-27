@@ -26,7 +26,7 @@ func (req *GetEncryptPinNewRequest) GetSource() string {
 	if found {
 		return source.(string)
 	}
-	return ``
+	return ""
 }
 
 func (req *GetEncryptPinNewRequest) SetToken(token string) {

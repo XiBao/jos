@@ -18,7 +18,7 @@ type FindCateByIdRequest struct {
 
 type FindCateByIdResponse struct {
 	ErrorResp *api.ErrorResponnse `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *FindCateByIdData   `json:"jingdong_category_read_findById_response,omitempty" codec:"jingdong_category_read_findById_response,omitempty"`
+	Data      *FindCateByIdData   `json:"jingdong_category_read_findById_responce,omitempty" codec:"jingdong_category_read_findById_responce,omitempty"`
 }
 
 type FindCateByIdData struct {

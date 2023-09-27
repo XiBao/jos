@@ -41,23 +41,23 @@ func GetEncryptPinNew(req *GetEncryptPinNewRequest) (string, error) {
 
 	result, err := client.Execute(r.Request, req.Session)
 	if err != nil {
-		return ``, err
+		return "", err
 	}
 	if len(result) == 0 {
-		return ``, errors.New("No result info.")
+		return "", errors.New("No result info.")
 	}
 	var response GetEncryptPinNewResponse
 	err = json.Unmarshal(result, &response)
 	if err != nil {
-		return ``, err
+		return "", err
 	}
 
 	if response.ErrorResp != nil {
-		return ``, response.ErrorResp
+		return "", response.ErrorResp
 	}
 
 	if response.Data.ReturnType.Code != 0 {
-		return ``, errors.New(response.Data.ReturnType.Message)
+		return "", errors.New(response.Data.ReturnType.Message)
 	}
 
 	return response.Data.ReturnType.Pin, nil
