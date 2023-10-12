@@ -19,6 +19,7 @@ type UnionOrderQueryRowRequest struct {
 	ChildUnionId string `json:"childUnionId,omitempty"` // 子推客unionID，传入该值可查询子推客的订单，注意不可和key同时传入。（需联系运营开通PID权限才能拿到数据）
 	Key          string `json:"key,omitempty"`          // 工具商传入推客的授权key，可帮助该推客查询订单，注意不可和childUnionid同时传入。（需联系运营开通工具商权限才能拿到数据）
 	Fields       string `json:"fields,omitempty"`       // 支持出参数据筛选，逗号','分隔，目前可用：goodsInfo（商品信息）,categoryInfo(类目信息）
+	OrderId      uint64 `json:"orderId,omitempty"`      // 订单号，当orderId不为空时，其他参数非必填
 }
 
 type UnionOrderQueryRowResponse struct {
@@ -121,6 +122,9 @@ func UnionOrderQueryRow(req *UnionOrderQueryRowRequest) (bool, []OrderRowResp, e
 		ChildUnionId: req.ChildUnionId,
 		Key:          req.Key,
 		Fields:       req.Fields,
+	}
+	if req.OrderId > 0 {
+		orderReq.OrderId = req.OrderId
 	}
 	r.SetOrderRowReq(orderReq)
 
