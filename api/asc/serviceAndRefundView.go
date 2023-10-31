@@ -1,8 +1,7 @@
 package asc
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -26,8 +25,33 @@ type ServiceAndRefundViewResponse struct {
 	Data      *ServiceAndRefundViewData `json:"jingdong_asc_serviceAndRefund_view_responce,omitempty" codec:"jingdong_asc_serviceAndRefund_view_responce,omitempty"`
 }
 
+func (r ServiceAndRefundViewResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r ServiceAndRefundViewResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type ServiceAndRefundViewData struct {
 	PageResult *ServiceAndRefundViewPageResult `json:"pageResult,omitempty" codec:"pageResult,omitempty"`
+}
+
+func (r ServiceAndRefundViewData) IsError() bool {
+	return r.PageResult == nil || r.PageResult.IsError()
+}
+
+func (r ServiceAndRefundViewData) Error() string {
+	if r.PageResult != nil {
+		return r.PageResult.Error()
+	}
+	return "no result data"
 }
 
 type ServiceAndRefundViewPageResult struct {
@@ -38,6 +62,14 @@ type ServiceAndRefundViewPageResult struct {
 	PageNumber string              `json:"pageNumber,omitempty" codec:"pageNumber,omitempty"` //页码
 	TotalCount string              `json:"totalCount,omitempty" codec:"totalCount,omitempty"` //总数
 	Data       []OrderAfsAndRefund `json:"data,omitempty" codec:"data,omitempty"`             //售后和退款列表
+}
+
+func (r ServiceAndRefundViewPageResult) IsError() bool {
+	return !r.Success
+}
+
+func (r ServiceAndRefundViewPageResult) Error() string {
+	return fmt.Sprintf("code: %s, error: %s", r.Code, r.Msg)
 }
 
 type OrderAfsAndRefund struct {
@@ -95,23 +127,10 @@ func ServiceAndRefundView(req *ServiceAndRefundViewRequest) (*ServiceAndRefundVi
 		r.SetExtJsonStr(req.ExtJsonStr)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result info")
-	}
 	var response ServiceAndRefundViewResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
 	return response.Data.PageResult, nil
 
 }

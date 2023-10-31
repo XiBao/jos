@@ -1,8 +1,7 @@
 package jzone
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -21,14 +20,47 @@ type AddCartItemByPinResponse struct {
 	Data      *AddCartItemByPinData `json:"jingdong_jzone_addCartItemByPin_responce,omitempty" codec:"jingdong_jzone_addCartItemByPin_responce,omitempty"`
 }
 
+func (r AddCartItemByPinResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r AddCartItemByPinResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type AddCartItemByPinData struct {
 	ReturnType *AddCartItemByPinReturnType `json:"returnType,omitempty" codec:"returnType,omitempty"`
 	Code       string                      `json:"code"`
 }
 
+func (r AddCartItemByPinData) IsError() bool {
+	return r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r AddCartItemByPinData) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return "no result data"
+}
+
 type AddCartItemByPinReturnType struct {
 	Message string `json:"message,omitempty" codec:"message,omitempty"`
 	Code    string `json:"code,omitempty" codec:"code,omitempty"`
+}
+
+func (r AddCartItemByPinReturnType) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r AddCartItemByPinReturnType) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Message)
 }
 
 // TODO  通过Pin将商品加入用户购物车
@@ -43,26 +75,9 @@ func AddCartItemByPin(req *AddCartItemByPinRequest) (bool, error) {
 	}
 	r.SetNum(1)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("No result info.")
-	}
 	var response AddCartItemByPinResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-
-	if response.Data.ReturnType.Code != "0" {
-		return false, errors.New(response.Data.ReturnType.Message)
-	}
-
 	return true, nil
 }

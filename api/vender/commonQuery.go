@@ -1,8 +1,7 @@
 package vender
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -20,16 +19,49 @@ type CommonQueryResponse struct {
 	Data      *CommonQuerySubResponse `json:"jingdong_data_vender_common_query_responce,omitempty" codec:"jingdong_data_vender_common_query_responce,omitempty"`
 }
 
+func (r CommonQueryResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r CommonQueryResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type CommonQuerySubResponse struct {
 	Code      string                  `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string                  `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Response  *CommonQuerySecResponse `json:"response,omitempty" codec:"response,omitempty"`
 }
 
+func (r CommonQuerySubResponse) IsError() bool {
+	return r.Code != "" || r.Response == nil || r.Response.IsError()
+}
+
+func (r CommonQuerySubResponse) Error() string {
+	if r.Response != nil && r.Response.IsError() {
+		return r.Response.Error()
+	}
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+}
+
 type CommonQuerySecResponse struct {
 	Code   int    `json:"code,omitempty" codec:"code,omitempty"`
 	Msg    string `json:"msg,omitempty" codec:"msg,omitempty"`
 	Result string `json:"result,omitempty" codec:"result,omitempty"`
+}
+
+func (r CommonQuerySecResponse) IsError() bool {
+	return r.Code != 0 || r.Result == ""
+}
+
+func (r CommonQuerySecResponse) Error() string {
+	return fmt.Sprintf("code:%d, msg:%s", r.Code, r.Msg)
 }
 
 type CommonQueryResult struct {
@@ -63,28 +95,10 @@ func CommonQuery(req *CommonQueryRequest) (string, error) {
 	if req.InputPara != "" {
 		r.SetInputPara(req.InputPara)
 	}
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return "", err
-	}
-	if len(result) == 0 {
-		return "", errors.New("No query info.")
-	}
 
 	var response CommonQueryResponse
-	err = json.Unmarshal([]byte(result), &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return "", err
 	}
-	if response.ErrorResp != nil {
-		return "", response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return "", errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Response.Code != 0 {
-		return "", errors.New(response.Data.Response.Msg)
-	}
-
 	return response.Data.Response.Result, nil
 }

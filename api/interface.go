@@ -8,8 +8,8 @@ import (
 type ApiKey struct {
 	Key    string
 	Secret string
-    Id     uint8  `json:"id,omitempty" codec:"id,omitempty"`
-    Name   string `json:"name,omitempty" codec:"name,omitempty"`
+	Id     uint8  `json:"id,omitempty" codec:"id,omitempty"`
+	Name   string `json:"name,omitempty" codec:"name,omitempty"`
 }
 
 type BaseRequest struct {
@@ -34,6 +34,10 @@ type ApiResult struct {
 	EnglishErrCode string `json:"englishErrCode,omitempty" codec:"englishErrCode,omitempty"`
 	ChineseErrCode string `json:"chineseErrCode,omitempty" codec:"chineseErrCode,omitempty"`
 	NumberCode     int    `json:"numberCode,omitempty" codec:"numberCode,omitempty"`
+}
+
+func (e ApiResult) IsError() bool {
+	return !e.Success
 }
 
 func (e ApiResult) Error() string {

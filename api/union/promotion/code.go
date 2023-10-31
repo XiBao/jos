@@ -3,7 +3,7 @@ package promotion
 import (
 	"encoding/json"
 	"errors"
-	"strconv"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -27,6 +27,17 @@ type UnionPromotionCodeResponse struct {
 	Data      *UnionPromotionCodeResponseData `json:"jd_union_open_promotion_common_get_responce,omitempty"`
 }
 
+func (r *UnionPromotionCodeResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.Result == ""
+}
+
+func (r *UnionPromotionCodeResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
+}
+
 type UnionPromotionCodeResponseData struct {
 	Result string `json:"getResult,omitempty"`
 }
@@ -35,6 +46,14 @@ type UnionPromotioncodeResult struct {
 	Code    int             `json:"code,omitempty"`
 	Message string          `json:"message,omitempty"`
 	Data    json.RawMessage `json:"data,omitempty"`
+}
+
+func (r UnionPromotioncodeResult) IsError() bool {
+	return r.Code != 200
+}
+
+func (r UnionPromotioncodeResult) Error() string {
+	return fmt.Sprintf("code: %d, message: %s", r.Code, r.Message)
 }
 
 type PromotionCodeResp struct {
@@ -58,13 +77,8 @@ func UnionPromotionCodeGet(req *UnionPromotionCodeRequest) (string, error) {
 	}
 	r.SetPromotionCodeReq(codeReq)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return "", err
-	}
 	var response UnionPromotionCodeResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return "", err
 	}
 
@@ -72,18 +86,15 @@ func UnionPromotionCodeGet(req *UnionPromotionCodeRequest) (string, error) {
 		return "", errors.New("no data")
 	}
 	var ret UnionPromotioncodeResult
-	err = json.Unmarshal([]byte(response.Data.Result), &ret)
-	if err != nil {
+	if err := client.Logger().DecodeJSON([]byte(response.Data.Result), &ret); err != nil {
 		return "", err
 	}
-
-	if ret.Code != 200 {
-		return "", &api.ErrorResponnse{Code: strconv.FormatInt(int64(ret.Code), 10), ZhDesc: ret.Message}
+	if ret.IsError() {
+		return "", ret
 	}
 
 	var codeResp PromotionCodeResp
-	err = json.Unmarshal(ret.Data, &codeResp)
-	if err != nil {
+	if err := json.Unmarshal(ret.Data, &codeResp); err != nil {
 		return "", err
 	}
 	return codeResp.ClickURL, nil

@@ -1,9 +1,7 @@
 package goods
 
 import (
-	"encoding/json"
-	"errors"
-	"strconv"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -24,6 +22,17 @@ type JingfenQueryResponse struct {
 	Data      *JingfenQueryResponseData `json:"jd_union_open_goods_jingfen_query_response,omitempty"`
 }
 
+func (r JingfenQueryResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.Result == ""
+}
+
+func (r JingfenQueryResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
+}
+
 type JingfenQueryResponseData struct {
 	Result string `json:"result,omitempty"`
 }
@@ -33,6 +42,14 @@ type JingfenQueryResult struct {
 	Message    string        `json:"message,omitempty"`
 	TotalCount uint          `json:"totalCount,omitempty"`
 	Data       []JFGoodsResp `json:"data,omitempty"`
+}
+
+func (r JingfenQueryResult) IsError() bool {
+	return r.Code != 200
+}
+
+func (r JingfenQueryResult) Error() string {
+	return fmt.Sprintf("code: %d, msg: %s", r.Code, r.Message)
 }
 
 type JFGoodsResp struct {
@@ -158,26 +175,16 @@ func JingfenQuery(req *JingfenQueryRequest) (*JingfenQueryResult, error) {
 	}
 	r.SetGoodsReq(goodsReq)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
 	var response JingfenQueryResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-	if response.Data == nil || response.Data.Result == "" {
-		return nil, errors.New("no result")
 	}
 	var resp JingfenQueryResult
-	err = json.Unmarshal([]byte(response.Data.Result), &resp)
-	if err != nil {
+	if err := client.Logger().DecodeJSON([]byte(response.Data.Result), &resp); err != nil {
 		return nil, err
 	}
-	if resp.Code != 200 {
-		return nil, &api.ErrorResponnse{Code: strconv.FormatInt(resp.Code, 10), ZhDesc: resp.Message}
+	if resp.IsError() {
+		return nil, resp
 	}
-
 	return &resp, nil
 }

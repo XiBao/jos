@@ -1,9 +1,6 @@
 package dmp
 
 import (
-	"encoding/json"
-	"errors"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -30,9 +27,34 @@ type KuaicheDmpTagListResponse struct {
 	ErrorResp *api.ErrorResponnse        `json:"error_response,omitempty" codec:"error_response,omitempty"`
 }
 
+func (r KuaicheDmpTagListResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Responce == nil || r.Responce.IsError()
+}
+
+func (r KuaicheDmpTagListResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Responce != nil {
+		return r.Responce.Error()
+	}
+	return "no result data"
+}
+
 type KuaicheDmpTagListResponce struct {
 	Data *KuaicheDmpTagListResponseData `json:"data,omitempty" codec:"data,omitempty"`
 	Code string                         `json:"code,omitempty" codec:"code,omitempty"`
+}
+
+func (r KuaicheDmpTagListResponce) IsError() bool {
+	return r.Data == nil || r.Data.IsError()
+}
+
+func (r KuaicheDmpTagListResponce) Error() string {
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
 }
 
 type KuaicheDmpTagListResponseData struct {
@@ -87,28 +109,9 @@ func KuaicheDmpTagList(req *KuaicheDmpTagListRequest) (*KuaicheDmpTagListRespons
 		r.SetTagCategoryType(req.TagCategoryType)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result.")
-	}
-
 	var response KuaicheDmpTagListResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, errors.New(response.ErrorResp.ZhDesc)
-	}
-	if response.Responce == nil || response.Responce.Data == nil {
-		return nil, errors.New("no result data.")
-	}
-	if !response.Responce.Data.Success {
-		return nil, errors.New(response.Responce.Data.Msg)
-	}
-
 	return response.Responce.Data.Data.TagPageInfo, nil
 }

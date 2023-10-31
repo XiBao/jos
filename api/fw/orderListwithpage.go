@@ -1,8 +1,7 @@
 package fw
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -22,9 +21,34 @@ type OrderListWithPageResponse struct {
 	Data      *OrderListWithPageData `json:"jingdong_pop_fw_order_listwithpage_responce,omitempty" codec:"jingdong_pop_fw_order_listwithpage_responce,omitempty"`
 }
 
+func (r OrderListWithPageResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r OrderListWithPageResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type OrderListWithPageData struct {
 	ReturnType *OrderListWithPageReturnType `json:"returnType,omitempty" codec:"returnType,omitempty"`
 	Code       string                       `json:"code"`
+}
+
+func (r OrderListWithPageData) IsError() bool {
+	return r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r OrderListWithPageData) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return "no result data"
 }
 
 type OrderListWithPageReturnType struct {
@@ -36,6 +60,14 @@ type OrderListWithPageReturnType struct {
 	IsSuccess   bool       `json:"isSuccess,omitempty" codec:"isSuccess,omitempty"`     //是否成功
 	ErrorMsg    string     `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`       // 错误信息
 	OrderList   []*FWOrder `json:"orderList,omitempty" codec:"orderList,omitempty"`     //订单列表
+}
+
+func (r OrderListWithPageReturnType) IsError() bool {
+	return r.ErrorCode != 0
+}
+
+func (r OrderListWithPageReturnType) Error() string {
+	return fmt.Sprintf("code:%d, msg:%s", r.ErrorCode, r.ErrorMsg)
 }
 
 type FWOrder struct {
@@ -87,25 +119,9 @@ func OrderListWithPage(req *OrderListWithPageRequest) (*OrderListWithPageReturnT
 		r.SetServiceCode(req.ServiceCode)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No result info.")
-	}
 	var response OrderListWithPageResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if response.Data.ReturnType.ErrorCode != 0 {
-		return nil, errors.New(response.Data.ReturnType.ErrorMsg)
 	}
 	return response.Data.ReturnType, nil
 

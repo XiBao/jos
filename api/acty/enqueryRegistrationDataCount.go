@@ -1,9 +1,6 @@
 package acty
 
 import (
-	"encoding/json"
-	"errors"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/acty"
@@ -26,6 +23,17 @@ type EnqueryRegistrationDataCountResponce struct {
 	Result *EnqueryRegistrationDataCountResult `json:"queryregistrationdatacount_result,omitempty" codec:"queryregistrationdatacount_result,omitempty"`
 }
 
+func (r EnqueryRegistrationDataCountResponse) IsError() bool {
+	return r.Responce == nil || r.Responce.Result == nil
+}
+
+func (r EnqueryRegistrationDataCountResponse) Error() string {
+	if r.Responce == nil || r.Responce.Result == nil {
+		return "no result"
+	}
+	return ""
+}
+
 type EnqueryRegistrationDataCountResult struct {
 	Message           string              `json:"message,omitempty" codec:"message,omitempty"`
 	ResultCode        uint                `json:"resultCode" codec:"resultCode,omitempty"`
@@ -42,25 +50,9 @@ func EnqueryRegistrationDataCount(req *EnqueryRegistrationDataCountRequest) (*En
 	r.SetBeginDate(req.BeginDate)
 	r.SetEndDate(req.EndDate)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No result.")
-	}
-
 	var response EnqueryRegistrationDataCountResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.Responce == nil {
-		return nil, errors.New("No result.")
-	}
-	if response.Responce.Result == nil {
-		return nil, errors.New("No result.")
-	}
-
 	return response.Responce.Result, nil
 }

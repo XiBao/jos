@@ -1,8 +1,6 @@
 package ware
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"strconv"
 
@@ -19,6 +17,17 @@ type PriceGetRequest struct {
 type PriceGetResponse struct {
 	ErrorResp *api.ErrorResponnse `json:"error_response,omitempty" codec:"error_response,omitempty"`
 	Data      *PriceChangesData   `json:"jingdong_ware_price_get_responce,omitempty" codec:"jingdong_ware_price_get_responce,omitempty"`
+}
+
+func (r *PriceGetResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || len(r.Data.PriceChanges) == 0
+}
+
+func (r *PriceGetResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
 }
 
 type PriceChangesData struct {
@@ -44,23 +53,11 @@ func PriceGet(req *PriceGetRequest) (*PriceChange, error) {
 	r := ware.NewWarePriceGetRequest()
 	r.SetSkuId(fmt.Sprintf("J_%d", req.SkuId))
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No result.")
-	}
 	var response PriceGetResponse
-	err = json.Unmarshal(result, &response)
+	err := client.Execute(r.Request, req.Session, &response)
 	if err != nil {
 		return nil, err
 	}
-
-	if response.ErrorResp != nil || len(response.Data.PriceChanges) == 0 {
-		return nil, response.ErrorResp
-	}
-
 	priceChange := &PriceChange{}
 	priceChange.SkuId = req.SkuId
 	priceChange.Price, err = strconv.ParseFloat(response.Data.PriceChanges[0].Price, 64)

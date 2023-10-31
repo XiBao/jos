@@ -1,9 +1,6 @@
 package market
 
 import (
-	"encoding/json"
-	"errors"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/market"
@@ -21,6 +18,17 @@ type GetUserCartSkuResponse struct {
 	Data      *GetUserCartSkuData `json:"jingdong_market_bdp_userBehavior_getUserCartSku_responce,omitempty" codec:"jingdong_market_bdp_userBehavior_getUserCartSku_responce,omitempty"`
 }
 
+func (r GetUserCartSkuResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil
+}
+
+func (r GetUserCartSkuResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
+}
+
 type GetUserCartSkuData struct {
 	Code     string    `json:"code,omitempty" codec:"code,omitempty"`
 	CartSkus []CartSku `json:"returnType,omitempty" codec:"returnType,omitempty"`
@@ -35,21 +43,9 @@ func GetUserCartSku(req *GetUserCartSkuRequest) ([]CartSku, error) {
 	r.SetOpenIdBuyer(req.OpenIdBuyer)
 	r.SetXidBuyer(req.XidBuyer)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No cart sku info.")
-	}
 	var response GetUserCartSkuResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
 	}
 
 	return response.Data.CartSkus, nil

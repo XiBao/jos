@@ -1,8 +1,7 @@
 package adkckeyword
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -16,18 +15,48 @@ type KeywordDeleteRequest struct {
 }
 
 type KeywordDeleteResponse struct {
-	ErrorResp *api.ErrorResponnse      `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *RecommendkeywordGetData `json:"jingdong_dsp_adkckeyword_keyword_delete_responce,omitempty" codec:"jingdong_dsp_adkckeyword_keyword_delete_responce,omitempty"`
+	ErrorResp *api.ErrorResponnse `json:"error_response,omitempty" codec:"error_response,omitempty"`
+	Data      *KeywordDeleteData  `json:"jingdong_dsp_adkckeyword_keyword_delete_responce,omitempty" codec:"jingdong_dsp_adkckeyword_keyword_delete_responce,omitempty"`
+}
+
+func (r KeywordDeleteResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r KeywordDeleteResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
 }
 
 type KeywordDeleteData struct {
-	Result KeywordInsertResult `json:"result,omitempty" codec:"result,omitempty"`
+	Result KeywordDeleteResult `json:"result,omitempty" codec:"result,omitempty"`
+}
+
+func (r KeywordDeleteData) IsError() bool {
+	return r.Result.IsError()
+}
+
+func (r KeywordDeleteData) Error() string {
+	return r.Result.Error()
 }
 
 type KeywordDeleteResult struct {
 	Success    bool   `json:"success,omitempty" codec:"success,omitempty"`
 	ResultCode string `json:"resultCode,omitempty" codec:"resultCode,omitempty"`
 	ErrorMsg   string `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
+}
+
+func (r KeywordDeleteResult) IsError() bool {
+	return !r.Success
+}
+
+func (r KeywordDeleteResult) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
 }
 
 // 删除关键词
@@ -37,28 +66,10 @@ func KeywordDelete(req *KeywordDeleteRequest) (bool, error) {
 	r := adkckeyword.NewKeywordDeleteRequest()
 	r.SetAdGroupId(req.AdGroupId)
 	r.SetKeyWordsName(req.KeyWordsName)
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("no result info")
-	}
+
 	var response KeywordDeleteResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-
-	if !response.Data.Result.Success {
-		if response.Data.Result.ErrorMsg == `` {
-			response.Data.Result.ErrorMsg = "新建关键词失败"
-		}
-		return false, errors.New(response.Data.Result.ErrorMsg)
-	}
-
 	return true, nil
 }

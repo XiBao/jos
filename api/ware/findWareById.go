@@ -1,9 +1,6 @@
 package ware
 
 import (
-	"encoding/json"
-	"errors"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/ware"
@@ -21,6 +18,17 @@ type FindWareByIdResponse struct {
 	Data      *FindWareByIdData   `json:"jingdong_ware_read_findWareById_responce,omitempty" codec:"jingdong_ware_read_findWareById_responce,omitempty"`
 }
 
+func (r FindWareByIdResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.Ware == nil
+}
+
+func (r FindWareByIdResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
+}
+
 type FindWareByIdData struct {
 	Code string `json:"code,omitempty" codec:"code,omitempty"`
 	Ware *Ware  `json:"ware,omitempty" codec:"ware,omitempty"`
@@ -36,22 +44,9 @@ func FindWareById(req *FindWareByIdRequest) (*Ware, error) {
 	}
 	r.SetWareId(req.WareId)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No ware info.")
-	}
 	var response FindWareByIdResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
 	return response.Data.Ware, nil
 }

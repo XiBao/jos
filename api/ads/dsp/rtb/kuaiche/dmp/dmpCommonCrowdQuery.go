@@ -1,9 +1,6 @@
 package dmp
 
 import (
-	"encoding/json"
-	"errors"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -34,9 +31,34 @@ type KuaicheDmpCommonCrowdQueryResponse struct {
 	ErrorResp *api.ErrorResponnse                 `json:"error_response,omitempty" codec:"error_response,omitempty"`
 }
 
+func (r KuaicheDmpCommonCrowdQueryResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Responce == nil || r.Responce.IsError()
+}
+
+func (r KuaicheDmpCommonCrowdQueryResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Responce != nil {
+		return r.Responce.Error()
+	}
+	return "no result data"
+}
+
 type KuaicheDmpCommonCrowdQueryResponce struct {
 	Data *KuaicheDmpCommonCrowdQueryResponseData `json:"data,omitempty" codec:"data,omitempty"`
 	Code string                                  `json:"code,omitempty" codec:"code,omitempty"`
+}
+
+func (r KuaicheDmpCommonCrowdQueryResponce) IsError() bool {
+	return r.Data == nil || r.Data.IsError()
+}
+
+func (r KuaicheDmpCommonCrowdQueryResponce) Error() string {
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
 }
 
 type KuaicheDmpCommonCrowdQueryResponseData struct {
@@ -93,28 +115,9 @@ func KuaicheDmpCommonCrowdQuery(req *KuaicheDmpCommonCrowdQueryRequest) (*Kuaich
 		r.SetAuthType(req.AuthType)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result.")
-	}
-
 	var response KuaicheDmpCommonCrowdQueryResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, errors.New(response.ErrorResp.ZhDesc)
-	}
-	if response.Responce == nil || response.Responce.Data == nil {
-		return nil, errors.New("no result data.")
-	}
-	if !response.Responce.Data.Success {
-		return nil, errors.New(response.Responce.Data.Msg)
-	}
-
 	return response.Responce.Data.Data, nil
 }

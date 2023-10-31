@@ -1,8 +1,7 @@
 package order
 
 import (
-	"encoding/json"
-	"strconv"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -24,6 +23,17 @@ type UnionOrderQueryResponse struct {
 	Data      *UnionOrderQueryResponseData `json:"jd_union_open_order_query_response,omitempty"`
 }
 
+func (r UnionOrderQueryResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.Result == ""
+}
+
+func (r UnionOrderQueryResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
+}
+
 type UnionOrderQueryResponseData struct {
 	Result string `json:"result,omitempty"`
 }
@@ -33,6 +43,14 @@ type UnionOrderQueryResult struct {
 	Message string      `json:"message,omitempty"`
 	Data    []OrderResp `json:"data,omitempty"`
 	HasMore bool        `json:"hasMore,omitempty"`
+}
+
+func (r UnionOrderQueryResult) IsError() bool {
+	return r.Code != 200
+}
+
+func (r UnionOrderQueryResult) Error() string {
+	return fmt.Sprintf("code: %d, message: %s", r.Code, r.Message)
 }
 
 type OrderResp struct {
@@ -97,26 +115,17 @@ func UnionOrderQuery(req *UnionOrderQueryRequest) (bool, []OrderResp, error) {
 	}
 	r.SetOrderReq(orderReq)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, nil, err
-	}
 	var response UnionOrderQueryResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return false, nil, err
-	}
-	if response.Data == nil {
-		return false, nil, nil
 	}
 	var ret UnionOrderQueryResult
-	err = json.Unmarshal([]byte(response.Data.Result), &ret)
-	if err != nil {
+	if err := client.Logger().DecodeJSON([]byte(response.Data.Result), &ret); err != nil {
 		return false, nil, err
 	}
 
-	if ret.Code != 200 {
-		return false, nil, &api.ErrorResponnse{Code: strconv.FormatInt(int64(ret.Code), 10), ZhDesc: ret.Message}
+	if ret.IsError() {
+		return false, nil, ret
 	}
 
 	return ret.HasMore, ret.Data, nil

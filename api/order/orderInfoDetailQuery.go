@@ -1,14 +1,11 @@
 package order
 
 import (
-	"encoding/json"
 	"fmt"
 
 	. "github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/order"
-
-	"github.com/XiBao/jos/api/util"
 )
 
 type OrderInfoDetailQueryRequest struct {
@@ -27,16 +24,48 @@ type OrderInfoDetailQueryResponse struct {
 	Data      *OrderInfoDetailQueryData `json:"jingdong_orderInfoDetailQuery_responce,omitempty" codec:"jingdong_orderInfoDetailQuery_responce,omitempty"`
 }
 
-type OrderInfoDetailQueryData struct {
-	Code      string `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
+func (r OrderInfoDetailQueryResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
 
-	Result *OrderInfoDetailQueryResult `json:"returnType,omitempty" codec:"returnType,omitempty"`
+func (r OrderInfoDetailQueryResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
+type OrderInfoDetailQueryData struct {
+	Code      string                      `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc string                      `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	Result    *OrderInfoDetailQueryResult `json:"returnType,omitempty" codec:"returnType,omitempty"`
+}
+
+func (r OrderInfoDetailQueryData) IsError() bool {
+	return r.Code != "0" || r.Result == nil
+}
+
+func (r OrderInfoDetailQueryData) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
 }
 
 type OrderInfoDetailQueryResult struct {
 	Message string                        `json:"message,omitempty" codec:"message,omitempty"`
 	Content []OrderInfoDetailQueryContent `json:"content,omitempty" codec:"content,omitempty"`
+}
+
+func (r OrderInfoDetailQueryResult) IsError() bool {
+	return r.Message != "SUCCESS"
+}
+
+func (r OrderInfoDetailQueryResult) Error() string {
+	return r.Message
 }
 
 type OrderInfoDetailQueryContent struct {
@@ -67,29 +96,9 @@ func OrderInfoDetailQuery(req *OrderInfoDetailQueryRequest) ([]OrderInfoDetailQu
 		r.SetSearchDate(req.SearchDate)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response OrderInfoDetailQueryResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return nil, fmt.Errorf("%v", response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return nil, fmt.Errorf("No result.")
-	}
-	if response.Data.Result.Message != "SUCCESS" {
-		return nil, fmt.Errorf(response.Data.Result.Message)
-	}
-
 	return response.Data.Result.Content, nil
 }

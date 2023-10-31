@@ -1,8 +1,7 @@
 package fullcoupon
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -20,8 +19,33 @@ type CreateFullCouponResponse struct {
 	Data      *CreateFullCouponResponseData `json:"jingdong_fullCoupon_createFullCoupon_responce,omitempty" codec:"jingdong_fullCoupon_createFullCoupon_responce,omitempty"`
 }
 
+func (r CreateFullCouponResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r CreateFullCouponResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type CreateFullCouponResponseData struct {
 	ReturnType *CreateFullCouponResponseReturnType `json:"returnType,omitempty" codec:"returnType,omitempty"`
+}
+
+func (r CreateFullCouponResponseData) IsError() bool {
+	return r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r CreateFullCouponResponseData) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return "no result data"
 }
 
 type CreateFullCouponResponseReturnType struct {
@@ -31,36 +55,23 @@ type CreateFullCouponResponseReturnType struct {
 	Data    uint64 `json:"data,omitempty" codec:"data,omitempty"`       // 促销ID
 }
 
+func (r CreateFullCouponResponseReturnType) IsError() bool {
+	return !r.Success
+}
+
+func (r CreateFullCouponResponseReturnType) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Msg)
+}
+
 func CreateFullCoupon(req *CreateFullCouponRequest) (*CreateFullCouponResponseReturnType, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := fullcoupon.NewCreateFullCouponRequest()
 	r.SetParam(req.Param)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result.")
-	}
-
 	var response CreateFullCouponResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if response.Data == nil || response.Data.ReturnType == nil {
-		return nil, errors.New("no result.")
-	}
-
-	if !response.Data.ReturnType.Success {
-		return nil, errors.New(response.Data.ReturnType.Msg)
-	}
-
 	return response.Data.ReturnType, nil
 }

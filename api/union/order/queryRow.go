@@ -1,8 +1,7 @@
 package order
 
 import (
-	"encoding/json"
-	"strconv"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -27,6 +26,17 @@ type UnionOrderQueryRowResponse struct {
 	Data      *UnionOrderQueryRowResponseData `json:"jd_union_open_order_row_query_responce,omitempty"`
 }
 
+func (r UnionOrderQueryRowResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.Result == ""
+}
+
+func (r UnionOrderQueryRowResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
+}
+
 type UnionOrderQueryRowResponseData struct {
 	Result string `json:"queryResult,omitempty"`
 }
@@ -36,6 +46,14 @@ type UnionOrderQueryRowResult struct {
 	Message string         `json:"message,omitempty"`
 	Data    []OrderRowResp `json:"data,omitempty"`
 	HasMore bool           `json:"hasMore,omitempty"`
+}
+
+func (r UnionOrderQueryRowResult) IsError() bool {
+	return r.Code != 200
+}
+
+func (r UnionOrderQueryRowResult) Error() string {
+	return fmt.Sprintf("code: %d, message: %s", r.Code, r.Message)
 }
 
 type OrderRowResp struct {
@@ -128,26 +146,17 @@ func UnionOrderQueryRow(req *UnionOrderQueryRowRequest) (bool, []OrderRowResp, e
 	}
 	r.SetOrderRowReq(orderReq)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, nil, err
-	}
 	var response UnionOrderQueryRowResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return false, nil, err
-	}
-	if response.Data == nil {
-		return false, nil, nil
 	}
 	var ret UnionOrderQueryRowResult
-	err = json.Unmarshal([]byte(response.Data.Result), &ret)
-	if err != nil {
+	if err := client.Logger().DecodeJSON([]byte(response.Data.Result), &ret); err != nil {
 		return false, nil, err
 	}
 
-	if ret.Code != 200 {
-		return false, nil, &api.ErrorResponnse{Code: strconv.FormatInt(int64(ret.Code), 10), ZhDesc: ret.Message}
+	if ret.IsError() {
+		return false, nil, ret
 	}
 
 	return ret.HasMore, ret.Data, nil

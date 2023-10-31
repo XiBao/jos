@@ -1,8 +1,7 @@
 package report
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -32,8 +31,33 @@ type AdgroupkeywordQueryResponse struct {
 	Data      *AdgroupkeywordQueryData `json:"jingdong_dsp_report_adgroupkeyword_query_responce,omitempty" codec:"jingdong_dsp_report_adgroupkeyword_query_responce,omitempty"`
 }
 
+func (r AdgroupkeywordQueryResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r AdgroupkeywordQueryResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type AdgroupkeywordQueryData struct {
 	Result *AdgroupkeywordQueryResult `json:"keywordreportquery_result,omitempty" codec:"keywordreportquery_result,omitempty"`
+}
+
+func (r AdgroupkeywordQueryData) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r AdgroupkeywordQueryData) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type AdgroupkeywordQueryResult struct {
@@ -42,6 +66,17 @@ type AdgroupkeywordQueryResult struct {
 	ErrorMsg   string `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
 	Success    bool   `json:"success,omitempty" codec:"success,omitempty"`
 	Value      *AdgroupkeywordQueryValue
+}
+
+func (r AdgroupkeywordQueryResult) IsError() bool {
+	return !r.Success || r.Value == nil
+}
+
+func (r AdgroupkeywordQueryResult) Error() string {
+	if !r.Success {
+		return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+	}
+	return "no result data"
 }
 
 type AdgroupkeywordQueryValue struct {
@@ -84,8 +119,8 @@ type JosKeywordTmp struct {
 	IsDefaultPrice          bool    `json:"isDefaultPrice,omitempty" codec:"isDefaultPrice,omitempty"`
 	OrderCVS                string  `json:"OrderCVS,omitempty" codec:"OrderCVS,omitempty"`
 	NewTotalOrderCnt        string  `json:"NewTotalOrderCnt,omitempty" codec:"NewTotalOrderCnt,omitempty"`
-	NewTotalOrderSum        string  `json:"TotalOrderSum,omitempty" codec:"NewTotalOrderCnt,omitempty"`
-	NewTotalOrderCVS        string  `json:"NewTotalOrderCnt,omitempty" codec:"NewTotalOrderCnt,omitempty"`
+	NewTotalOrderSum        string  `json:"NewTotalOrderSum,omitempty" codec:"NewTotalOrderCnt,omitempty"`
+	NewTotalOrderCVS        string  `json:"NewTotalOrderCVS,omitempty" codec:"NewTotalOrderCVS,omitempty"`
 	KeywordFlag             string  `json:"KeywordFlag,omitempty" codec:"KeywordFlag,omitempty"`
 	MobileType              string  `json:"MobileType,omitempty" codec:"MobileType,omitempty"`
 }
@@ -126,8 +161,8 @@ type JosKeyword struct {
 	IsDefaultPrice          bool      `json:"is_default_price,omitempty" codec:"is_default_price,omitempty"`
 	OrderCVS                float64   `json:"order_cvs,omitempty" codec:"order_cvs,omitempty"`
 	NewTotalOrderCnt        uint64    `json:"new_total_order_cnt,omitempty" codec:"new_total_order_cnt,omitempty"`
-	NewTotalOrderSum        float64   `json:"new_total_order_cnt,omitempty" codec:"new_total_order_cnt,omitempty"`
-	NewTotalOrderCVS        float64   `json:"new_total_order_cnt,omitempty" codec:"new_total_order_cnt,omitempty"`
+	NewTotalOrderSum        float64   `json:"new_total_order_sum,omitempty" codec:"new_total_order_sum,omitempty"`
+	NewTotalOrderCVS        float64   `json:"new_total_order_cvs,omitempty" codec:"new_total_order_cvs,omitempty"`
 	KeywordFlag             int       `json:"keyword_flag,omitempty" codec:"keyword_flag,omitempty"`
 	MobileType              string    `json:"mobile_type,omitempty" codec:"mobile_type,omitempty"`
 	RecordOn                time.Time `json:"-" codec:"-"`
@@ -228,27 +263,11 @@ func AdgroupkeywordQuery(req *AdgroupkeywordQueryRequest) ([]*JosKeyword, error)
 		r.SetOrderStatusCategory(req.OrderStatusCategory)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result info")
-	}
 	var response AdgroupkeywordQueryResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if !response.Data.Result.Success {
-		return nil, errors.New(response.Data.Result.ErrorMsg)
-	}
-
-	var record []*JosKeyword
+	record := make([]*JosKeyword, 0, len(response.Data.Result.Value.Datas))
 	for _, v := range response.Data.Result.Value.Datas {
 		record = append(record, v.ToJosKeyword())
 	}

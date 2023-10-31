@@ -1,10 +1,7 @@
 package center
 
 import (
-	"encoding/json"
-	"errors"
-
-	"github.com/XiBao/jos/api/util"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -23,10 +20,35 @@ type GetEvaluateActivityByIdResponse struct {
 	Data      *GetEvaluateActivityByIdData `json:"jingdong_interact_center_vender_read_evaluate_getActivityById_responce,omitempty" codec:"jingdong_interact_center_vender_read_evaluate_getActivityById_responce,omitempty"`
 }
 
+func (r GetEvaluateActivityByIdResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r GetEvaluateActivityByIdResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type GetEvaluateActivityByIdData struct {
 	Code      string            `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string            `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    *EvaluateActivity `json:"EvaluateActivity,omitempty" codec:"GiftActivityResults,omitempty"`
+}
+
+func (r GetEvaluateActivityByIdData) IsError() bool {
+	return r.Code != "0" || r.Result == nil
+}
+
+func (r GetEvaluateActivityByIdData) Error() string {
+	if r.Code != "0" {
+		return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	}
+	return "no result data"
 }
 
 type EvaluateActivity struct {
@@ -56,26 +78,9 @@ func GetEvaluateActivityById(req *GetEvaluateActivityByIdRequest) (*EvaluateActi
 	r.SetChannel(req.Channel)
 	r.SetActivityId(req.ActivityId)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response GetEvaluateActivityByIdResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return nil, errors.New("No result.")
-	}
-
 	return response.Data.Result, nil
 }

@@ -1,8 +1,7 @@
 package adkckeyword
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -18,18 +17,48 @@ type KeywordInsertRequest struct {
 }
 
 type KeywordInsertResponse struct {
-	ErrorResp *api.ErrorResponnse      `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *RecommendkeywordGetData `json:"jingdong_dsp_adkckeyword_newkeyword_insert_responce,omitempty" codec:"jingdong_dsp_adkckeyword_newkeyword_insert_responce,omitempty"`
+	ErrorResp *api.ErrorResponnse `json:"error_response,omitempty" codec:"error_response,omitempty"`
+	Data      *KeywordInsertData  `json:"jingdong_dsp_adkckeyword_newkeyword_insert_responce,omitempty" codec:"jingdong_dsp_adkckeyword_newkeyword_insert_responce,omitempty"`
+}
+
+func (r KeywordInsertResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r KeywordInsertResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
 }
 
 type KeywordInsertData struct {
 	Result KeywordInsertResult `json:"searchrecommendkeywords_result,omitempty" codec:"searchrecommendkeywords_result,omitempty"`
 }
 
+func (r KeywordInsertData) IsError() bool {
+	return r.Result.IsError()
+}
+
+func (r KeywordInsertData) Error() string {
+	return r.Result.Error()
+}
+
 type KeywordInsertResult struct {
 	Success    bool   `json:"success,omitempty" codec:"success,omitempty"`
 	ResultCode string `json:"resultCode,omitempty" codec:"resultCode,omitempty"`
 	ErrorMsg   string `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
+}
+
+func (r KeywordInsertResult) IsError() bool {
+	return !r.Success
+}
+
+func (r KeywordInsertResult) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
 }
 
 // 插入关键词
@@ -41,28 +70,10 @@ func KeywordInsert(req *KeywordInsertRequest) (bool, error) {
 	r.SetPrice(req.Price)
 	r.SetType(req.Type)
 	r.SetAdGroupId(req.AdGroupId)
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("no result info")
-	}
+
 	var response KeywordInsertResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-
-	if !response.Data.Result.Success {
-		if response.Data.Result.ErrorMsg == `` {
-			response.Data.Result.ErrorMsg = "新建关键词失败"
-		}
-		return false, errors.New(response.Data.Result.ErrorMsg)
-	}
-
 	return true, nil
 }

@@ -1,8 +1,7 @@
 package promotion
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -25,10 +24,32 @@ type SkuAddResponse struct {
 	Data      *SkuAddResponseData `json:"jingdong_seller_promotion_sku_add_responce,omitempty" codec:"jingdong_seller_promotion_sku_add_responce,omitempty"`
 }
 
+func (r SkuAddResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r SkuAddResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type SkuAddResponseData struct {
 	Code      string   `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string   `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Ids       []uint64 `json:"ids,omitempty" codec:"ids,omitempty"`
+}
+
+func (r SkuAddResponseData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r SkuAddResponseData) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
 }
 
 // 添加参加促销的sku，单次最多添加100个SKU，一个促销最多支持1000个SKU，当基于套装促销添加SKU时，最多可设置3个商品的SKU，并且相同商品的次序要一致；当基于赠品促销添加SKU时，赠品SKU只能是1-5个，每个赠品只能赠送1-3个，赠品的总价应低于主商品中的最小京东价。
@@ -51,25 +72,10 @@ func SkuAdd(req *SkuAddRequest) ([]uint64, error) {
 	if req.BindType != "" {
 		r.SetBindType(req.BindType)
 	}
-	result, err := client.PostExecute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result.")
-	}
 
 	var response SkuAddResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.PostExecute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-
 	return response.Data.Ids, nil
 }

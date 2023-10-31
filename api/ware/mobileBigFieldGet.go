@@ -1,11 +1,9 @@
 package ware
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/ware"
 )
@@ -20,10 +18,32 @@ type MobileBigFieldResponse struct {
 	Data      *MobileBigFieldData `json:"jingdong_new_ware_mobilebigfield_get_responce,omitempty" codec:"jingdong_new_ware_mobilebigfield_get_responce,omitempty"`
 }
 
+func (r MobileBigFieldResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r MobileBigFieldResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data.IsError() {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type MobileBigFieldData struct {
 	Code      string `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    string `json:"result,omitempty" codec:"result,omitempty"`
+}
+
+func (r MobileBigFieldData) IsError() bool {
+	return r.Code != "0" || r.Result == ""
+}
+
+func (r MobileBigFieldData) Error() string {
+	return fmt.Sprintf("code: %s, desc: %s, result: %s", r.Code, r.ErrorDesc, r.Result)
 }
 
 func MobileBigField(req *MobileBigFieldRequest) (string, error) {
@@ -32,26 +52,9 @@ func MobileBigField(req *MobileBigFieldRequest) (string, error) {
 	r := ware.NewMobileBigFieldRequest()
 	r.SetSkuId(req.SkuId)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return "", err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response MobileBigFieldResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return "", err
 	}
-	if response.ErrorResp != nil {
-		return "", response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return "", errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == "" {
-		return "", errors.New("No mobile desc info.")
-	}
-
 	return response.Data.Result, nil
 }

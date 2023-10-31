@@ -1,8 +1,7 @@
 package goods
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -21,6 +20,17 @@ type PromotionGoodsInfoQueryResponse struct {
 	Data      *PromotionGoodsInfoQueryResponseData `json:"jd_union_open_goods_promotiongoodsinfo_query_response,omitempty"`
 }
 
+func (r PromotionGoodsInfoQueryResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.Result == ""
+}
+
+func (r PromotionGoodsInfoQueryResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
+}
+
 type PromotionGoodsInfoQueryResponseData struct {
 	Result string `json:"queryResult,omitempty"`
 }
@@ -29,6 +39,14 @@ type PromotionQueryResult struct {
 	Code    int64                `json:"code,omitempty"`
 	Message string               `json:"message,omitempty"`
 	Data    []PromotionGoodsResp `json:"data,omitempty"`
+}
+
+func (r PromotionQueryResult) IsError() bool {
+	return r.Code != 200
+}
+
+func (r PromotionQueryResult) Error() string {
+	return fmt.Sprintf("code: %d, msg: %s", r.Code, r.Message)
 }
 
 type PromotionGoodsResp struct {
@@ -68,28 +86,16 @@ func PromotionGoodsInfoQuery(req *PromotionGoodsInfoQueryRequest) ([]PromotionGo
 	}
 	r.SetSkuIds(strings.Join(skuIds, ","))
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
 	var response PromotionGoodsInfoQueryResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.Data == nil {
-		return nil, errors.New("no result")
-	}
-
 	var ret PromotionQueryResult
-	err = json.Unmarshal([]byte(response.Data.Result), &ret)
-	if err != nil {
+	if err := client.Logger().DecodeJSON([]byte(response.Data.Result), &ret); err != nil {
 		return nil, err
 	}
-
-	if ret.Code != 200 {
-		return nil, &api.ErrorResponnse{Code: strconv.FormatInt(ret.Code, 10), ZhDesc: ret.Message}
+	if ret.IsError() {
+		return nil, ret
 	}
-
 	return ret.Data, nil
 }

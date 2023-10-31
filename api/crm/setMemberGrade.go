@@ -1,9 +1,6 @@
 package crm
 
 import (
-	"encoding/json"
-	"errors"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
@@ -20,8 +17,33 @@ type SetMemberGradeResponse struct {
 	Data      *SetMemberGradeData `json:"jingdong_pop_crm_setMemberGrade_responce,omitempty" codec:"jingdong_pop_crm_setMemberGrade_responce,omitempty"`
 }
 
+func (r SetMemberGradeResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r SetMemberGradeResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type SetMemberGradeData struct {
 	ReturnType *ReturnType `json:"returnType,omitempty" codec:"returnType,omitempty"`
+}
+
+func (r SetMemberGradeData) IsError() bool {
+	return r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r SetMemberGradeData) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return "no result data"
 }
 
 // TODO 修改会员等级
@@ -38,26 +60,10 @@ func SetMemberGrade(req *SetMemberGradeRequest) (bool, error) {
 		r.SetGrade(req.Grade)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("no result info")
-	}
 	var response SetMemberGradeResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-
-	if response.Data.ReturnType.Code != "200" {
-		return false, errors.New(response.Data.ReturnType.Desc)
-	}
-
 	return response.Data.ReturnType.Data, nil
 
 }

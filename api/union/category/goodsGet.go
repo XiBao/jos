@@ -1,9 +1,7 @@
 package category
 
 import (
-	"encoding/json"
-	"errors"
-	"strconv"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -21,6 +19,17 @@ type GoodsGetResponse struct {
 	Data      *GoodsGetResponseData `json:"jd_union_open_category_goods_get_response,omitempty"`
 }
 
+func (r GoodsGetResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.Result == ""
+}
+
+func (r GoodsGetResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
+}
+
 type GoodsGetResponseData struct {
 	Result string `json:"result,omitempty"`
 }
@@ -29,6 +38,14 @@ type GoodsGetResult struct {
 	Code    int64          `json:"code,omitempty"`
 	Message string         `json:"message,omitempty"`
 	Data    []CategoryResp `json:"data,omitempty"`
+}
+
+func (r GoodsGetResult) IsError() bool {
+	return r.Code != 200
+}
+
+func (r GoodsGetResult) Error() string {
+	return fmt.Sprintf("code: %d, msg: %s", r.Code, r.Message)
 }
 
 type CategoryResp struct {
@@ -49,25 +66,16 @@ func GoodsGet(req *GoodsGetRequest) ([]CategoryResp, error) {
 	}
 	r.SetReq(goodsReq)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
 	var response GoodsGetResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-	if response.Data == nil || response.Data.Result == "" {
-		return nil, errors.New("no result")
 	}
 	var resp GoodsGetResult
-	err = json.Unmarshal([]byte(response.Data.Result), &resp)
-	if err != nil {
+	if err := client.Logger().DecodeJSON([]byte(response.Data.Result), &resp); err != nil {
 		return nil, err
 	}
-	if resp.Code != 200 {
-		return nil, &api.ErrorResponnse{Code: strconv.FormatInt(resp.Code, 10), ZhDesc: resp.Message}
+	if resp.IsError() {
+		return nil, resp
 	}
 
 	return resp.Data, nil

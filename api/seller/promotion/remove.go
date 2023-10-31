@@ -1,11 +1,9 @@
 package promotion
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
 )
@@ -24,11 +22,32 @@ type RemoveResponse struct {
 	Data      *RemoveData         `json:"jingdong_seller_promotion_v2_remove_responce,omitempty" codec:"jingdong_seller_promotion_v2_remove_responce,omitempty"`
 }
 
-type RemoveData struct {
-	Code      string `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
+func (r RemoveResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
 
-	RemoveResult bool `json:"remove_result,omitempty" codec:"remove_result,omitempty"`
+func (r RemoveResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
+type RemoveData struct {
+	Code         string `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc    string `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	RemoveResult bool   `json:"remove_result,omitempty" codec:"remove_result,omitempty"`
+}
+
+func (r RemoveData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r RemoveData) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
 }
 
 func Remove(req *RemoveRequest) (bool, error) {
@@ -43,22 +62,9 @@ func Remove(req *RemoveRequest) (bool, error) {
 		r.SetRequestId(req.RequestId)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response RemoveResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return false, err
-	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return false, errors.New(response.Data.ErrorDesc)
 	}
 
 	return response.Data.RemoveResult, nil

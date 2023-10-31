@@ -1,8 +1,7 @@
 package promotion
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -18,10 +17,32 @@ type CommitResponse struct {
 	Data      *CommitResponseData `json:"jingdong_seller_promotion_commit_responce,omitempty" codec:"jingdong_seller_promotion_commit_responce,omitempty"`
 }
 
+func (r CommitResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r CommitResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type CommitResponseData struct {
 	Code      string `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Success   bool   `json:"success,omitempty" codec:"success,omitempty"`
+}
+
+func (r CommitResponseData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r CommitResponseData) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
 }
 
 // 促销创建完毕,提交保存促销命令
@@ -30,24 +51,10 @@ func Commit(req *CommitRequest) (bool, error) {
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionCommitRequest()
 	r.SetPromoId(req.PromoId)
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("no result.")
-	}
 
 	var response CommitResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return false, err
-	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return false, errors.New(response.Data.ErrorDesc)
 	}
 
 	return response.Data.Success, nil

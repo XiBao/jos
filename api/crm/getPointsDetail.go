@@ -1,8 +1,6 @@
 package crm
 
 import (
-	"encoding/json"
-	"errors"
 	"time"
 
 	"github.com/XiBao/jos/api"
@@ -24,12 +22,34 @@ type GetPointsDetailRequest struct {
 
 type GetPointsDetailResponse struct {
 	ErrorResp *api.ErrorResponnse  `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *GetPointsDetailData `json:"jingdong_pop_crm_getPointsDetail_responce",omitempty" codec:"jingdong_pop_crm_getPointsDetail_responce",omitempty"`
+	Data      *GetPointsDetailData `json:"jingdong_pop_crm_getPointsDetail_responce,omitempty" codec:"jingdong_pop_crm_getPointsDetail_responce,omitempty"`
+}
+
+func (r GetPointsDetailResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r GetPointsDetailResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
 }
 
 type GetPointsDetailData struct {
 	Code   string                 `json:"code,omitempty" codec:"code,omitempty"`
 	Result *GetPointsDetailResult `json:"getpointsdetail_result,omitempty" codec:"getpointsdetail_result,omitempty"`
+}
+
+func (r GetPointsDetailData) IsError() bool {
+	return r.Result == nil
+}
+
+func (r GetPointsDetailData) Error() string {
+	return "no result data"
 }
 
 type GetPointsDetailResult struct {
@@ -72,26 +92,9 @@ func GetPointsDetail(req *GetPointsDetailRequest) ([]*PointsDetailView, error) {
 	r.SetPageSize(50)
 	//r.SetStartRowKey(req.StartRowKey)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No result info.")
-	}
 	var response GetPointsDetailResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if response.Data == nil || response.Data.Result == nil {
-		return nil, nil
-	}
-
 	return response.Data.Result.PointsDetailViews, nil
 }

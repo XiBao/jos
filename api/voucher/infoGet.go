@@ -2,8 +2,6 @@ package voucher
 
 import (
 	"encoding/base64"
-	"encoding/json"
-	"errors"
 	"fmt"
 
 	"github.com/XiBao/jos/api"
@@ -22,14 +20,47 @@ type VoucherInfoGetResponse struct {
 	Response  *VoucherInfoResponse `json:"jingdong_jos_voucher_info_get_responce,omitempty" codec:"jingdong_jos_voucher_info_get_responce,omitempty"`
 }
 
+func (r VoucherInfoGetResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Response == nil || r.Response.IsError()
+}
+
+func (r VoucherInfoGetResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Response != nil {
+		return r.Response.Error()
+	}
+	return "no result data"
+}
+
 type VoucherInfoResponse struct {
 	Result *VoucherInfoResult `json:"response,omitempty" codec:"response,omitempty"`
+}
+
+func (r VoucherInfoResponse) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r VoucherInfoResponse) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type VoucherInfoResult struct {
 	Code      string          `json:"errorCode,omitempty" codec:"errorCode,omitempty"`
 	ErrorDesc string          `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
 	Data      VoucherInfoData `json:"data,omitempty" codec:"data,omitempty"`
+}
+
+func (r VoucherInfoResult) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r VoucherInfoResult) Error() string {
+	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.ErrorDesc)
 }
 
 type VoucherInfoData struct {
@@ -47,7 +78,7 @@ type VoucherData struct {
 	Service   string `json:"service"`   //服务识别码
 	Act       string `json:"act"`       //ignore
 	Effective int64  `json:"effective"` //生效时间戳，客户端需要检查凭证是否已生效，未生效的凭证无法获取密钥
-	Expired   int64  `"expired"`        //过期时间戳，客户端需要检查凭证是否已过期，已过期的凭证无法获取密钥
+	Expired   int64  `json:"expired"`   //过期时间戳，客户端需要检查凭证是否已过期，已过期的凭证无法获取密钥
 	SType     int    `json:"stype"`     //ignore
 }
 
@@ -63,40 +94,17 @@ func VoucherInfoGet(req *VoucherInfoGetRequest) (voucherData VoucherData, err er
 	r := voucher.NewVoucherInfoGet()
 	r.SetCustomerUserId(req.CustomerUserId)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return
-	}
-	if len(result) == 0 {
-		err = errors.New("No result.")
-		return
-	}
 	var response VoucherInfoGetResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
-		return
-	}
-	if response.ErrorResp != nil {
-		err = response.ErrorResp
-		return
-	}
-	if response.Response.Result == nil {
-		err = errors.New("No result.")
-		return
-	}
-	if response.Response.Result.Code != "0" {
-		err = errors.New(response.Response.Result.ErrorDesc)
+	if err = client.Execute(r.Request, req.Session, &response); err != nil {
 		return
 	}
 
 	voucherBytes, err := base64.URLEncoding.DecodeString(response.Response.Result.Data.Voucher)
 	var voucherInfo Voucher
-	err = json.Unmarshal(voucherBytes, &voucherInfo)
-	if err != nil {
+	if err = client.Logger().DecodeJSON(voucherBytes, &voucherInfo); err != nil {
 		return
 	}
-	err = voucherInfo.Verify()
-	if err != nil {
+	if err = voucherInfo.Verify(); err != nil {
 		return
 	}
 	return voucherInfo.Data, nil

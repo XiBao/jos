@@ -1,8 +1,7 @@
 package crm
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -20,10 +19,35 @@ type ShopGiftCloseResponse struct {
 	Data      *ShopGiftCloseData  `json:"jingdong_pop_crm_shopGift_closeShopGiftCallBack_responce,omitempty" codec:"jingdong_pop_crm_shopGift_closeShopGiftCallBack_responce,omitempty"`
 }
 
+func (r ShopGiftCloseResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r ShopGiftCloseResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type ShopGiftCloseData struct {
 	Code      string               `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string               `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    *ShopGiftCloseResult `json:"closeshopgiftcallback_result,omitempty" codec:"closeshopgiftcallback_result,omitempty"`
+}
+
+func (r ShopGiftCloseData) IsError() bool {
+	return r.Code != "0" || r.Result == nil || r.Result.IsError()
+}
+
+func (r ShopGiftCloseData) Error() string {
+	if r.Result != nil && r.Result.IsError() {
+		return r.Result.Error()
+	}
+	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.ErrorDesc)
 }
 
 type ShopGiftCloseResult struct {
@@ -32,38 +56,23 @@ type ShopGiftCloseResult struct {
 	Desc string `json:"desc,omitempty" codec:"desc,omitempty"`
 }
 
+func (r ShopGiftCloseResult) IsError() bool {
+	return r.Code != "200"
+}
+
+func (r ShopGiftCloseResult) Error() string {
+	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.Desc)
+}
+
 func ShopGiftClose(req *ShopGiftCloseRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewShopGiftCloseRequest()
 	r.SetActivityId(req.ActivityId)
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("No result info.")
-	}
+
 	var response ShopGiftCloseResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return false, err
-	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return false, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return false, errors.New("No close result.")
-	}
-	if response.Data.Result.Code != "200" {
-		if response.Data.Result.Desc == "" {
-			return false, errors.New("未知错误")
-		} else {
-			return false, errors.New(response.Data.Result.Desc)
-		}
 	}
 	return response.Data.Result.Data, nil
 }

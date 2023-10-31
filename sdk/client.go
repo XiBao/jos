@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -20,6 +21,11 @@ type Request struct {
 	Params     map[string]interface{}
 	IsLogGW    bool `json:"-"`
 	IsUnionGW  bool `json:"-"`
+}
+
+type IResponse interface {
+	error
+	IsError() bool
 }
 
 type Response struct {
@@ -106,10 +112,10 @@ func (c *Client) SetDev(dev bool) {
 	c.Dev = dev
 }
 
-func (c *Client) Execute(req *Request, token string) (result []byte, err error) {
+func (c *Client) Execute(req *Request, token string, rep IResponse) error {
 	sysParams := make(map[string]string, 7)
-	if paramJson, e := json.Marshal(req.Params); e != nil {
-		return nil, e
+	if paramJson, err := json.Marshal(req.Params); err != nil {
+		return err
 	} else if req.IsUnionGW {
 		sysParams["360buy_param_json"] = string(paramJson)
 	} else {
@@ -145,38 +151,33 @@ func (c *Client) Execute(req *Request, token string) (result []byte, err error) 
 	debug.DebugPrintPostJSONRequest(gwURL, Json(sysParams))
 	gatewayUrl := fmt.Sprintf(`%s?%s`, gwURL, values.Encode())
 	debug.DebugPrintGetRequest(gatewayUrl)
-	var (
-		response *http.Response
-		e        error
-	)
-	tryCnt := 3
-	for {
-		response, e = http.DefaultClient.Get(gatewayUrl)
-		if e != nil {
-			debug.DebugPrintError(e)
-			if tryCnt <= 0 {
-				return nil, Error{Code: 0, Msg: "HTTP Response Error"}
-			} else {
-				tryCnt--
-				continue
-			}
-		}
-		break
+
+	response, err := http.DefaultClient.Get(gatewayUrl)
+	if err != nil {
+		debug.DebugPrintError(err)
+		return err
 	}
 	defer response.Body.Close()
-	res, e := io.ReadAll(response.Body)
-	if e != nil {
+	if body, err := io.ReadAll(response.Body); err != nil {
 		debug.DebugPrintError(err)
-		return nil, Error{Code: 0, Msg: fmt.Sprintf("ReadAll on response.Body: %v", e)}
+		return err
+	} else if rep != nil {
+		if err := debug.DecodeJSON(body, rep); err != nil {
+			return errors.Join(Error{Code: 0, Msg: string(body)}, err)
+		}
+		if rep.IsError() {
+			return rep
+		}
+	} else {
+		debug.DebugPrintStringResponse(string(body))
 	}
-	debug.DebugPrintStringResponse(string(res))
-	return res, nil
+	return nil
 }
 
-func (c *Client) PostExecute(req *Request, token string) (result []byte, err error) {
+func (c *Client) PostExecute(req *Request, token string, rep IResponse) error {
 	sysParams := make(map[string]string, 7)
-	if paramJson, e := json.Marshal(req.Params); e != nil {
-		return nil, e
+	if paramJson, err := json.Marshal(req.Params); err != nil {
+		return err
 	} else if req.IsUnionGW {
 		sysParams["360buy_param_json"] = string(paramJson)
 	} else {
@@ -211,19 +212,26 @@ func (c *Client) PostExecute(req *Request, token string) (result []byte, err err
 	debug := c.Logger()
 	debug.DebugPrintPostJSONRequest(gwURL, Json(sysParams))
 
-	response, e := http.PostForm(gwURL, values)
-	if e != nil {
+	response, err := http.PostForm(gwURL, values)
+	if err != nil {
 		debug.DebugPrintError(err)
-		return nil, Error{Code: 0, Msg: "HTTP Response Error"}
+		return err
 	}
 	defer response.Body.Close()
-	res, e := io.ReadAll(response.Body)
-	if e != nil {
+	if body, err := io.ReadAll(response.Body); err != nil {
 		debug.DebugPrintError(err)
-		return nil, Error{Code: 0, Msg: fmt.Sprintf("ReadAll on response.Body: %v", e)}
+		return err
+	} else if rep != nil {
+		if err := debug.DecodeJSON(body, rep); err != nil {
+			return errors.Join(Error{Code: 0, Msg: string(body)}, err)
+		}
+		if rep.IsError() {
+			return rep
+		}
+	} else {
+		debug.DebugPrintStringResponse(string(body))
 	}
-	debug.DebugPrintStringResponse(string(res))
-	return res, nil
+	return nil
 }
 
 func (c *Client) GenerateRawSign(params map[string]string) string {
