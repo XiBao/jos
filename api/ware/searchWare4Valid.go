@@ -1,8 +1,7 @@
 package ware
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 	"time"
 
 	"github.com/XiBao/jos/api"
@@ -57,10 +56,32 @@ type SearchWare4ValidResponse struct {
 	Data      *SearchWare4ValidSubResponse `json:"jingdong_ware_read_searchWare4Valid_responce,omitempty" codec:"jingdong_ware_read_searchWare4Valid_responce,omitempty"`
 }
 
+func (r SearchWare4ValidResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r SearchWare4ValidResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data.IsError() {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type SearchWare4ValidSubResponse struct {
 	Code      string                `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string                `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Page      *SearchWare4ValidPage `json:"page,omitempty" codec:"page,omitempty"`
+}
+
+func (r SearchWare4ValidSubResponse) IsError() bool {
+	return r.Code != "0" || r.Page == nil
+}
+
+func (r SearchWare4ValidSubResponse) Error() string {
+	return fmt.Sprintf("code: %s, desc: %s", r.Code, r.ErrorDesc)
 }
 
 type SearchWare4ValidPage struct {
@@ -104,25 +125,9 @@ func SearchWare4Valid(req *SearchWare4ValidRequest) (*SearchWare4ValidPage, erro
 		r.SetOrderType(req.OrderType)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No ware info.")
-	}
-
 	var response SearchWare4ValidResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
 	}
 
 	if len(response.Data.Page.Data) > 0 {

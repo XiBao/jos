@@ -1,9 +1,6 @@
 package sku
 
 import (
-	"encoding/json"
-	"errors"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ware"
 	"github.com/XiBao/jos/sdk"
@@ -21,6 +18,17 @@ type FindSkuByIdResponse struct {
 	Data      *FindSkuByIdData    `json:"jingdong_sku_read_findSkuById_responce,omitempty" codec:"jingdong_sku_read_findSkuById_responce,omitempty"`
 }
 
+func (r *FindSkuByIdResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.Sku == nil
+}
+
+func (r *FindSkuByIdResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
+}
+
 type FindSkuByIdData struct {
 	Code string    `json:"code,omitempty" codec:"code,omitempty"`
 	Sku  *ware.Sku `json:"sku,omitempty" codec:"sku,omitempty"`
@@ -36,22 +44,9 @@ func FindSkuById(req *FindSkuByIdRequest) (*ware.Sku, error) {
 	}
 	r.SetSkuId(req.SkuId)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No sku info.")
-	}
 	var response FindSkuByIdResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
 	return response.Data.Sku, nil
 }

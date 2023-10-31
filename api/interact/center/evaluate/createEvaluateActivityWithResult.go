@@ -1,10 +1,7 @@
 package center
 
 import (
-	"encoding/json"
-	"errors"
-
-	"github.com/XiBao/jos/api/util"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -52,10 +49,32 @@ type CreateEvaluateActivityWithResultResponse struct {
 	Data      *CreateEvaluateActivityWithResultData `json:"jingdong_com_jd_interact_center_api_write_EvaluateActivityWriteService_createActivityWithResult_responce,omitempty" codec:"jingdong_com_jd_interact_center_api_write_EvaluateActivityWriteService_createActivityWithResult_responce,omitempty"`
 }
 
+func (r CreateEvaluateActivityWithResultResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || !r.Data.IsError()
+}
+
+func (r CreateEvaluateActivityWithResultResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.ErrorDesc
+	}
+	return "no result data"
+}
+
 type CreateEvaluateActivityWithResultData struct {
 	Code      string `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    uint64 `json:"result,omitempty" codec:"result,omitempty"`
+}
+
+func (r CreateEvaluateActivityWithResultData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r CreateEvaluateActivityWithResultData) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
 }
 
 func CreateEvaluateActivityWithResult(req *CreateEvaluateActivityWithResultRequest) (uint64, error) {
@@ -161,23 +180,9 @@ func CreateEvaluateActivityWithResult(req *CreateEvaluateActivityWithResultReque
 		r.SetWordRequirement(req.WordRequirement)
 	}
 
-	result, err := client.PostExecute(r.Request, req.Session)
-	if err != nil {
-		return 0, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response CreateEvaluateActivityWithResultResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.PostExecute(r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
-	if response.ErrorResp != nil {
-		return 0, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return 0, errors.New(response.Data.ErrorDesc)
-	}
-
 	return response.Data.Result, nil
 }

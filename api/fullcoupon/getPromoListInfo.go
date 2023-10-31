@@ -1,8 +1,7 @@
 package fullcoupon
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -14,8 +13,8 @@ type FullCouponGetPromoListInfoRequest struct {
 	api.BaseRequest
 	WareId    uint64 `json:"wareId,omitempty" codec:"wareId,omitempty"`       // 商品编码
 	PageIndex int    `json:"pageIndex,omitempty" codec:"pageIndex,omitempty"` // 页码
-	EvtStatus int    `json:"evtStatus", codec:"evtStatus"`                    // 促销状态 全部：-1 ；系统未审核：1；人工未审核：5；驳回：11；未开始：2；进行中：3；已暂停：4；已结束：6；即将结束：20
-	EvtName   string `json:"evtName,omitempty", codec:"evtName,omitempty"`    // 促销名称
+	EvtStatus int    `json:"evtStatus" codec:"evtStatus"`                     // 促销状态 全部：-1 ；系统未审核：1；人工未审核：5；驳回：11；未开始：2；进行中：3；已暂停：4；已结束：6；即将结束：20
+	EvtName   string `json:"evtName,omitempty" codec:"evtName,omitempty"`     // 促销名称
 	PageSize  int    `json:"pageSize,omitempty" codec:"pageSize,omitempty"`   // 促销名称
 	StartTime string `json:"startTime,omitempty" codec:"startTime,omitempty"` // 促销开始时间
 	PromoId   uint64 `json:"promoId,omitempty" codec:"promoId,omitempty"`     // 促销编码
@@ -29,8 +28,33 @@ type FullCouponGetPromoListInfoResponse struct {
 	Data      *FullCouponGetPromoListInfoResponseResult `json:"jingdong_fullCoupon_getPromoListInfo_responce,omitempty" codec:"jingdong_fullCoupon_getPromoListInfo_responce,omitempty"`
 }
 
+func (r FullCouponGetPromoListInfoResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r FullCouponGetPromoListInfoResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type FullCouponGetPromoListInfoResponseResult struct {
 	Result *FullCouponGetPromoListInfoResponseData `json:"result,omitempty" codec:"result,omitempty"`
+}
+
+func (r FullCouponGetPromoListInfoResponseResult) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r FullCouponGetPromoListInfoResponseResult) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type FullCouponGetPromoListInfoResponseData struct {
@@ -38,6 +62,14 @@ type FullCouponGetPromoListInfoResponseData struct {
 	Code    string                                      `json:"code,omitempty" codec:"code,omitempty"`       // 状态码
 	Success bool                                        `json:"success,omitempty" codec:"success,omitempty"` // 请求是否成功
 	Data    *FullCouponGetPromoListInfoResponseDataList `json:"data,omitempty" codec:"data,omitempty"`
+}
+
+func (r FullCouponGetPromoListInfoResponseData) IsError() bool {
+	return r.Data == nil
+}
+
+func (r FullCouponGetPromoListInfoResponseData) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Msg)
 }
 
 type FullCouponGetPromoListInfoResponseDataList struct {
@@ -77,25 +109,9 @@ func GetPromoListInfo(req *FullCouponGetPromoListInfoRequest) ([]PromoListInfo, 
 	r.SetPageIndex(req.PageIndex)
 	r.SetPageSize(req.PageSize)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, 0, err
-	}
-	if len(result) == 0 {
-		return nil, 0, errors.New("no result.")
-	}
-
 	var response FullCouponGetPromoListInfoResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, 0, err
-	}
-	if response.ErrorResp != nil {
-		return nil, 0, response.ErrorResp
-	}
-
-	if response.Data == nil || response.Data.Result == nil || response.Data.Result.Data == nil || response.Data.Result.Data.PromoList == nil {
-		return nil, 0, errors.New("no promo list.")
 	}
 
 	return response.Data.Result.Data.PromoList, response.Data.Result.Data.TotalPageCount, nil

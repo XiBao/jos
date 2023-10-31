@@ -1,8 +1,7 @@
 package report
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 	"sort"
 	"strconv"
 	"time"
@@ -31,8 +30,33 @@ type QueryCampDailySumResponse struct {
 	Data      *QueryCampDailySumData `json:"jingdong_dsp_report_queryCampDailySum_responce,omitempty" codec:"jingdong_dsp_report_queryCampDailySum_responce,omitempty"`
 }
 
+func (r QueryCampDailySumResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r QueryCampDailySumResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type QueryCampDailySumData struct {
 	Result *QueryCampDailySumResult `json:"querycampdailysum_result,omitempty" codec:"querycampdailysum_result,omitempty"`
+}
+
+func (r QueryCampDailySumData) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r QueryCampDailySumData) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type QueryCampDailySumResult struct {
@@ -42,6 +66,14 @@ type QueryCampDailySumResult struct {
 	Total      int           `json:"total,omitempty" codec:"total,omitempty"`
 	Page       int           `json:"page,omitempty" codec:"page,omitempty"`
 	Value      []*ReportInfo `json:"value,omitempty" codec:"value,omitempty"`
+}
+
+func (r QueryCampDailySumResult) IsError() bool {
+	return !r.Success
+}
+
+func (r QueryCampDailySumResult) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s ", r.ResultCode, r.ErrorMsg)
 }
 
 type ReportInfo struct {
@@ -125,29 +157,12 @@ func QueryCampDailySum(req *QueryCampDailySumRequest) ([]*CampaignDailyRpt, erro
 	r.SetPageIndex(req.PageIndex)
 	r.SetPageSize(req.PageSize)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result info")
-	}
-
 	var response QueryCampDailySumResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if !response.Data.Result.Success {
-		return nil, errors.New(response.Data.Result.ErrorMsg)
-	}
-
 	loc := time.Now().Location()
-	rpts := []*CampaignDailyRpt{}
+	rpts := make([]*CampaignDailyRpt, 0, len(response.Data.Result.Value))
 	for _, data := range response.Data.Result.Value {
 		rpt := &CampaignDailyRpt{}
 		for k, v := range data.FigureData {

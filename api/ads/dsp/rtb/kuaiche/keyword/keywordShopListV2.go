@@ -1,9 +1,6 @@
 package keyword
 
 import (
-	"encoding/json"
-	"errors"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -36,8 +33,33 @@ type KuaicheKeywordShopListResponse struct {
 	ErrorResp *api.ErrorResponnse             `json:"error_response,omitempty" codec:"error_response,omitempty"`
 }
 
+func (r KuaicheKeywordShopListResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Responce == nil || r.Responce.IsError()
+}
+
+func (r KuaicheKeywordShopListResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Responce != nil {
+		return r.Responce.Error()
+	}
+	return "no result data"
+}
+
 type KuaicheKeywordShopListResponce struct {
 	ReturnType *KuaicheKeywordShopListResponseData `json:"returnType,omitempty" codec:"returnType,omitempty"`
+}
+
+func (r KuaicheKeywordShopListResponce) IsError() bool {
+	return r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r KuaicheKeywordShopListResponce) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return "no result data"
 }
 
 type KuaicheKeywordShopListResponseData struct {
@@ -88,28 +110,9 @@ func KuaicheKeywordShopList(req *KuaicheKeywordShopListRequest) (*KuaicheKeyword
 		r.SetPlatformBusinessType(req.PlatformBusinessType)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result.")
-	}
-
 	var response KuaicheKeywordShopListResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, errors.New(response.ErrorResp.ZhDesc)
-	}
-	if response.Responce == nil || response.Responce.ReturnType == nil {
-		return nil, errors.New("no result data.")
-	}
-	if !response.Responce.ReturnType.Success {
-		return nil, errors.New(response.Responce.ReturnType.Msg)
-	}
-
 	return response.Responce.ReturnType.Data, nil
 }

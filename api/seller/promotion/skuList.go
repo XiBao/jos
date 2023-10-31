@@ -1,8 +1,7 @@
 package promotion
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -24,10 +23,32 @@ type SkuListResponse struct {
 	Data      *SkuListResponseData `json:"jingdong_seller_promotion_v2_sku_list_responce,omitempty" codec:"jingdong_seller_promotion_v2_sku_list_responce,omitempty"`
 }
 
+func (r SkuListResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r SkuListResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data.IsError() {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type SkuListResponseData struct {
 	Code             string              `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc        string              `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	PromotionSkuList []*PromotionSkuList `json:"promotion_sku_list,omitempty" codec:"promotion_sku_list,omitempty"`
+}
+
+func (r SkuListResponseData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r SkuListResponseData) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
 }
 
 // 店铺促销商品查询
@@ -58,26 +79,9 @@ func SkuList(req *SkuListRequest) ([]*PromotionSkuList, error) {
 		r.SetBindType(req.BindType)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result.")
-	}
-
 	var response SkuListResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-
 	return response.Data.PromotionSkuList, nil
 }

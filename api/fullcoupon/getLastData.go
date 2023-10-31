@@ -1,8 +1,7 @@
 package fullcoupon
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -23,8 +22,33 @@ type FullCouponGetLastDataResponse struct {
 	Data      *FullCouponGetLastDataResponseResult `json:"jingdong_fullCoupon_getLastData_responce,omitempty" codec:"jingdong_fullCoupon_getLastData_responce,omitempty"`
 }
 
+func (r FullCouponGetLastDataResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r FullCouponGetLastDataResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type FullCouponGetLastDataResponseResult struct {
 	Result *FullCouponGetLastDataResponseResultData `json:"result,omitempty" codec:"result,omitempty"`
+}
+
+func (r FullCouponGetLastDataResponseResult) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r FullCouponGetLastDataResponseResult) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type FullCouponGetLastDataResponseResultData struct {
@@ -32,6 +56,14 @@ type FullCouponGetLastDataResponseResultData struct {
 	Code    string          `json:"code,omitempty" codec:"code,omitempty"`       // 状态码
 	Success bool            `json:"success,omitempty" codec:"success,omitempty"` // 请求是否成功
 	Data    *PromoTrendData `json:"data,omitempty" codec:"data,omitempty"`
+}
+
+func (r FullCouponGetLastDataResponseResultData) IsError() bool {
+	return r.Data == nil
+}
+
+func (r FullCouponGetLastDataResponseResultData) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Msg)
 }
 
 func GetLastData(req *FullCouponGetLastDataRequest) (*PromoTrendData, error) {
@@ -43,25 +75,9 @@ func GetLastData(req *FullCouponGetLastDataRequest) (*PromoTrendData, error) {
 	r.SetShopId(req.ShopId)
 	r.SetDate(req.Date)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result.")
-	}
-
 	var response FullCouponGetLastDataResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data == nil || response.Data.Result == nil || response.Data.Result.Data == nil {
-		return nil, errors.New("no data.")
-	}
-
 	return response.Data.Result.Data, nil
 }

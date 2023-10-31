@@ -74,15 +74,15 @@ type PromotionSkuList struct {
 	WareId      uint64 `json:"ware_id" codec:"ware_id"`
 	SkuId       uint64 `json:"sku_id" codec:"sku_id"`
 	SkuName     string `json:"sku_name" codec:"sku_name"`
-	BindType    uint8  `json:"bind_type" codec:"bind_type"`            // sku绑定类型（1、主商品，2、赠品，4、附件）
-	JdPrice     string `json:"jd_price" codec:"jd_price"`              // 京东价
-	PromoPrice  string `json:"promo_price" codec:"promo_price"`        // 促销价
-	ItemNum     string `json:"item_num" codec:"item_num"`              // 货号
-	LimitNum    uint   `json:"limit_num" codec:"limit_num"`            // 限购数量
-	SkuStatus   uint8  `json:"sku_status" codec:"sku_status"`          // sku生效状态（0、未生效，1、已生效）
-	Seq         uint64 `json:"seq" codec:"seq"`                        // 序号
-	Display     uint8  `json:"display" codec:"display"`                // 是否展示
-	IsNeedToBuy uint8  `json:"is_need_to_buy" codec: "is_need_to_buy"` // 是否必买
+	BindType    uint8  `json:"bind_type" codec:"bind_type"`           // sku绑定类型（1、主商品，2、赠品，4、附件）
+	JdPrice     string `json:"jd_price" codec:"jd_price"`             // 京东价
+	PromoPrice  string `json:"promo_price" codec:"promo_price"`       // 促销价
+	ItemNum     string `json:"item_num" codec:"item_num"`             // 货号
+	LimitNum    uint   `json:"limit_num" codec:"limit_num"`           // 限购数量
+	SkuStatus   uint8  `json:"sku_status" codec:"sku_status"`         // sku生效状态（0、未生效，1、已生效）
+	Seq         uint64 `json:"seq" codec:"seq"`                       // 序号
+	Display     uint8  `json:"display" codec:"display"`               // 是否展示
+	IsNeedToBuy uint8  `json:"is_need_to_buy" codec:"is_need_to_buy"` // 是否必买
 	Created     uint64 `json:"created" codec:"created"`
 	Modified    uint64 `json:"modified" codec:"modified"`
 	Rfld        uint64 `json:"rfId" codec:"rfId"`

@@ -1,8 +1,6 @@
 package ware
 
 import (
-	"encoding/json"
-	"errors"
 	"strconv"
 	"strings"
 
@@ -22,6 +20,17 @@ type WareBaseProductGetResponse struct {
 	Data      *WareBaseProductGetData `json:"jingdong_new_ware_baseproduct_get_responce,omitempty" codec:"jingdong_new_ware_baseproduct_get_responce,omitempty"`
 }
 
+func (r WareBaseProductGetResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil
+}
+
+func (r WareBaseProductGetResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
+}
+
 type WareBaseProductGetData struct {
 	Code   string          `json:"code,omitempty" codec:"code,omitempty"`
 	Result []*ProductsBase `json:"listproductbase_result,omitempty" codec:"listproductbase_result,omitempty"`
@@ -39,21 +48,9 @@ func WareBaseProductGet(req *WareBaseProductGetRequest) ([]*ProductsBase, error)
 	r.SetIds(strings.Join(ids, ","))
 	r.SetBaseFields(req.BaseFields)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No result.")
-	}
 	var response WareBaseProductGetResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
 	}
 	return response.Data.Result, nil
 }

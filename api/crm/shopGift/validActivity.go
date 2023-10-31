@@ -1,8 +1,7 @@
 package crm
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -20,16 +19,49 @@ type ShopGiftValidActivityResponse struct {
 	Data      *ShopGiftValidActivityData `json:"jingdong_pop_crm_shopGift_getValidActivity_responce,omitempty" codec:"jingdong_pop_crm_shopGift_getValidActivity_responce,omitempty"`
 }
 
+func (r ShopGiftValidActivityResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r ShopGiftValidActivityResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type ShopGiftValidActivityData struct {
 	Code      string                       `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string                       `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    *ShopGiftValidActivityResult `json:"commonResult,omitempty" codec:"commonResult,omitempty"`
 }
 
+func (r ShopGiftValidActivityData) IsError() bool {
+	return r.Code != "0" || r.Result == nil || r.Result.IsError()
+}
+
+func (r ShopGiftValidActivityData) Error() string {
+	if r.Result != nil && r.Result.IsError() {
+		return r.Result.Error()
+	}
+	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.ErrorDesc)
+}
+
 type ShopGiftValidActivityResult struct {
 	Code string                  `json:"code,omitempty" codec:"code,omitempty"`
 	Desc string                  `json:"msg,omitempty" codec:"desc,omitempty"`
 	Data *ShopGiftActivityDomain `json:"data,omitempty" codec:"data,omitempty"`
+}
+
+func (r ShopGiftValidActivityResult) IsError() bool {
+	return r.Code != "200"
+}
+
+func (r ShopGiftValidActivityResult) Error() string {
+	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.Desc)
 }
 
 type ShopGiftActivityDomain struct {
@@ -46,33 +78,10 @@ func ShopGiftValidActivity(req *ShopGiftValidActivityRequest) (*ShopGiftActivity
 	client.Debug = req.Debug
 	r := crm.NewShopGiftValidActivityRequest()
 	r.SetChannel(req.Channel)
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No result info.")
-	}
+
 	var response ShopGiftValidActivityResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return nil, errors.New("No result.")
-	}
-	if response.Data.Result.Code != "200" {
-		if response.Data.Result.Desc == "" {
-			return nil, errors.New("未知错误")
-		} else {
-			return nil, errors.New(response.Data.Result.Desc)
-		}
 	}
 	return response.Data.Result.Data, nil
 }

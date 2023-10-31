@@ -1,8 +1,7 @@
 package vender
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -19,14 +18,47 @@ type GetMemberLevelResponse struct {
 	Data      *GetMemberLevelData `json:"jingdong_pop_vender_getMemberLevel_responce,omitempty" codec:"jingdong_pop_vender_getMemberLevel_responce,omitempty"`
 }
 
+func (r GetMemberLevelResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r GetMemberLevelResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type GetMemberLevelData struct {
 	ReturnType *MemberLevelReturnType `json:"returnType,omitempty" codec:"returnType,omitempty"`
+}
+
+func (r GetMemberLevelData) IsError() bool {
+	return r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r GetMemberLevelData) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return "no result data"
 }
 
 type MemberLevelReturnType struct {
 	Desc string           `json:"desc,omitempty" codec:"desc,omitempty"`
 	Code string           `json:"code,omitempty" codec:"code,omitempty"`
 	Info *MemberLevelInfo `json:"memberLevelInfo,omitempty" codec:"memberLevelInfo,omitempty"`
+}
+
+func (r MemberLevelReturnType) IsError() bool {
+	return r.Code != "200" || r.Info == nil
+}
+
+func (r MemberLevelReturnType) Error() string {
+	return fmt.Sprintf("code: %s, desc: %s", r.Code, r.Desc)
 }
 
 type MemberLevelInfo struct {
@@ -57,26 +89,9 @@ func GetMemberLevel(req *GetMemberLevelRequest) (*MemberLevelInfo, error) {
 		r.SetCustomerPin(req.CustomerPin)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result info")
-	}
 	var response GetMemberLevelResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if response.Data.ReturnType.Code != "200" {
-		return nil, errors.New(response.Data.ReturnType.Desc)
-	}
-
 	return response.Data.ReturnType.Info, nil
 }

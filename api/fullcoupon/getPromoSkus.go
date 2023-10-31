@@ -1,8 +1,7 @@
 package fullcoupon
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -22,8 +21,33 @@ type FullCouponGetPromoSkusResponse struct {
 	Data      *FullCouponGetPromoSkusResponseResult `json:"jingdong_fullCoupon_getPromoSkus_responce,omitempty" codec:"jingdong_fullCoupon_getPromoSkus_responce,omitempty"`
 }
 
+func (r FullCouponGetPromoSkusResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r FullCouponGetPromoSkusResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type FullCouponGetPromoSkusResponseResult struct {
 	Result *FullCouponGetPromoSkusResponseData `json:"result,omitempty" codec:"result,omitempty"`
+}
+
+func (r FullCouponGetPromoSkusResponseResult) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r FullCouponGetPromoSkusResponseResult) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type FullCouponGetPromoSkusResponseData struct {
@@ -31,6 +55,14 @@ type FullCouponGetPromoSkusResponseData struct {
 	Code    string     `json:"code,omitempty" codec:"code,omitempty"`       // 状态码
 	Success bool       `json:"success,omitempty" codec:"success,omitempty"` // 请求是否成功
 	Data    []PromoSku `json:"data,omitempty" codec:"data,omitempty"`
+}
+
+func (r FullCouponGetPromoSkusResponseData) IsError() bool {
+	return !r.Success
+}
+
+func (r FullCouponGetPromoSkusResponseData) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Msg)
 }
 
 func GetPromoSkus(req *FullCouponGetPromoSkusRequest) ([]PromoSku, error) {
@@ -41,25 +73,9 @@ func GetPromoSkus(req *FullCouponGetPromoSkusRequest) ([]PromoSku, error) {
 	r.SetAppKey(req.AppKey)
 	r.SetPromoId(req.PromoId)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result.")
-	}
-
 	var response FullCouponGetPromoSkusResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data == nil || response.Data.Result == nil || response.Data.Result.Data == nil {
-		return nil, errors.New("no sku list.")
-	}
-
 	return response.Data.Result.Data, nil
 }

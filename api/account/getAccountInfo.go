@@ -1,11 +1,9 @@
 package account
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/account"
 )
@@ -22,11 +20,39 @@ type GetAccountInfoResponse struct {
 	Data      *GetAccountInfoData `json:"jingdong_pop_account_getAccountInfo_responce,omitempty" codec:"jingdong_pop_account_getAccountInfo_responce,omitempty"`
 }
 
+func (r GetAccountInfoResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r GetAccountInfoResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no bean account info"
+}
+
 type GetAccountInfoData struct {
 	Code      string `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
 
 	Result *AccountInfo `json:"beanAccount,omitempty" codec:"beanAccount,omitempty"`
+}
+
+func (r GetAccountInfoData) IsError() bool {
+	return r.Code != "0" || r.Result == nil
+}
+
+func (r GetAccountInfoData) Error() string {
+	if r.Code != "0" {
+		return fmt.Sprintf("code:%s, message: %s", r.Code, r.ErrorDesc)
+	}
+	if r.Result == nil {
+		return "no bean account info."
+	}
+	return "unexpected error"
 }
 
 func GetAccountInfo(req *GetAccountInfoRequest) (*AccountInfo, error) {
@@ -36,25 +62,9 @@ func GetAccountInfo(req *GetAccountInfoRequest) (*AccountInfo, error) {
 	r.SetAccountType(req.AccountType)
 	r.SetAccountCode(req.AccountCode)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response GetAccountInfoResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return nil, errors.New("No bean account info.")
 	}
 
 	return response.Data.Result, nil

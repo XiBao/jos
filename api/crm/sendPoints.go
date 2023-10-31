@@ -1,8 +1,6 @@
 package crm
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"strconv"
 	"time"
@@ -36,7 +34,18 @@ type SendPointsRequest struct {
 
 type SendPointsResponse struct {
 	ErrorResp *api.ErrorResponnse `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *SendPointsData     `json:"jingdong_pop_crm_sendPoints_responce",omitempty" codec:"jingdong_pop_crm_sendPoints_responce",omitempty"`
+	Data      *SendPointsData     `json:"jingdong_pop_crm_sendPoints_responce,omitempty" codec:"jingdong_pop_crm_sendPoints_responce,omitempty"`
+}
+
+func (r SendPointsResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil
+}
+
+func (r SendPointsResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
 }
 
 type SendPointsData struct {
@@ -61,23 +70,11 @@ func SendPoints(req *SendPointsRequest) (int64, error) {
 	}
 	r.SetSourceType(strconv.Itoa(req.SourceType))
 	r.SetPoints(req.Points)
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
+
+	var response SendPointsResponse
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
-	if len(result) == 0 {
-		return 0, errors.New("No result info.")
-	}
-	var response SendPointsResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
-		return 0, errors.New(fmt.Sprintf("%s result :%s", err.Error(), result))
-	}
-
-	if response.ErrorResp != nil {
-		return 0, response.ErrorResp
-	}
-
 	return response.Data.Result, nil
 }
 

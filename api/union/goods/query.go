@@ -1,9 +1,7 @@
 package goods
 
 import (
-	"encoding/json"
-	"errors"
-	"strconv"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -67,6 +65,17 @@ type QueryResponse struct {
 	Data      *QueryResponseData  `json:"jd_union_open_goods_query_responce,omitempty"`
 }
 
+func (r QueryResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.Result == ""
+}
+
+func (r QueryResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
+}
+
 type QueryResponseData struct {
 	Result string `json:"queryResult,omitempty"`
 }
@@ -76,6 +85,14 @@ type QueryResult struct {
 	Message    string      `json:"message,omitempty"`
 	TotalCount uint        `json:"totalCount,omitempty"`
 	Data       []GoodsResp `json:"data,omitempty"`
+}
+
+func (r QueryResult) IsError() bool {
+	return r.Code != 200
+}
+
+func (r QueryResult) Error() string {
+	return fmt.Sprintf("code: %d, message: %s", r.Code, r.Message)
 }
 
 type GoodsResp struct {
@@ -181,25 +198,16 @@ func Query(req *QueryRequest) (*QueryResult, error) {
 	}
 	r.SetGoodsReqDTO(goodsReq)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
 	var response QueryResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-	if response.Data == nil || response.Data.Result == "" {
-		return nil, errors.New("no result")
 	}
 	var resp QueryResult
-	err = json.Unmarshal([]byte(response.Data.Result), &resp)
-	if err != nil {
+	if err := client.Logger().DecodeJSON([]byte(response.Data.Result), &resp); err != nil {
 		return nil, err
 	}
-	if resp.Code != 200 {
-		return nil, &api.ErrorResponnse{Code: strconv.FormatInt(resp.Code, 10), ZhDesc: resp.Message}
+	if resp.IsError() {
+		return nil, resp
 	}
 
 	return &resp, nil

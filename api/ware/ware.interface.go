@@ -74,7 +74,7 @@ type Sku struct {
 	SaleAttrs            []*SaleAttr `json:"saleAttrs,omitempty" codec:"saleAttrs,omitempty"` // 销售属性集合
 	Features             []*Feature  `json:"features,omitempty" codec:"features,omitempty"`   // 特殊属性集合
 	JdPrice              float64     `json:"jdPrice,omitempty" codec:"jdPrice,omitempty"`     // 京东价
-	PromoPrice           float64     `json:"promoPrice,omitempty", codec:"promoPrice,omitempty"`
+	PromoPrice           float64     `json:"promoPrice,omitempty" codec:"promoPrice,omitempty"`
 	OuterId              string      `json:"outerId,omitempty" codec:"outerId,omitempty"`                           // 外部ID
 	BarCode              string      `json:"barCode,omitempty" codec:"barCode,omitempty"`                           // sku条形码
 	CategoryId           uint64      `json:"categoryId,omitempty" codec:"categoryId,omitempty"`                     // 类目id

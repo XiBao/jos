@@ -1,8 +1,7 @@
 package jm
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -17,12 +16,37 @@ type GetEncryptPinNewRequest struct {
 
 type GetEncryptPinNewResponse struct {
 	ErrorResp *api.ErrorResponnse   `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *GetEncryptPinNewData `json:"jingdong_pop_jm_center_user_getEncryptPinNew_responce",omitempty" codec:"jingdong_pop_jm_center_user_getEncryptPinNew_responce",omitempty"`
+	Data      *GetEncryptPinNewData `json:"jingdong_pop_jm_center_user_getEncryptPinNew_responce,omitempty" codec:"jingdong_pop_jm_center_user_getEncryptPinNew_responce,omitempty"`
+}
+
+func (r GetEncryptPinNewResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r GetEncryptPinNewResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
 }
 
 type GetEncryptPinNewData struct {
 	Code       string                      `json:"code,omitempty" codec:"code,omitempty"`
 	ReturnType *GetEncryptPinNewReturnType `json:"returnType,omitempty" codec:"returnType,omitempty"`
+}
+
+func (r GetEncryptPinNewData) IsError() bool {
+	return r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r GetEncryptPinNewData) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return "no result data"
 }
 
 type GetEncryptPinNewReturnType struct {
@@ -32,6 +56,14 @@ type GetEncryptPinNewReturnType struct {
 	RequestId string `json:"requestId,omitempty" codec:"requestId,omitempty"` //请求id
 }
 
+func (r GetEncryptPinNewReturnType) IsError() bool {
+	return r.Code != 0
+}
+
+func (r GetEncryptPinNewReturnType) Error() string {
+	return fmt.Sprintf("code:%d, msg:%s", r.Code, r.Message)
+}
+
 func GetEncryptPinNew(req *GetEncryptPinNewRequest) (string, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -39,27 +71,10 @@ func GetEncryptPinNew(req *GetEncryptPinNewRequest) (string, error) {
 	r.SetToken(req.Token)
 	r.SetSource(req.Source)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return "", err
-	}
-	if len(result) == 0 {
-		return "", errors.New("No result info.")
-	}
 	var response GetEncryptPinNewResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return "", err
 	}
-
-	if response.ErrorResp != nil {
-		return "", response.ErrorResp
-	}
-
-	if response.Data.ReturnType.Code != 0 {
-		return "", errors.New(response.Data.ReturnType.Message)
-	}
-
 	return response.Data.ReturnType.Pin, nil
 
 }

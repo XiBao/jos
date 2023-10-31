@@ -1,8 +1,7 @@
 package token
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -20,10 +19,32 @@ type ConverstionJmEncryptPinResponse struct {
 	Data      *ConverstionJmEncryptPinData `json:"jingdong_TokenToPinCenter_converstionJmEncryptPin_responce,omitempty" codec:"jingdong_TokenToPinCenter_converstionJmEncryptPin_responce,omitempty"`
 }
 
+func (r *ConverstionJmEncryptPinResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r *ConverstionJmEncryptPinResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type ConverstionJmEncryptPinData struct {
 	Code      string                         `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string                         `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    *ConverstionJmEncryptPinResult `json:"result,omitempty" codec:"result,omitempty"`
+}
+
+func (r ConverstionJmEncryptPinData) IsError() bool {
+	return r.Code != "0" || r.Result == nil
+}
+
+func (r ConverstionJmEncryptPinData) Error() string {
+	return fmt.Sprintf("code: %s, error_description: %s", r.Code, r.ErrorDesc)
 }
 
 type ConverstionJmEncryptPinResult struct {
@@ -34,6 +55,14 @@ type ConverstionJmEncryptPinResult struct {
 	OpenIdSeller string `json:"open_id_seller,omitempty" codec:"open_id_seller,omitempty"`
 }
 
+func (r ConverstionJmEncryptPinResult) IsError() bool {
+	return r.Code != 200
+}
+
+func (r ConverstionJmEncryptPinResult) Error() string {
+	return fmt.Sprintf("code: %d, error_description: %s", r.Code, r.Message)
+}
+
 // 输入单个订单id，得到所有相关订单信息
 func ConverstionJmEncryptPin(req *ConverstionJmEncryptPinRequest) (*ConverstionJmEncryptPinResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
@@ -42,27 +71,9 @@ func ConverstionJmEncryptPin(req *ConverstionJmEncryptPinRequest) (*ConverstionJ
 	r.SetAppKey(req.AppKey)
 	r.SetEncryptPin(req.EncryptPin)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No result.")
-	}
 	var response ConverstionJmEncryptPinResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return nil, errors.New("No pin.")
-	}
-
 	return response.Data.Result, nil
 }

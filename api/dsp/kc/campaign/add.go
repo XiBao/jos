@@ -1,8 +1,7 @@
 package campaign
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -19,8 +18,31 @@ type AddResponse struct {
 	ErrorResp *api.ErrorResponnse `json:"error_response,omitempty" codec:"error_response,omitempty"`
 	Data      *AddData            `json:"jingdong_dsp_kc_campainShop_add_responce,omitempty" codec:"jingdong_dsp_kc_campainShop_add_responce,omitempty"`
 }
+
+func (r AddResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r AddResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type AddData struct {
 	Result AddResult `json:"addcampain_result,omitempty" codec:"addcampain_result,omitempty"`
+}
+
+func (r AddData) IsError() bool {
+	return r.Result.IsError()
+}
+
+func (r AddData) Error() string {
+	return r.Result.Error()
 }
 
 type AddResult struct {
@@ -28,6 +50,14 @@ type AddResult struct {
 	Success    bool   `json:"success,omitempty" codec:"success,omitempty"`
 	ResultCode string `json:"resultCode,omitempty" codec:"resultCode,omitempty"`
 	ErrorMsg   string `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
+}
+
+func (r AddResult) IsError() bool {
+	return !r.Success
+}
+
+func (r AddResult) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
 }
 
 // 新建计划
@@ -39,26 +69,9 @@ func Add(req *AddRequest) (bool, error) {
 	r.SetName(req.Name)
 	r.SetDayBudget(req.DayBudget)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("no result info")
-	}
-
 	var response AddResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-
-	if !response.Data.Result.Success {
-		return false, errors.New(response.Data.Result.ErrorMsg)
-	}
-
 	return true, nil
 }

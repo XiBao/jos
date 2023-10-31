@@ -1,11 +1,9 @@
 package link
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/wxsq/mjgj/link"
 )
@@ -21,10 +19,32 @@ type GetOpenLinkResponse struct {
 	Data      *GetOpenLinkData    `json:"jingdong_new_ware_mobilebigfield_get_responce,omitempty" codec:"jingdong_new_ware_mobilebigfield_get_responce,omitempty"`
 }
 
+func (r GetOpenLinkResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r GetOpenLinkResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type GetOpenLinkData struct {
 	Code      string `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    string `json:"result,omitempty" codec:"result,omitempty"`
+}
+
+func (r GetOpenLinkData) IsError() bool {
+	return r.Code != "0" || r.Result == ""
+}
+
+func (r GetOpenLinkData) Error() string {
+	return fmt.Sprintf("code: %s, error_description: %s", r.Code, r.ErrorDesc)
 }
 
 func GetOpenLink(req *GetOpenLinkRequest) (string, error) {
@@ -34,26 +54,9 @@ func GetOpenLink(req *GetOpenLinkRequest) (string, error) {
 	r.SetJump(req.Jump)
 	r.SetRUrl(req.RUrl)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return "", err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response GetOpenLinkResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return "", err
 	}
-	if response.ErrorResp != nil {
-		return "", response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return "", errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == "" {
-		return "", errors.New("No open link info.")
-	}
-
 	return response.Data.Result, nil
 }

@@ -1,9 +1,6 @@
 package coupon
 
 import (
-	"encoding/json"
-	"errors"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/coupon"
@@ -29,6 +26,17 @@ type CouponReadGetCouponListRequest struct {
 type CouponReadGetCouponListResponse struct {
 	ErrorResp *api.ErrorResponnse                  `json:"error_response,omitempty" codec:"error_response,omitempty"`
 	Data      *CouponReadGetCouponListResponseData `json:"jingdong_seller_coupon_read_getCouponList_responce,omitempty" codec:"jingdong_seller_coupon_read_getCouponList_responce,omitempty"`
+}
+
+func (r CouponReadGetCouponListResponse) IsError() bool {
+	return r.ErrorResp != nil
+}
+
+func (r CouponReadGetCouponListResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
 }
 
 type CouponReadGetCouponListResponseData struct {
@@ -80,22 +88,9 @@ func CouponReadGetCouponList(req *CouponReadGetCouponListRequest) ([]*Coupon, er
 	r.SetPage(req.Page)
 	r.SetPageSize(req.PageSize)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result.")
-	}
-
 	var response CouponReadGetCouponListResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
 	return response.Data.List, nil
 }

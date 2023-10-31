@@ -1,11 +1,9 @@
 package bean
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/bean"
 )
@@ -29,10 +27,32 @@ type SendBeanResponse struct {
 	Data      *SendBeanData       `json:"jingdong_pop_bean_sendBean_responce,omitempty" codec:"jingdong_pop_bean_sendBean_responce,omitempty"`
 }
 
+func (r SendBeanResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r SendBeanResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type SendBeanData struct {
 	Code      string          `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string          `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    *SendBeanResult `json:"beanSendResult,omitempty" codec:"beanSendResult,omitempty"`
+}
+
+func (r SendBeanData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r SendBeanData) Error() string {
+	return fmt.Sprintf("code:%s, desc:%s", r.Code, r.ErrorDesc)
 }
 
 type SendBeanResult struct {
@@ -62,26 +82,9 @@ func SendBean(req *SendBeanRequest) (*SendBeanResult, error) {
 		r.SetRfld(req.Rfld)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response SendBeanResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return nil, errors.New("No send bean result.")
-	}
-
 	return response.Data.Result, nil
 }

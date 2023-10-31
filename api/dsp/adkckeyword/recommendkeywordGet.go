@@ -1,8 +1,7 @@
 package adkckeyword
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -23,8 +22,33 @@ type RecommendkeywordGetResponse struct {
 	Data      *RecommendkeywordGetData `json:"jingdong_dsp_adkckeyword_recommendkeyword_get_responce,omitempty" codec:"jingdong_dsp_adkckeyword_recommendkeyword_get_responce,omitempty"`
 }
 
+func (r RecommendkeywordGetResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r RecommendkeywordGetResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type RecommendkeywordGetData struct {
 	Result *RecommendkeywordGetResult `json:"searchrecommendkeywords_result,omitempty" codec:"searchrecommendkeywords_result,omitempty"`
+}
+
+func (r RecommendkeywordGetData) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r RecommendkeywordGetData) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type RecommendkeywordGetResult struct {
@@ -32,6 +56,17 @@ type RecommendkeywordGetResult struct {
 	ResultCode string                    `json:"resultCode,omitempty" codec:"resultCode,omitempty"`
 	Success    bool                      `json:"success,omitempty" codec:"success,omitempty"`
 	Value      *RecommendkeywordGetValue `json:"data,omitempty" codec:"data,omitempty"`
+}
+
+func (r RecommendkeywordGetResult) IsError() bool {
+	return !r.Success || r.Value == nil
+}
+
+func (r RecommendkeywordGetResult) Error() string {
+	if !r.Success {
+		return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+	}
+	return "no result data"
 }
 
 type RecommendkeywordGetValue struct {
@@ -55,24 +90,10 @@ func RecommendkeywordGet(req *RecommendkeywordGetRequest) ([]*KeyWordRecommendQu
 	r.SetOrder(req.Order)
 	r.SetSortType(req.SortType)
 	r.SetKeyWordType(req.KeyWordType)
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result info")
-	}
-	var response RecommendkeywordGetResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
-		return nil, err
-	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
 
-	if !response.Data.Result.Success {
-		return nil, errors.New(response.Data.Result.ErrorMsg)
+	var response RecommendkeywordGetResponse
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+		return nil, err
 	}
 
 	return response.Data.Result.Value.Datas, nil

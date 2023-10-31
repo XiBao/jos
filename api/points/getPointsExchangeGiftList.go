@@ -1,8 +1,7 @@
 package points
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -18,14 +17,47 @@ type GetPointsExchangeGiftListResponse struct {
 	Data      *GetPointsExchangeGiftListData `json:"jingdong_points_jos_getPointsExchangeGiftList_responce,omitempty" codec:"jingdong_points_jos_getPointsExchangeGiftList_responce,omitempty"`
 }
 
+func (r GetPointsExchangeGiftListResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r GetPointsExchangeGiftListResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type GetPointsExchangeGiftListData struct {
 	JsfResult *GetPointsExchangeGiftListJsfResult `json:"jsfResult,omitempty" codec:"jsfResult,omitempty"`
+}
+
+func (r GetPointsExchangeGiftListData) IsError() bool {
+	return r.JsfResult == nil || r.JsfResult.IsError()
+}
+
+func (r GetPointsExchangeGiftListData) Error() string {
+	if r.JsfResult == nil {
+		return r.JsfResult.Error()
+	}
+	return "no result data"
 }
 
 type GetPointsExchangeGiftListJsfResult struct {
 	Code   string                   `json:"code,omitempty" codec:"code,omitempty"`     //返回码
 	Desc   string                   `json:"desc,omitempty" codec:"desc,omitempty"`     //返回描述
 	Result []*PointsExchangeGiftDTO `json:"result,omitempty" codec:"result,omitempty"` //活动列表
+}
+
+func (r GetPointsExchangeGiftListJsfResult) IsError() bool {
+	return r.Code != "200"
+}
+
+func (r GetPointsExchangeGiftListJsfResult) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Desc)
 }
 
 type PointsExchangeGiftDTO struct {
@@ -46,27 +78,10 @@ func GetPointsExchangeGiftList(req *GetPointsExchangeGiftListRequest) ([]*Points
 	client.Debug = req.Debug
 	r := points.NewGetPointsExchangeGiftListRequest()
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result info")
-	}
 	var response GetPointsExchangeGiftListResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if response.Data.JsfResult.Code != "200" {
-		return nil, errors.New(response.Data.JsfResult.Desc)
-	}
-
 	return response.Data.JsfResult.Result, nil
 
 }

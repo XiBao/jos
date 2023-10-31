@@ -1,11 +1,9 @@
 package promotion
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
 )
@@ -24,11 +22,32 @@ type ResumeResponse struct {
 	Data      *ResumeData         `json:"jingdong_seller_promotion_v2_resume_responce,omitempty" codec:"jingdong_seller_promotion_v2_resume_responce,omitempty"`
 }
 
-type ResumeData struct {
-	Code      string `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
+func (r ResumeResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
 
-	ResumeResult bool `json:"resume_result,omitempty" codec:"resume_result,omitempty"`
+func (r ResumeResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
+type ResumeData struct {
+	Code         string `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc    string `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	ResumeResult bool   `json:"resume_result,omitempty" codec:"resume_result,omitempty"`
+}
+
+func (r ResumeData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r ResumeData) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
 }
 
 func Resume(req *ResumeRequest) (bool, error) {
@@ -43,23 +62,9 @@ func Resume(req *ResumeRequest) (bool, error) {
 		r.SetRequestId(req.RequestId)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response ResumeResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return false, errors.New(response.Data.ErrorDesc)
-	}
-
 	return response.Data.ResumeResult, nil
 }

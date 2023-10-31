@@ -1,8 +1,6 @@
 package points
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"time"
 
@@ -24,13 +22,46 @@ type JosSendPointsResponse struct {
 	Data      *JosSendPointsData  `json:"jingdong_points_jos_sendPoints_responce,omitempty" codec:"jingdong_points_jos_sendPoints_responce,omitempty"`
 }
 
+func (r JosSendPointsResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r JosSendPointsResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type JosSendPointsData struct {
 	JsfResult *JosSendPointsJsfResult `json:"jsfResult,omitempty" codec:"jsfResult,omitempty"`
+}
+
+func (r JosSendPointsData) IsError() bool {
+	return r.JsfResult == nil || r.JsfResult.IsError()
+}
+
+func (r JosSendPointsData) Error() string {
+	if r.JsfResult != nil {
+		return r.JsfResult.Error()
+	}
+	return "no result data"
 }
 
 type JosSendPointsJsfResult struct {
 	Code string `json:"code,omitempty" codec:"code,omitempty"` //返回码
 	Desc string `json:"desc,omitempty" codec:"desc,omitempty"` //返回描述
+}
+
+func (r JosSendPointsJsfResult) IsError() bool {
+	return r.Code != "200"
+}
+
+func (r JosSendPointsJsfResult) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Desc)
 }
 
 // TODO 积分变更开放接口 开放请求的渠道为：26-消费积分 27-发放积分
@@ -54,27 +85,10 @@ func JosSendPoints(req *JosSendPointsRequest) (bool, error) {
 
 	r.SetBusinessId(req.BusinessId)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("no result info")
-	}
 	var response JosSendPointsResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-
-	if response.Data.JsfResult.Code != "200" {
-		return false, errors.New(response.Data.JsfResult.Desc)
-	}
-
 	return true, nil
 
 }

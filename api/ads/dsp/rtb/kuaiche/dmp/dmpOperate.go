@@ -1,9 +1,6 @@
 package dmp
 
 import (
-	"encoding/json"
-	"errors"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -23,8 +20,33 @@ type KuaicheDmpOperateResponse struct {
 	ErrorResp *api.ErrorResponnse        `json:"error_response,omitempty" codec:"error_response,omitempty"`
 }
 
+func (r KuaicheDmpOperateResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Responce == nil || r.Responce.IsError()
+}
+
+func (r KuaicheDmpOperateResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Responce != nil {
+		return r.Responce.Error()
+	}
+	return "no result data"
+}
+
 type KuaicheDmpOperateResponce struct {
 	ReturnType *dsp.DataCommonResponse `json:"returnType,omitempty" codec:"returnType,omitempty"`
+}
+
+func (r KuaicheDmpOperateResponce) IsError() bool {
+	return r.ReturnType != nil && !r.ReturnType.Success
+}
+
+func (r KuaicheDmpOperateResponce) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Msg
+	}
+	return "no result data"
 }
 
 func KuaicheDmpOperate(req *KuaicheDmpOperateRequest) (bool, error) {
@@ -36,28 +58,9 @@ func KuaicheDmpOperate(req *KuaicheDmpOperateRequest) (bool, error) {
 		r.SetParamExt(req.ParamExt)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("no result.")
-	}
-
 	var response KuaicheDmpOperateResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-	if response.ErrorResp != nil {
-		return false, errors.New(response.ErrorResp.ZhDesc)
-	}
-	if response.Responce == nil || response.Responce.ReturnType == nil {
-		return false, errors.New("no result data.")
-	}
-	if !response.Responce.ReturnType.Success {
-		return false, errors.New(response.Responce.ReturnType.Msg)
-	}
-
 	return response.Responce.ReturnType.Success, nil
 }

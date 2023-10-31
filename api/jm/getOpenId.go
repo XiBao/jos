@@ -1,8 +1,7 @@
 package jm
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	. "github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -20,6 +19,29 @@ type GetOpenIdResponse struct {
 	Data      GetOpenIdResponseData `json:"jingdong_pop_jm_center_user_getOpenId_responce"`
 }
 
+func (r GetOpenIdResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data.IsError()
+}
+
+func (r GetOpenIdResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return r.Data.Error()
+}
+
+type GetOpenIdResponseData struct {
+	ReturnType GetOpenIdReturnType `json:"returnType"`
+}
+
+func (r GetOpenIdResponseData) IsError() bool {
+	return r.ReturnType.IsError()
+}
+
+func (r GetOpenIdResponseData) Error() string {
+	return r.ReturnType.Error()
+}
+
 type GetOpenIdReturnType struct {
 	Message   string `json:"message"`
 	OpenID    string `json:"open_id"`
@@ -28,8 +50,12 @@ type GetOpenIdReturnType struct {
 	Code      int    `json:"code"`
 }
 
-type GetOpenIdResponseData struct {
-	ReturnType GetOpenIdReturnType `json:"returnType"`
+func (r GetOpenIdReturnType) IsError() bool {
+	return r.Code != 0 && r.Code != 200
+}
+
+func (r GetOpenIdReturnType) Error() string {
+	return fmt.Sprintf("code:%d, msg:%s", r.Code, r.Message)
 }
 
 func GetOpenId(req GetOpenIdRequest) (GetOpenIdReturnType, error) {
@@ -38,26 +64,11 @@ func GetOpenId(req GetOpenIdRequest) (GetOpenIdReturnType, error) {
 	r := jm.NewGetOpenIdRequest()
 	r.SetSource(req.Source)
 	r.SetToken(req.Token)
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return GetOpenIdReturnType{}, err
-	}
-	if len(result) == 0 {
-		return GetOpenIdReturnType{}, errors.New("no result.")
-	}
+
 	var response GetOpenIdResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return GetOpenIdReturnType{}, err
 	}
-	if response.ErrorResp != nil {
-		return GetOpenIdReturnType{}, response.ErrorResp
-	}
-
-	if response.Data.ReturnType.Code != 0 && response.Data.ReturnType.Code != 200 {
-		return GetOpenIdReturnType{}, errors.New(response.Data.ReturnType.Message)
-	}
-
 	return response.Data.ReturnType, nil
 
 }

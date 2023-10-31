@@ -1,8 +1,7 @@
 package adkcunit
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/dsp"
@@ -22,8 +21,33 @@ type AdkcunitAdgroupListResponse struct {
 	Data      *AdkcunitAdgroupListData `json:"jingdong_dsp_adkcunit_adgroup_list_responce,omitempty" codec:"jingdong_dsp_adkcunit_adgroup_list_responce,omitempty"`
 }
 
+func (r AdkcunitAdgroupListResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r AdkcunitAdgroupListResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type AdkcunitAdgroupListData struct {
 	Result *AdkcunitAdgroupListResult `json:"querylistbyparam_result,omitempty" codec:"querylistbyparam_result,omitempty"`
+}
+
+func (r AdkcunitAdgroupListData) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r AdkcunitAdgroupListData) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type AdkcunitAdgroupListResult struct {
@@ -31,6 +55,17 @@ type AdkcunitAdgroupListResult struct {
 	ResultCode string                    `json:"resultCode,omitempty" codec:"resultCode,omitempty"`
 	Success    bool                      `json:"success,omitempty" codec:"success,omitempty"`
 	Value      *AdkcunitAdgroupListValue `json:"data,omitempty" codec:"data,omitempty"`
+}
+
+func (r AdkcunitAdgroupListResult) IsError() bool {
+	return !r.Success || r.Value == nil
+}
+
+func (r AdkcunitAdgroupListResult) Error() string {
+	if !r.Success {
+		return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+	}
+	return "no result data"
 }
 
 type AdkcunitAdgroupListValue struct {
@@ -51,9 +86,8 @@ type ADGroupQuery struct {
 	InSearchFee    uint64 `json:"inSearchFee,omitempty" codec:"inSearchFee,omitempty"`       //	搜索出价
 	FeeStr         string `json:"feeStr,omitempty" codec:"feeStr,omitempty"`                 // 站内出价
 	Area           string `json:"area,omitempty" codec:"area,omitempty"`                     // 推广区域
-
-	CreatedTime string `json:"createdTime,omitempty" codec:"createdTime,omitempty"` // 推广区域
-	PutType     int8   `json:"putType,omitempty" codec:"putType,omitempty"`         // 推广类型
+	CreatedTime    string `json:"createdTime,omitempty" codec:"createdTime,omitempty"`       // 推广区域
+	PutType        int8   `json:"putType,omitempty" codec:"putType,omitempty"`               // 推广类型
 }
 
 // 获取计划下的推广单元列表
@@ -65,24 +99,9 @@ func AdkcunitAdgroupList(req *AdkcunitAdgroupListRequest) ([]*ADGroupQuery, int,
 	r.SetPageSize(req.PageSize)
 	r.SetPageNum(req.PageNum)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, 0, err
-	}
-	if len(result) == 0 {
-		return nil, 0, errors.New("no result info")
-	}
 	var response AdkcunitAdgroupListResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, 0, err
-	}
-	if response.ErrorResp != nil {
-		return nil, 0, response.ErrorResp
-	}
-
-	if !response.Data.Result.Success {
-		return nil, 0, errors.New(response.Data.Result.ErrorMsg)
 	}
 
 	return response.Data.Result.Value.Datas, response.Data.Result.Value.Paginator.Items, nil

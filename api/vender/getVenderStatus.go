@@ -1,8 +1,7 @@
 package vender
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -18,14 +17,47 @@ type GetVenderStatusResponse struct {
 	Data      *GetVenderStatusData `json:"jingdong_pop_vender_getVenderStatus_responce,omitempty" codec:"jingdong_pop_vender_getVenderStatus_responce,omitempty"`
 }
 
+func (r GetVenderStatusResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r GetVenderStatusResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type GetVenderStatusData struct {
 	ReturnType *VenderStatusReturnType `json:"returnType,omitempty" codec:"returnType,omitempty"`
+}
+
+func (r GetVenderStatusData) IsError() bool {
+	return r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r GetVenderStatusData) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return "no result data"
 }
 
 type VenderStatusReturnType struct {
 	Status uint   `json:"status"` //会员体系状态：0:未开启状态；1:ISV计算；2：官方计算
 	Code   string `json:"code"`   //200：成功，201：信息不存在，400：参数错误，500：系统错误
 	Desc   string `json:"desc"`   //成功，信息不存在，参数错误，服务端异常
+}
+
+func (r VenderStatusReturnType) IsError() bool {
+	return r.Code != "200"
+}
+
+func (r VenderStatusReturnType) Error() string {
+	return fmt.Sprintf("code:%s desc:%s", r.Code, r.Desc)
 }
 
 // TODO 查询会员体系状态
@@ -35,25 +67,9 @@ func GetVenderStatus(req *GetVenderStatusRequest) (uint, error) {
 	client.Debug = req.Debug
 	r := vender.NewGetVenderStatusRequest()
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return 0, err
-	}
-	if len(result) == 0 {
-		return 0, errors.New("no result info")
-	}
 	var response GetVenderStatusResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return 0, err
-	}
-
-	if response.ErrorResp != nil {
-		return 0, response.ErrorResp
-	}
-
-	if response.Data.ReturnType.Code != "200" {
-		return 0, errors.New(response.Data.ReturnType.Desc)
 	}
 	return response.Data.ReturnType.Status, nil
 }

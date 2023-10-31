@@ -1,11 +1,9 @@
 package coupon
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/market/coupon"
 )
@@ -60,10 +58,35 @@ type MarketCreateCouponResponse struct {
 	Data      *MarketCreateCouponData `json:"jingdong_market_tool_coupon_api_service_CouponWriteOuterService_createCoupon_responce,omitempty" codec:"jingdong_market_tool_coupon_api_service_CouponWriteOuterService_createCoupon_responce,omitempty"`
 }
 
+func (r MarketCreateCouponResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r MarketCreateCouponResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type MarketCreateCouponData struct {
 	Code       string                            `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc  string                            `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	ReturnType *MarketCreateCouponDataReturnType `json:"returnType,omitempty" codec:"returnType,omitempty"`
+}
+
+func (r MarketCreateCouponData) IsError() bool {
+	return r.Code != "0" || r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r MarketCreateCouponData) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
 }
 
 type MarketCreateCouponDataReturnType struct {
@@ -71,6 +94,14 @@ type MarketCreateCouponDataReturnType struct {
 	Code    uint   `json:"code,omitempty" codec:"code,omitempty"`
 	Success bool   `json:"success,omitempty" codec:"success,omitempty"`
 	Data    uint64 `json:"data,omitempty" codec:"data,omitempty"`
+}
+
+func (r MarketCreateCouponDataReturnType) IsError() bool {
+	return r.Code == 0
+}
+
+func (r MarketCreateCouponDataReturnType) Error() string {
+	return fmt.Sprintf("code:%d, msg:%s", r.Code, r.Msg)
 }
 
 func MarketCreateCoupon(req *MarketCreateCouponRequest) (uint64, error) {
@@ -153,32 +184,9 @@ func MarketCreateCoupon(req *MarketCreateCouponRequest) (uint64, error) {
 		r.SetIp(req.Ip)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return 0, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response MarketCreateCouponResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
-	if response.ErrorResp != nil {
-		return 0, response.ErrorResp
-	}
-	if response.Data.Code != "0" && response.Data.ErrorDesc != "" {
-		return 0, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.ReturnType == nil {
-		return 0, errors.New("No return type.")
-	}
-	if response.Data.ReturnType.Msg != "" {
-		return 0, errors.New(response.Data.ReturnType.Msg)
-	}
-	if response.Data.ReturnType.Data == 0 {
-		return 0, errors.New("No coupon id.")
-	}
-
 	return response.Data.ReturnType.Data, nil
 }

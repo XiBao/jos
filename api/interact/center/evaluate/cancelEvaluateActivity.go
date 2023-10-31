@@ -1,10 +1,7 @@
 package center
 
 import (
-	"encoding/json"
-	"errors"
-
-	"github.com/XiBao/jos/api/util"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -23,10 +20,32 @@ type CancelEvaluateActivityResponse struct {
 	Data      *CancelEvaluateActivityData `json:"jingdong_com_jd_interact_center_api_service_write_EvaluateActivityWriteService_cancelActivity_responce,omitempty" codec:"jingdong_com_jd_interact_center_api_service_write_EvaluateActivityWriteService_cancelActivity_responce,omitempty"`
 }
 
+func (r CancelEvaluateActivityResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r CancelEvaluateActivityResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type CancelEvaluateActivityData struct {
 	Code      string `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    bool   `json:"result,omitempty" codec:"result,omitempty"`
+}
+
+func (r CancelEvaluateActivityData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r CancelEvaluateActivityData) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
 }
 
 func CancelEvaluateActivity(req *CancelEvaluateActivityRequest) (bool, error) {
@@ -37,22 +56,9 @@ func CancelEvaluateActivity(req *CancelEvaluateActivityRequest) (bool, error) {
 	r.SetChannel(req.Channel)
 	r.SetId(req.Id)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response CancelEvaluateActivityResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return false, err
-	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return false, errors.New(response.Data.ErrorDesc)
 	}
 
 	return response.Data.Result, nil

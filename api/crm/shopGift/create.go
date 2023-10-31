@@ -1,8 +1,7 @@
 package crm
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -38,16 +37,49 @@ type ShopGiftCreateResponse struct {
 	Data      *ShopGiftCreateData `json:"jingdong_pop_crm_shopGift_createShopGift_responce,omitempty" codec:"jingdong_pop_crm_shopGift_createShopGift_responce,omitempty"`
 }
 
+func (r ShopGiftCreateResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r ShopGiftCreateResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type ShopGiftCreateData struct {
 	Code      string                `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string                `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    *ShopGiftCreateResult `json:"createisvshopgift_result,omitempty" codec:"createisvshopgift_result,omitempty"`
 }
 
+func (r ShopGiftCreateData) IsError() bool {
+	return r.Code != "0" || r.Result == nil || r.Result.IsError()
+}
+
+func (r ShopGiftCreateData) Error() string {
+	if r.Result != nil && r.Result.IsError() {
+		return r.Result.Error()
+	}
+	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.ErrorDesc)
+}
+
 type ShopGiftCreateResult struct {
 	Code string `json:"code,omitempty" codec:"code,omitempty"`
 	Data uint64 `json:"data,omitempty" codec:"data,omitempty"`
 	Desc string `json:"desc,omitempty" codec:"desc,omitempty"`
+}
+
+func (r ShopGiftCreateResult) IsError() bool {
+	return r.Code != "200"
+}
+
+func (r ShopGiftCreateResult) Error() string {
+	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.Desc)
 }
 
 func ShopGiftCreate(req *ShopGiftCreateRequest) (uint64, error) {
@@ -81,33 +113,10 @@ func ShopGiftCreate(req *ShopGiftCreateRequest) (uint64, error) {
 	if req.ValidateDay != "" {
 		r.SetValidateDay(req.ValidateDay)
 	}
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return 0, err
-	}
-	if len(result) == 0 {
-		return 0, errors.New("No result info.")
-	}
+
 	var response ShopGiftCreateResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return 0, err
-	}
-	if response.ErrorResp != nil {
-		return 0, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return 0, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return 0, errors.New("No create result.")
-	}
-	if response.Data.Result.Code != "200" {
-		if response.Data.Result.Desc == "" {
-			return 0, errors.New("未知错误")
-		} else {
-			return 0, errors.New(response.Data.Result.Desc)
-		}
 	}
 	return response.Data.Result.Data, nil
 }

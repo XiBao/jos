@@ -1,10 +1,7 @@
 package center
 
 import (
-	"encoding/json"
-	"errors"
-
-	"github.com/XiBao/jos/api/util"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -27,10 +24,32 @@ type GetEvaluateSkuListResponse struct {
 	Data      *GetEvaluateSkuListData `json:"jingdong_com_jd_interact_center_api_service_read_EvaluateSkuReadService_getSkuListByPatams_responce,omitempty" codec:"jingdong_com_jd_interact_center_api_service_read_EvaluateSkuReadService_getSkuListByPatams_responce,omitempty"`
 }
 
+func (r GetEvaluateSkuListResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r GetEvaluateSkuListResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type GetEvaluateSkuListData struct {
 	Code      string         `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string         `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    []*EvaluateSku `json:"result,omitempty" codec:"result,omitempty"`
+}
+
+func (r GetEvaluateSkuListData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r GetEvaluateSkuListData) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
 }
 
 type EvaluateSku struct {
@@ -66,25 +85,9 @@ func GetEvaluateSkuList(req *GetEvaluateSkuListRequest) ([]*EvaluateSku, error) 
 		r.SetEndTime(req.EndTime)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response GetEvaluateSkuListResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return nil, errors.New("No result.")
 	}
 
 	return response.Data.Result, nil

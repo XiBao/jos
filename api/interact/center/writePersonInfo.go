@@ -1,8 +1,6 @@
 package center
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 
 	. "github.com/XiBao/jos/api"
@@ -39,14 +37,41 @@ type WritePersonInfoResponse struct {
 	Response  WritePersonInfoResponse1 `json:"jingdong_interact_center_api_service_write_writePersonInfo_responce,omitempty" codec:"jingdong_interact_center_api_service_write_writePersonInfo_responce,omitempty"`
 }
 
+func (r WritePersonInfoResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Response.IsError()
+}
+
+func (r WritePersonInfoResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return r.Response.Error()
+}
+
 type WritePersonInfoResponse1 struct {
 	Result WritePersonInfoResult `json:"giftActivityResults" codec:"giftActivityResults"`
+}
+
+func (r WritePersonInfoResponse1) IsError() bool {
+	return r.Result.IsError()
+}
+
+func (r WritePersonInfoResponse1) Error() string {
+	return r.Result.Error()
 }
 
 type WritePersonInfoResult struct {
 	Data bool   `json:"data" codec:"data"` //请求是否成功
 	Code uint   `json:"code" codec:"code"` //返回状态码
 	Msg  string `json:"msg" codec:"msg"`
+}
+
+func (r WritePersonInfoResult) IsError() bool {
+	return r.Code != 200 && r.Code != 0
+}
+
+func (r WritePersonInfoResult) Error() string {
+	return fmt.Sprintf("code:%d, msg:%s", r.Code, r.Msg)
 }
 
 func WritePersonInfo(req WritePersonInfoRequest) (bool, error) {
@@ -69,24 +94,9 @@ func WritePersonInfo(req WritePersonInfoRequest) (bool, error) {
 		r.SetProfileUrl(req.ProfileUrl)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-
 	var response WritePersonInfoResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return false, err
-	}
-
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-
-	if response.Response.Result.Code != 200 && response.Response.Result.Code != 0 || !response.Response.Result.Data {
-
-		return false, errors.New(fmt.Sprintf("%s", result))
 	}
 
 	return response.Response.Result.Data, nil

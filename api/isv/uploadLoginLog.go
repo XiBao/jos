@@ -1,9 +1,6 @@
 package isv
 
 import (
-	"encoding/json"
-	"errors"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/isv"
@@ -27,9 +24,31 @@ type UploadLoginLogResponse struct {
 	Data      *UploadLoginLogResult `json:"jingdong_isv_uploadLoginLog_responce,omitempty" codec:"jingdong_isv_uploadLoginLog_responce,omitempty"`
 }
 
+func (r UploadLoginLogResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r UploadLoginLogResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type UploadLoginLogResult struct {
 	Code string `json:"code,omitempty" codec:"code,omitempty"`     //返回码
 	C    int    `json:"result,omitempty" codec:"result,omitempty"` //是否成功
+}
+
+func (r UploadLoginLogResult) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r UploadLoginLogResult) Error() string {
+	return r.Code
 }
 
 func UploadLoginLog(req *UploadLoginLogRequest) (int, error) {
@@ -48,26 +67,9 @@ func UploadLoginLog(req *UploadLoginLogRequest) (int, error) {
 	r.SetTimestamp(req.Timestamp)
 	r.Request.IsLogGW = true
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return -1, err
-	}
-	if len(result) == 0 {
-		return -1, errors.New("no result info")
-	}
 	var response UploadLoginLogResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return -1, err
 	}
-
-	if response.ErrorResp != nil {
-		return -1, response.ErrorResp
-	}
-
-	if response.Data.Code != "0" {
-		return -1, errors.New(response.Data.Code)
-	}
-
 	return response.Data.C, nil
 }

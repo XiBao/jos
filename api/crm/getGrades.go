@@ -1,9 +1,6 @@
 package crm
 
 import (
-	"encoding/json"
-	"errors"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
@@ -16,6 +13,17 @@ type GetGradesRequest struct {
 type GetGradesResponse struct {
 	ErrorResp *api.ErrorResponnse `json:"error_response,omitempty" codec:"error_response,omitempty"`
 	Data      *GetGradesData      `json:"jingdong_crm_grade_get_responce,omitempty" codec:"jingdong_crm_grade_get_responce,omitempty"`
+}
+
+func (r GetGradesResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil
+}
+
+func (r GetGradesResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
 }
 
 type GetGradesData struct {
@@ -37,22 +45,9 @@ func GetGrades(req *GetGradesRequest) ([]*GetGradesResult, error) {
 	client.Debug = req.Debug
 	r := crm.NewGetGradesRequest()
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No result info.")
-	}
 	var response GetGradesResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
 	return response.Data.Result, nil
 }

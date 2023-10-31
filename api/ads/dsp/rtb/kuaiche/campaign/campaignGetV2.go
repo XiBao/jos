@@ -1,9 +1,6 @@
 package campaign
 
 import (
-	"encoding/json"
-	"errors"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -23,9 +20,34 @@ type KuaicheCampaignGetV2Response struct {
 	ErrorResp *api.ErrorResponnse           `json:"error_response,omitempty" codec:"error_response,omitempty"`
 }
 
+func (r KuaicheCampaignGetV2Response) IsError() bool {
+	return r.ErrorResp != nil || r.Responce == nil || r.Responce.IsError()
+}
+
+func (r KuaicheCampaignGetV2Response) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Responce != nil {
+		return r.Responce.Error()
+	}
+	return "no result data"
+}
+
 type KuaicheCampaignGetV2Responce struct {
 	Data *KuaicheCampaignGetV2ResponseData `json:"data,omitempty" codec:"data,omitempty"`
 	Code string                            `json:"code,omitempty" codec:"code,omitempty"`
+}
+
+func (r KuaicheCampaignGetV2Responce) IsError() bool {
+	return r.Data == nil || r.Data.IsError()
+}
+
+func (r KuaicheCampaignGetV2Responce) Error() string {
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
 }
 
 type KuaicheCampaignGetV2ResponseData struct {
@@ -42,28 +64,9 @@ func KuaicheCampaignGetV2(req *KuaicheCampaignGetV2Request) (*dsp.Campaign, erro
 		r.SetSystem(req.System)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result.")
-	}
-
 	var response KuaicheCampaignGetV2Response
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, errors.New(response.ErrorResp.ZhDesc)
-	}
-	if response.Responce == nil || response.Responce.Data == nil {
-		return nil, errors.New("no result data.")
-	}
-	if !response.Responce.Data.Success {
-		return nil, errors.New(response.Responce.Data.Msg)
-	}
-
 	return response.Responce.Data.Data, nil
 }

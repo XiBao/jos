@@ -1,11 +1,9 @@
 package dsp
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp"
 )
@@ -19,10 +17,38 @@ type BalanceGetResponse struct {
 	Data      *BalanceGetData     `json:"jingdong_dsp_balance_get_responce,omitempty" codec:"jingdong_dsp_balance_get_responce,omitempty"`
 }
 
+func (r BalanceGetResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r BalanceGetResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type BalanceGetData struct {
 	Code      string            `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string            `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    *BalanceGetResult `json:"getaccountbalance_result,omitempty" codec:"getaccountbalance_result,omitempty"`
+}
+
+func (r BalanceGetData) IsError() bool {
+	return r.Code != "0" || r.Result == nil || r.Result.IsError()
+}
+
+func (r BalanceGetData) Error() string {
+	if r.Result != nil && r.Result.IsError() {
+		return r.Result.Error()
+	}
+	if r.Code != "0" {
+		return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	}
+	return "no result data"
 }
 
 type BalanceGetResult struct {
@@ -30,6 +56,17 @@ type BalanceGetResult struct {
 	ResultCode string                `json:"resultCode,omitempty" codec:"resultCode,omitempty"`
 	ErrorMsg   string                `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
 	Success    bool                  `json:"success" codec:"success"`
+}
+
+func (r BalanceGetResult) IsError() bool {
+	return !r.Success || r.Data == nil
+}
+
+func (r BalanceGetResult) Error() string {
+	if !r.Success {
+		return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+	}
+	return "no result data"
 }
 
 type BalanceGetResultData struct {
@@ -43,32 +80,9 @@ func BalanceGet(req *BalanceGetRequest) (*BalanceGetResultData, error) {
 	client.Debug = req.Debug
 	r := dsp.NewBalanceGetRequest()
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response BalanceGetResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" && response.Data.ErrorDesc != "" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return nil, errors.New("No dsp balance result.")
-	} else if !response.Data.Result.Success {
-		if response.Data.Result.ErrorMsg != "" {
-			return nil, errors.New(response.Data.Result.ErrorMsg)
-		} else {
-			return nil, errors.New("未知错误")
-		}
-	}
-
 	return response.Data.Result.Data, nil
 }

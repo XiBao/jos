@@ -1,11 +1,9 @@
 package center
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/interact/center"
 )
@@ -29,11 +27,38 @@ type FindCollectInfoResponse struct {
 	Data      *FindCollectInfoData `json:"jingdong_interact_center_api_service_read_findCollectInfo_responce,omitempty" codec:"jingdong_interact_center_api_service_read_findCollectInfo_responce,omitempty"`
 }
 
-type FindCollectInfoData struct {
-	Code      string `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
+func (r FindCollectInfoResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
 
-	Result *FindCollectInfoResult `json:"giftActivityResults,omitempty" codec:"giftActivityResults,omitempty"`
+func (r FindCollectInfoResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
+type FindCollectInfoData struct {
+	Code      string                 `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc string                 `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	Result    *FindCollectInfoResult `json:"giftActivityResults,omitempty" codec:"giftActivityResults,omitempty"`
+}
+
+func (r FindCollectInfoData) IsError() bool {
+	return r.Code != "0" || r.Result == nil || r.Result.IsError()
+}
+
+func (r FindCollectInfoData) Error() string {
+	if r.Result != nil && r.Result.IsError() {
+		return r.Result.Error()
+	}
+	if r.Code != "0" {
+		return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	}
+	return "no result data"
 }
 
 type FindCollectInfoDetails struct {
@@ -60,6 +85,14 @@ type FindCollectInfoResult struct {
 	Msg  string                    `json:"msg" codec:"msg"`
 }
 
+func (r FindCollectInfoResult) IsError() bool {
+	return r.Code != 200
+}
+
+func (r FindCollectInfoResult) Error() string {
+	return fmt.Sprintf("code:%d, msg:%s", r.Code, r.Msg)
+}
+
 func FindCollectInfo(req *FindCollectInfoRequest) ([]*FindCollectInfoDetails, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
@@ -71,28 +104,9 @@ func FindCollectInfo(req *FindCollectInfoRequest) ([]*FindCollectInfoDetails, er
 	r.SetActivityId(req.ActivityId)
 	r.SetType(req.Type)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response FindCollectInfoResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return nil, errors.New("No find collect info result.")
-	}
-	if response.Data.Result.Code != 200 && response.Data.Result.Msg != "" {
-		return nil, errors.New(response.Data.Result.Msg)
 	}
 
 	return response.Data.Result.Data, nil

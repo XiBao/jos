@@ -1,8 +1,7 @@
 package crm
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -22,16 +21,49 @@ type PopShopGiftListResponse struct {
 	Data      *PopShopGiftListData `json:"jingdong_pop_crm_shopGift_getPopShopGiftList_responce,omitempty" codec:"jingdong_pop_crm_shopGift_getPopShopGiftList_responce,omitempty"`
 }
 
+func (r PopShopGiftListResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r PopShopGiftListResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type PopShopGiftListData struct {
 	Code      string                 `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string                 `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    *PopShopGiftListResult `json:"commonResult,omitempty" codec:"commonResult,omitempty"`
 }
 
+func (r PopShopGiftListData) IsError() bool {
+	return r.Code != "0" || r.Result == nil || r.Result.IsError()
+}
+
+func (r PopShopGiftListData) Error() string {
+	if r.Result != nil && r.Result.IsError() {
+		return r.Result.Error()
+	}
+	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.ErrorDesc)
+}
+
 type PopShopGiftListResult struct {
 	Code string                  `json:"code,omitempty" codec:"code,omitempty"`
 	Desc string                  `json:"desc,omitempty" codec:"desc,omitempty"`
 	Data []*PopShopGiftListModel `json:"data,omitempty" codec:"data,omitempty"`
+}
+
+func (r PopShopGiftListResult) IsError() bool {
+	return r.Code != "200"
+}
+
+func (r PopShopGiftListResult) Error() string {
+	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.Desc)
 }
 
 type PopShopGiftListModel struct {
@@ -51,33 +83,10 @@ func PopShopGiftList(req *PopShopGiftListRequest) ([]*PopShopGiftListModel, erro
 	r.SetChannel(req.Channel)
 	r.SetUserPin(req.UserPin)
 	r.SetOpenIdBuyer(req.OpenIdBuyer)
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No result info.")
-	}
+
 	var response PopShopGiftListResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return nil, errors.New("No result.")
-	}
-	if response.Data.Result.Code != "200" {
-		if response.Data.Result.Desc == "" {
-			return nil, errors.New("未知错误")
-		} else {
-			return nil, errors.New(response.Data.Result.Desc)
-		}
 	}
 	return response.Data.Result.Data, nil
 }

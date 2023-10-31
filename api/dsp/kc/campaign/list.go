@@ -1,8 +1,7 @@
 package campaign
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/dsp"
@@ -21,8 +20,33 @@ type ListResponse struct {
 	Data      *ListData           `json:"jingdong_dsp_kc_campain_list_responce,omitempty" codec:"jingdong_dsp_kc_campain_list_responce,omitempty"`
 }
 
+func (r ListResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r ListResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type ListData struct {
 	Result *ListResult `json:"querylistbyparam_result"`
+}
+
+func (r ListData) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r ListData) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type ListResult struct {
@@ -30,6 +54,17 @@ type ListResult struct {
 	ErrorMsg   string     `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
 	Success    bool       `json:"success,omitempty" codec:"success,omitempty"`
 	Value      *ListValue `json:"value,omitempty" codec:"value,omitempty"`
+}
+
+func (r ListResult) IsError() bool {
+	return !r.Success || r.Value == nil
+}
+
+func (r ListResult) Error() string {
+	if !r.Success {
+		return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+	}
+	return "no result data"
 }
 
 type ListValue struct {
@@ -59,26 +94,10 @@ func List(req *ListRequest) ([]*Query, int, error) {
 	r.SetPageNum(req.PageNum)
 	r.SetPageSize(req.PageSize)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, 0, err
-	}
-	if len(result) == 0 {
-		return nil, 0, errors.New("no result info")
-	}
 	var response ListResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, 0, err
 	}
-	if response.ErrorResp != nil {
-		return nil, 0, response.ErrorResp
-	}
-
-	if !response.Data.Result.Success {
-		return nil, 0, errors.New(response.Data.Result.ErrorMsg)
-	}
-
 	return response.Data.Result.Value.Datas, response.Data.Result.Value.Paginator.Items, nil
 
 }

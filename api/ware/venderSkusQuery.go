@@ -1,9 +1,6 @@
 package ware
 
 import (
-	"encoding/json"
-	"errors"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/ware"
@@ -19,9 +16,31 @@ type VenderSkusQueryResponse struct {
 	Data      *VenderSkusQueryData `json:"jingdong_new_ware_vender_skus_query_responce,omitempty" codec:"jingdong_new_ware_vender_skus_query_responce,omitempty"`
 }
 
+func (r VenderSkusQueryResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r VenderSkusQueryResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data.IsError() {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type VenderSkusQueryData struct {
 	Code         string                 `json:"code,omitempty" codec:"code,omitempty"`
 	SearchResult *VenderSkusQueryResult `json:"search_result,omitempty" codec:"search_result,omitempty"`
+}
+
+func (r VenderSkusQueryData) IsError() bool {
+	return r.SearchResult == nil
+}
+
+func (r VenderSkusQueryData) Error() string {
+	return "no result data"
 }
 
 type VenderSkusQueryResult struct {
@@ -37,23 +56,10 @@ func VenderSkusQuery(req *VenderSkusQueryRequest) ([]uint64, int, error) {
 	r := ware.NewWareVenderSkusQueryRequest()
 	r.SetIndex(req.Index)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, 0, err
-	}
-	if len(result) == 0 {
-		return nil, 0, errors.New("No result.")
-	}
 	var response VenderSkusQueryResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, 0, err
 	}
-
-	if response.ErrorResp != nil {
-		return nil, 0, response.ErrorResp
-	}
-
 	searchResult := response.Data.SearchResult
 	return searchResult.SkuList, searchResult.Total, nil
 }

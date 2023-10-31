@@ -1,9 +1,7 @@
 package goods
 
 import (
-	"encoding/json"
-	"errors"
-	"strconv"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -21,6 +19,17 @@ type BidFieldQueryResponse struct {
 	Data      *BidFieldQueryResponseData `json:"jd_union_open_goods_bigfield_query_responce,omitempty"`
 }
 
+func (r BidFieldQueryResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.Result == ""
+}
+
+func (r BidFieldQueryResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
+}
+
 type BidFieldQueryResponseData struct {
 	Result string `json:"queryResult,omitempty"`
 }
@@ -29,6 +38,14 @@ type BidFieldQueryResult struct {
 	Code    int64               `json:"code,omitempty"`
 	Message string              `json:"message,omitempty"`
 	Data    []BidFieldQueryResp `json:"data,omitempty"`
+}
+
+func (r BidFieldQueryResult) IsError() bool {
+	return r.Code != 200
+}
+
+func (r BidFieldQueryResult) Error() string {
+	return fmt.Sprintf("code: %d, msg: %s", r.Code, r.Message)
 }
 
 type BidFieldQueryResp struct {
@@ -108,28 +125,16 @@ func BidFieldQuery(req *BidFieldQueryRequest) ([]BidFieldQueryResp, error) {
 	}
 	r.SetGoodsReq(goodsReq)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
 	var response BidFieldQueryResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.Data == nil {
-		return nil, errors.New("no result")
-	}
-
 	var ret BidFieldQueryResult
-	err = json.Unmarshal([]byte(response.Data.Result), &ret)
-	if err != nil {
+	if err := client.Logger().DecodeJSON([]byte(response.Data.Result), &ret); err != nil {
 		return nil, err
 	}
-
-	if ret.Code != 200 {
-		return nil, &api.ErrorResponnse{Code: strconv.FormatInt(ret.Code, 10), ZhDesc: ret.Message}
+	if ret.IsError() {
+		return nil, ret
 	}
-
 	return ret.Data, nil
 }

@@ -1,8 +1,7 @@
 package crm
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -18,14 +17,47 @@ type GetMemeberDiscountResponse struct {
 	Data      *GetMemeberDiscountData `json:"jingdong_pop_crm_getMemeberDiscount_responce,omitempty" codec:"jingdong_pop_crm_getMemeberDiscount_responce,omitempty"`
 }
 
+func (r GetMemeberDiscountResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r GetMemeberDiscountResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type GetMemeberDiscountData struct {
 	ReturnType *GetMemeberDiscountReturnType `json:"returnType,omitempty" codec:"returnType,omitempty"`
+}
+
+func (r GetMemeberDiscountData) IsError() bool {
+	return r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r GetMemeberDiscountData) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return "no result data"
 }
 
 type GetMemeberDiscountReturnType struct {
 	Desc string                 `json:"desc,omitempty" codec:"desc,omitempty"` //返回值code码
 	Code string                 `json:"code,omitempty" codec:"code,omitempty"` //返回值code码描述
 	Data []*ShopRuleDiscountDTO `json:"data,omitempty" codec:"data,omitempty"` //折扣信息数组   返回值：code码为200时，可能为空；code码为400、500时，为空；
+}
+
+func (r GetMemeberDiscountReturnType) IsError() bool {
+	return r.Code != "200"
+}
+
+func (r GetMemeberDiscountReturnType) Error() string {
+	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.Desc)
 }
 
 type ShopRuleDiscountDTO struct {
@@ -42,27 +74,10 @@ func GetMemeberDiscount(req *GetMemeberDiscountRequest) ([]*ShopRuleDiscountDTO,
 	client.Debug = req.Debug
 	r := crm.NewGetMemeberDiscountRequest()
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result info")
-	}
 	var response GetMemeberDiscountResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if response.Data.ReturnType.Code != `200` {
-		return nil, errors.New(response.Data.ReturnType.Desc)
-	}
-
 	return response.Data.ReturnType.Data, nil
 
 }

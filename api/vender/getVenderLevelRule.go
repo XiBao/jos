@@ -1,8 +1,7 @@
 package vender
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -18,14 +17,47 @@ type GetVenderLevelRuleResponse struct {
 	Data      *GetVenderLevelRuleData `json:"jingdong_pop_vender_getVenderLevelRule_responce,omitempty" codec:"jingdong_pop_vender_getVenderLevelRule_responce,omitempty"`
 }
 
+func (r GetVenderLevelRuleResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r GetVenderLevelRuleResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type GetVenderLevelRuleData struct {
 	ReturnType *GetVenderLevelRuleReturnType `json:"returnType,omitempty" codec:"returnType,omitempty"`
+}
+
+func (r GetVenderLevelRuleData) IsError() bool {
+	return r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r GetVenderLevelRuleData) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return "no result data"
 }
 
 type GetVenderLevelRuleReturnType struct {
 	Desc string              `json:"desc,omitempty" codec:"desc,omitempty"`
 	Code string              `json:"code,omitempty" codec:"code,omitempty"`
 	List []*ShopLevelRuleDTO `json:"shopLevelRuleDTOList,omitempty" codec:"shopLevelRuleDTOList,omitempty"`
+}
+
+func (r GetVenderLevelRuleReturnType) IsError() bool {
+	return r.Code != "200"
+}
+
+func (r GetVenderLevelRuleReturnType) Error() string {
+	return fmt.Sprintf("code: %s, desc: %s", r.Code, r.Desc)
 }
 
 type ShopLevelRuleDTO struct {
@@ -44,25 +76,9 @@ func GetVenderLevelRule(req *GetVenderLevelRuleRequest) ([]*ShopLevelRuleDTO, er
 	client.Debug = req.Debug
 	r := vender.NewGetVenderLevelRuleRequest()
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result info")
-	}
 	var response GetVenderLevelRuleResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if response.Data.ReturnType.Code != "200" {
-		return nil, errors.New(response.Data.ReturnType.Desc)
 	}
 	return response.Data.ReturnType.List, nil
 }

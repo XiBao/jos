@@ -1,10 +1,20 @@
 package dsp
 
+import "fmt"
+
 type DataCommonResponse struct {
 	Msg     string                             `json:"msg,omitempty"`
 	Code    int                                `json:"code"`
 	Success bool                               `json:"success"`
 	System  *JdDspPlatformGatewayApiVoParamExt `json:"system,omitempty"`
+}
+
+func (r DataCommonResponse) IsError() bool {
+	return !r.Success
+}
+
+func (r DataCommonResponse) Error() string {
+	return fmt.Sprintf("code: %d, msg: %s", r.Code, r.Msg)
 }
 
 type Paginator struct {

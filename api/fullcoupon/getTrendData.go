@@ -1,8 +1,7 @@
 package fullcoupon
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -24,8 +23,33 @@ type FullCouponGetTrendDataResponse struct {
 	Data      *FullCouponGetTrendDataResponseResult `json:"jingdong_fullCoupon_getTrendData_responce,omitempty" codec:"jingdong_fullCoupon_getTrendData_responce,omitempty"`
 }
 
+func (r FullCouponGetTrendDataResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r FullCouponGetTrendDataResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type FullCouponGetTrendDataResponseResult struct {
 	Result *FullCouponGetTrendDataResponseData `json:"result,omitempty" codec:"result,omitempty"`
+}
+
+func (r FullCouponGetTrendDataResponseResult) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r FullCouponGetTrendDataResponseResult) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type FullCouponGetTrendDataResponseData struct {
@@ -33,6 +57,14 @@ type FullCouponGetTrendDataResponseData struct {
 	Code    string           `json:"code,omitempty" codec:"code,omitempty"`       // 状态码
 	Success bool             `json:"success,omitempty" codec:"success,omitempty"` // 请求是否成功
 	Data    []PromoTrendData `json:"data,omitempty" codec:"data,omitempty"`
+}
+
+func (r FullCouponGetTrendDataResponseData) IsError() bool {
+	return !r.Success
+}
+
+func (r FullCouponGetTrendDataResponseData) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Msg)
 }
 
 func GetTrendData(req *FullCouponGetTrendDataRequest) ([]PromoTrendData, error) {
@@ -45,25 +77,9 @@ func GetTrendData(req *FullCouponGetTrendDataRequest) ([]PromoTrendData, error) 
 	r.SetStartDate(req.StartDate)
 	r.SetEndDate(req.EndDate)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result.")
-	}
-
 	var response FullCouponGetTrendDataResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data == nil || response.Data.Result == nil || response.Data.Result.Data == nil {
-		return nil, errors.New("no trend data.")
-	}
-
 	return response.Data.Result.Data, nil
 }

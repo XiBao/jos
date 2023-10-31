@@ -1,8 +1,7 @@
 package areas
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -18,10 +17,32 @@ type CityGetResponse struct {
 	AreasCityGetResponse *AreasCityGetResponse `json:"jingdong_areas_city_get_responce,omitempty" codec:"jingdong_areas_city_get_responce,omitempty"`
 }
 
+func (r CityGetResponse) IsError() bool {
+	return r.ErrorResp != nil || r.AreasCityGetResponse == nil || r.AreasCityGetResponse.IsError()
+}
+
+func (r CityGetResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.AreasCityGetResponse != nil {
+		return r.AreasCityGetResponse.Error()
+	}
+	return "no result data"
+}
+
 type AreasCityGetResponse struct {
 	Code                 string                    `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc            string                    `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	AreasServiceResponse *BaseAreasServiceResponse `json:"baseAreaServiceResponse,omitempty" codec:"baseAreaServiceResponse,omitempty"`
+}
+
+func (r AreasCityGetResponse) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r AreasCityGetResponse) Error() string {
+	return fmt.Sprintf("code: %s, error: %s", r.Code, r.ErrorDesc)
 }
 
 func CityGet(req *CityGetRequest) ([]*Result, error) {
@@ -29,30 +50,10 @@ func CityGet(req *CityGetRequest) ([]*Result, error) {
 	client.Debug = req.Debug
 	r := areas.NewAreasCityGetRequest()
 	r.SetParentId(req.ParentId)
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no city result")
-	}
 
 	var response CityGetResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if response.AreasCityGetResponse.Code != "0" {
-		return nil, errors.New(response.AreasCityGetResponse.ErrorDesc)
-	}
-
-	if response.AreasCityGetResponse.AreasServiceResponse == nil || response.AreasCityGetResponse.AreasServiceResponse.Data == nil {
-		return nil, errors.New("no city result")
-	}
-
 	return response.AreasCityGetResponse.AreasServiceResponse.Data, nil
 }

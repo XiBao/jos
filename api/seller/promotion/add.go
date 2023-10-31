@@ -1,8 +1,7 @@
 package promotion
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -26,10 +25,32 @@ type AddResponse struct {
 	Data      *AddResponseData    `json:"jingdong_seller_promotion_add_responce,omitempty" codec:"jingdong_seller_promotion_add_responce,omitempty"`
 }
 
+func (r AddResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r AddResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type AddResponseData struct {
 	Code      string `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	PromoId   uint64 `json:"promo_id,omitempty" codec:"promo_id,omitempty"`
+}
+
+func (r AddResponseData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r AddResponseData) Error() string {
+	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
 }
 
 // 创建促销
@@ -54,24 +75,10 @@ func Add(req *AddRequest) (uint64, error) {
 	if req.Comment != "" {
 		r.SetComment(req.Comment)
 	}
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return 0, err
-	}
-	if len(result) == 0 {
-		return 0, errors.New("no result.")
-	}
 
 	var response AddResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return 0, err
-	}
-	if response.ErrorResp != nil {
-		return 0, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return 0, errors.New(response.Data.ErrorDesc)
 	}
 
 	return response.Data.PromoId, nil

@@ -1,11 +1,9 @@
 package report
 
 import (
-	"encoding/json"
-	"errors"
+	"fmt"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/report"
 )
@@ -29,10 +27,38 @@ type QueryAccountReportResponse struct {
 	Data      *QueryAccountReportData `json:"jingdong_dsp_report_queryAccountReport_responce,omitempty" codec:"jingdong_dsp_report_queryAccountReport_responce,omitempty"`
 }
 
+func (r QueryAccountReportResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r QueryAccountReportResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type QueryAccountReportData struct {
 	Code      string                    `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string                    `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    *QueryAccountReportResult `json:"querycampdailysum_result,omitempty" codec:"querycampdailysum_result,omitempty"`
+}
+
+func (r QueryAccountReportData) IsError() bool {
+	return r.Code != "0" || r.Result == nil || r.Result.IsError()
+}
+
+func (r QueryAccountReportData) Error() string {
+	if r.Result != nil && r.Result.IsError() {
+		return r.Result.Error()
+	}
+	if r.Code != "0" {
+		return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	}
+	return "no result data"
 }
 
 type QueryAccountReportResult struct {
@@ -40,6 +66,17 @@ type QueryAccountReportResult struct {
 	ResultCode string                         `json:"resultCode,omitempty" codec:"resultCode,omitempty"`
 	ErrorMsg   string                         `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
 	Success    bool                           `json:"success" codec:"success"`
+}
+
+func (r QueryAccountReportResult) IsError() bool {
+	return !r.Success || r.Value == nil
+}
+
+func (r QueryAccountReportResult) Error() string {
+	if !r.Success {
+		return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+	}
+	return "no result data"
 }
 
 type QueryAccountReportResultValue struct {
@@ -102,32 +139,9 @@ func QueryAccountReport(req *QueryAccountReportRequest) ([]*AccountReport, error
 		r.SetOrderStatusCategory(req.OrderStatusCategory)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response QueryAccountReportResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" && response.Data.ErrorDesc != "" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return nil, errors.New("No dsp report result.")
-	} else if !response.Data.Result.Success {
-		if response.Data.Result.ErrorMsg != "" {
-			return nil, errors.New(response.Data.Result.ErrorMsg)
-		} else {
-			return nil, errors.New("未知错误")
-		}
-	}
-
 	return response.Data.Result.Value.Datas, nil
 }
