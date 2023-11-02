@@ -165,7 +165,7 @@ func (c *Client) Execute(req *Request, token string, rep IResponse) error {
 	}
 	debug := c.Logger()
 	debug.DebugPrintPostJSONRequest(gwURL, Json(sysParams))
-	gatewayUrl := StringsJoin(`%s?%s`, gwURL, "?", payload)
+	gatewayUrl := StringsJoin(gwURL, "?", payload)
 	debug.DebugPrintGetRequest(gatewayUrl)
 
 	response, err := http.DefaultClient.Get(gatewayUrl)
