@@ -1,8 +1,6 @@
 package ware
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/ware"
@@ -43,7 +41,7 @@ func (r MobileBigFieldData) IsError() bool {
 }
 
 func (r MobileBigFieldData) Error() string {
-	return fmt.Sprintf("code: %s, desc: %s, result: %s", r.Code, r.ErrorDesc, r.Result)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 func MobileBigField(req *MobileBigFieldRequest) (string, error) {

@@ -1,8 +1,6 @@
 package vender
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/vender"
@@ -41,7 +39,7 @@ func (r InfoGetSubResponse) IsError() bool {
 }
 
 func (r InfoGetSubResponse) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 // 店铺信息查询

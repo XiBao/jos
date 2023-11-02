@@ -1,8 +1,6 @@
 package coupon
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	coupon "github.com/XiBao/jos/sdk/request/seller/coupon"
@@ -41,9 +39,9 @@ func (r SkuListResponse) Error() string {
 }
 
 type SkuListResponseData struct {
-	Code          string           `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc     string           `json:"error_description,omitempty" codec:"error_description,omitempty"`
-	CouponSkuList []*CouponSkuList `json:"couponSkuList,omitempty" codec:"couponSkuList,omitempty"`
+	Code          string          `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc     string          `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	CouponSkuList []CouponSkuList `json:"couponSkuList,omitempty" codec:"couponSkuList,omitempty"`
 }
 
 func (r SkuListResponseData) IsError() bool {
@@ -51,11 +49,11 @@ func (r SkuListResponseData) IsError() bool {
 }
 
 func (r SkuListResponseData) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 // 优惠券商品查询
-func SkuList(req *SkuListRequest) ([]*CouponSkuList, error) {
+func SkuList(req *SkuListRequest) ([]CouponSkuList, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := coupon.NewSellerCouponSkuListRequest()

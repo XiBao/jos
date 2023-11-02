@@ -1,6 +1,6 @@
 package crm
 
-import "fmt"
+import "github.com/XiBao/jos/sdk"
 
 type ReturnType struct {
 	Code string `json:"code,omitempty" codec:"code,omitempty"` //状态码
@@ -13,5 +13,5 @@ func (r ReturnType) IsError() bool {
 }
 
 func (r ReturnType) Error() string {
-	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }

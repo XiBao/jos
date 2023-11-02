@@ -1,7 +1,6 @@
 package report
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
@@ -74,13 +73,13 @@ func (r AdgroupkeywordQueryResult) IsError() bool {
 
 func (r AdgroupkeywordQueryResult) Error() string {
 	if !r.Success {
-		return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+		return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
 	}
 	return "no result data"
 }
 
 type AdgroupkeywordQueryValue struct {
-	Datas []*JosKeywordTmp `json:"datas,omitempty" codec:"datas,omitempty"`
+	Datas []JosKeywordTmp `json:"datas,omitempty" codec:"datas,omitempty"`
 }
 
 type JosKeywordTmp struct {
@@ -168,8 +167,8 @@ type JosKeyword struct {
 	RecordOn                time.Time `json:"-" codec:"-"`
 }
 
-func (k *JosKeywordTmp) ToJosKeyword() *JosKeyword {
-	kw := &JosKeyword{
+func (k JosKeywordTmp) ToJosKeyword() JosKeyword {
+	kw := JosKeyword{
 		Id:             k.Id,
 		Keyword:        k.Keyword,
 		KeywordType:    k.KeywordType,
@@ -238,7 +237,7 @@ func (k *JosKeywordTmp) ToJosKeyword() *JosKeyword {
 }
 
 // 获取关键词报表
-func AdgroupkeywordQuery(req *AdgroupkeywordQueryRequest) ([]*JosKeyword, error) {
+func AdgroupkeywordQuery(req *AdgroupkeywordQueryRequest) ([]JosKeyword, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := report.NewAdgroupkeywordQueryRequest()
@@ -267,7 +266,7 @@ func AdgroupkeywordQuery(req *AdgroupkeywordQueryRequest) ([]*JosKeyword, error)
 	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	record := make([]*JosKeyword, 0, len(response.Data.Result.Value.Datas))
+	record := make([]JosKeyword, 0, len(response.Data.Result.Value.Datas))
 	for _, v := range response.Data.Result.Value.Datas {
 		record = append(record, v.ToJosKeyword())
 	}

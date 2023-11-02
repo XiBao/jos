@@ -1,10 +1,6 @@
 package center
 
 import (
-	"fmt"
-
-	"github.com/davecgh/go-spew/spew"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	center "github.com/XiBao/jos/sdk/request/interact/center/evaluate"
@@ -46,11 +42,10 @@ func (r CreateEvaluateActivityData) IsError() bool {
 }
 
 func (r CreateEvaluateActivityData) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 func CreateEvaluateActivity(req *CreateEvaluateActivityRequest) (uint64, error) {
-	spew.Dump(req)
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewCreateEvaluateActivityRequest()

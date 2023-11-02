@@ -1,8 +1,6 @@
 package coupon
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/coupon"
@@ -49,7 +47,7 @@ func (r PromoCouponCheckDiscountAuthData) Error() string {
 	if r.Result != nil && r.Result.IsError() {
 		return r.Result.Error()
 	}
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type PromoCouponCheckDiscountAuthResult struct {
@@ -64,7 +62,7 @@ func (r PromoCouponCheckDiscountAuthResult) IsError() bool {
 }
 
 func (r PromoCouponCheckDiscountAuthResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Msg)
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
 func PromoCouponCheckDiscountAuth(req *PromoCouponCheckDiscountAuthRequest) (bool, error) {

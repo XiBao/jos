@@ -9,5 +9,5 @@ type Result struct {
 }
 
 type BaseAreasServiceResponse struct {
-	Data []*Result `json:"data,omitempty" codec:"data,omitempty"`
+	Data []Result `json:"data,omitempty" codec:"data,omitempty"`
 }

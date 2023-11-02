@@ -1,8 +1,6 @@
 package campaign
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/campaign"
@@ -57,7 +55,7 @@ func (r AddResult) IsError() bool {
 }
 
 func (r AddResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+	return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
 }
 
 // 新建计划

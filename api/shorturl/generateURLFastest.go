@@ -1,8 +1,6 @@
 package shorturl
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/shorturl"
@@ -64,7 +62,7 @@ func (r GenerateURLFastestResult) IsError() bool {
 }
 
 func (r GenerateURLFastestResult) Error() string {
-	return fmt.Sprintf("code: %s, message: %s", r.Code, r.Message)
+	return sdk.ErrorString(r.Code, r.Message)
 }
 
 // 生成短域新的api接口

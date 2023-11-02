@@ -1,8 +1,6 @@
 package center
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	center "github.com/XiBao/jos/sdk/request/interact/center/evaluate"
@@ -39,9 +37,9 @@ func (r GetEvaluateActivityListResponse) Error() string {
 }
 
 type GetEvaluateActivityListData struct {
-	Code      string                           `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string                           `json:"error_description,omitempty" codec:"error_description,omitempty"`
-	Result    []*GetEvaluateActivityListResult `json:"GiftActivityResults,omitempty" codec:"GiftActivityResults,omitempty"`
+	Code      string                          `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc string                          `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	Result    []GetEvaluateActivityListResult `json:"GiftActivityResults,omitempty" codec:"GiftActivityResults,omitempty"`
 }
 
 func (r GetEvaluateActivityListData) IsError() bool {
@@ -49,7 +47,7 @@ func (r GetEvaluateActivityListData) IsError() bool {
 }
 
 func (r GetEvaluateActivityListData) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type GetEvaluateActivityListResult struct {
@@ -63,7 +61,7 @@ type GetEvaluateActivityListResult struct {
 	Status    uint8  `json:"status"`
 }
 
-func GetEvaluateActivityList(req *GetEvaluateActivityListRequest) ([]*GetEvaluateActivityListResult, error) {
+func GetEvaluateActivityList(req *GetEvaluateActivityListRequest) ([]GetEvaluateActivityListResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewGetEvaluateActivityListRequest()

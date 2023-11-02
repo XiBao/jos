@@ -87,9 +87,12 @@ func (this *Client) GetMasterKey(tid string, voucherKey string) (keyStore *crypt
 		Tid: tid,
 		Key: voucherKey,
 	}
-	keyStore, err = master.MasterKeyGet(req)
-	if err != nil {
+	if keyStores, err := master.MasterKeyGet(req); err != nil {
 		return nil, err
+	} else if len(keyStores) == 0 {
+		return nil, errors.New("empty keystore")
+	} else {
+		keyStore = &keyStores[0]
 	}
 	this.Lock()
 	this.KeyStore = keyStore
@@ -220,7 +223,7 @@ func (this *Client) Decrypt(encryptedStr string, usePrivateEncrypt bool) (string
 		return "", err
 	}
 
-	data := encryptedData[ivStart:len(encryptedData)]
+	data := encryptedData[ivStart:]
 	if usePrivateEncrypt {
 		keyData = crypto.Sha256([]byte(this.AppKey))
 	} else {

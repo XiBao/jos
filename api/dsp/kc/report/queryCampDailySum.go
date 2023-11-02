@@ -1,7 +1,6 @@
 package report
 
 import (
-	"fmt"
 	"sort"
 	"strconv"
 	"time"
@@ -60,12 +59,12 @@ func (r QueryCampDailySumData) Error() string {
 }
 
 type QueryCampDailySumResult struct {
-	Success    bool          `json:"success,omitempty" codec:"success,omitempty"`
-	ResultCode string        `json:"resultCode,omitempty" codec:"resultCode,omitempty"`
-	ErrorMsg   string        `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
-	Total      int           `json:"total,omitempty" codec:"total,omitempty"`
-	Page       int           `json:"page,omitempty" codec:"page,omitempty"`
-	Value      []*ReportInfo `json:"value,omitempty" codec:"value,omitempty"`
+	Success    bool         `json:"success,omitempty" codec:"success,omitempty"`
+	ResultCode string       `json:"resultCode,omitempty" codec:"resultCode,omitempty"`
+	ErrorMsg   string       `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
+	Total      int          `json:"total,omitempty" codec:"total,omitempty"`
+	Page       int          `json:"page,omitempty" codec:"page,omitempty"`
+	Value      []ReportInfo `json:"value,omitempty" codec:"value,omitempty"`
 }
 
 func (r QueryCampDailySumResult) IsError() bool {
@@ -73,7 +72,7 @@ func (r QueryCampDailySumResult) IsError() bool {
 }
 
 func (r QueryCampDailySumResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s ", r.ResultCode, r.ErrorMsg)
+	return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
 }
 
 type ReportInfo struct {
@@ -132,7 +131,7 @@ type CampaignDailyRpt struct {
 }
 
 // 查询.快车.计划报表数据
-func QueryCampDailySum(req *QueryCampDailySumRequest) ([]*CampaignDailyRpt, error) {
+func QueryCampDailySum(req *QueryCampDailySumRequest) ([]CampaignDailyRpt, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := report.NewQueryCampDailySumRequest()
@@ -162,9 +161,9 @@ func QueryCampDailySum(req *QueryCampDailySumRequest) ([]*CampaignDailyRpt, erro
 		return nil, err
 	}
 	loc := time.Now().Location()
-	rpts := make([]*CampaignDailyRpt, 0, len(response.Data.Result.Value))
+	rpts := make([]CampaignDailyRpt, 0, len(response.Data.Result.Value))
 	for _, data := range response.Data.Result.Value {
-		rpt := &CampaignDailyRpt{}
+		var rpt CampaignDailyRpt
 		for k, v := range data.FigureData {
 			switch k {
 			case "TotalCartCntNCX":

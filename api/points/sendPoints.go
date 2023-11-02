@@ -1,7 +1,6 @@
 package points
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/XiBao/jos/api"
@@ -61,7 +60,7 @@ func (r JosSendPointsJsfResult) IsError() bool {
 }
 
 func (r JosSendPointsJsfResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 // TODO 积分变更开放接口 开放请求的渠道为：26-消费积分 27-发放积分
@@ -80,7 +79,7 @@ func JosSendPoints(req *JosSendPointsRequest) (bool, error) {
 		r.SetSourceType(req.SourceType)
 	}
 	if req.BusinessId == "" {
-		req.BusinessId = fmt.Sprintf("jdvip%s", time.Now().Format("20060102150405"))
+		req.BusinessId = sdk.StringsJoin("jdvip", time.Now().Format("20060102150405"))
 	}
 
 	r.SetBusinessId(req.BusinessId)

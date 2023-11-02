@@ -1,8 +1,6 @@
 package vender
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/vender"
@@ -43,7 +41,7 @@ func (r CheckAuthForVenderIdSubResponse) IsError() bool {
 }
 
 func (r CheckAuthForVenderIdSubResponse) Error() string {
-	return fmt.Sprintf("code:%s, message:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type AuthResult struct {

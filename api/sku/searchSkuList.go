@@ -1,8 +1,6 @@
 package sku
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ware"
 	"github.com/XiBao/jos/sdk"
@@ -36,11 +34,11 @@ type SearchSkuListResponse struct {
 	Data      *SearchSkuListSubResponse `json:"jingdong_sku_read_searchSkuList_responce,omitempty" codec:"jingdong_sku_read_searchSkuList_responce,omitempty"`
 }
 
-func (r *SearchSkuListResponse) IsError() bool {
+func (r SearchSkuListResponse) IsError() bool {
 	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
 }
 
-func (r *SearchSkuListResponse) Error() string {
+func (r SearchSkuListResponse) Error() string {
 	if r.ErrorResp != nil {
 		return r.ErrorResp.Error()
 	}
@@ -56,19 +54,19 @@ type SearchSkuListSubResponse struct {
 	Page      *SearchSkuListPage `json:"page,omitempty" codec:"page,omitempty"`
 }
 
-func (r *SearchSkuListSubResponse) IsError() bool {
+func (r SearchSkuListSubResponse) IsError() bool {
 	return r.Code != "0" || r.Page == nil
 }
 
-func (r *SearchSkuListSubResponse) Error() string {
-	return fmt.Sprintf("code: %s, error_description: %s", r.Code, r.ErrorDesc)
+func (r SearchSkuListSubResponse) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type SearchSkuListPage struct {
-	Data      []*ware.Sku `json:"data,omitempty" codec:"data,omitempty"`
-	PageNo    int         `json:"pageNo,omitempty" codec:"pageNo,omitempty"`
-	PageSize  int         `json:"pageSize,omitempty" codec:"pageSize,omitempty"`
-	TotalItem int         `json:"totalItem,omitempty" codec:"totalItem,omitempty"`
+	Data      []ware.Sku `json:"data,omitempty" codec:"data,omitempty"`
+	PageNo    int        `json:"pageNo,omitempty" codec:"pageNo,omitempty"`
+	PageSize  int        `json:"pageSize,omitempty" codec:"pageSize,omitempty"`
+	TotalItem int        `json:"totalItem,omitempty" codec:"totalItem,omitempty"`
 }
 
 // 根据条件检索订单信息 （仅适用于SOP、LBP，SOPL类型，FBP类型请调取FBP订单检索 ）

@@ -1,8 +1,6 @@
 package campaign
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/campaign"
@@ -60,7 +58,7 @@ func (r GetResult) IsError() bool {
 
 func (r GetResult) Error() string {
 	if !r.Success {
-		return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+		return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
 	}
 	return "no result data"
 }

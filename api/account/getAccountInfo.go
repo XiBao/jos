@@ -1,8 +1,6 @@
 package account
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/account"
@@ -47,7 +45,7 @@ func (r GetAccountInfoData) IsError() bool {
 
 func (r GetAccountInfoData) Error() string {
 	if r.Code != "0" {
-		return fmt.Sprintf("code:%s, message: %s", r.Code, r.ErrorDesc)
+		return sdk.ErrorString(r.Code, r.ErrorDesc)
 	}
 	if r.Result == nil {
 		return "no bean account info."

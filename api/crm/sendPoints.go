@@ -1,7 +1,6 @@
 package crm
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
@@ -66,7 +65,7 @@ func SendPoints(req *SendPointsRequest) (int64, error) {
 	if req.ResId != "" {
 		r.SetResId(req.ResId)
 	} else {
-		r.SetResId(fmt.Sprintf("jdvip%s", time.Now().Format("20060102150405")))
+		r.SetResId(sdk.StringsJoin("jdvip", time.Now().Format("20060102150405")))
 	}
 	r.SetSourceType(strconv.Itoa(req.SourceType))
 	r.SetPoints(req.Points)

@@ -1,7 +1,6 @@
 package ware
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/XiBao/jos/api"
@@ -35,9 +34,9 @@ func (r SkusGetResponse) Error() string {
 }
 
 type SkusGetSubResponse struct {
-	Code      string  `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string  `json:"error_description,omitempty" codec:"error_description,omitempty"`
-	Skus      []*Sku2 `json:"skus,omitempty" codec:"skus,omitempty"`
+	Code      string `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	Skus      []Sku2 `json:"skus,omitempty" codec:"skus,omitempty"`
 }
 
 func (r SkusGetSubResponse) IsError() bool {
@@ -45,11 +44,11 @@ func (r SkusGetSubResponse) IsError() bool {
 }
 
 func (r SkusGetSubResponse) Error() string {
-	return fmt.Sprintf("code: %s, desc: %s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 // 根据条件检索订单信息 （仅适用于SOP、LBP，SOPL类型，FBP类型请调取FBP订单检索 ）
-func SkusGet(req *SkusGetRequest) ([]*Sku2, error) {
+func SkusGet(req *SkusGetRequest) ([]Sku2, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := ware.NewWareSkusGetRequest()

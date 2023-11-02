@@ -1,8 +1,6 @@
 package follow
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/follow"
@@ -59,7 +57,7 @@ func (r QueryForCountByVidResult) IsError() bool {
 }
 
 func (r QueryForCountByVidResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Msg)
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
 func QueryForCountByVid(req *QueryForCountByVidRequest) (uint64, error) {

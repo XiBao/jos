@@ -1,8 +1,6 @@
 package promotion
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -43,7 +41,7 @@ func (r CheckResponseData) IsError() bool {
 }
 
 func (r CheckResponseData) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 // 促销审核,只能对人工审状态的促销进行审核

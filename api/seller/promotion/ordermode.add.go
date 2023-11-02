@@ -1,8 +1,6 @@
 package promotion
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -49,7 +47,7 @@ func (r OrdermodeAddResponseData) IsError() bool {
 }
 
 func (r OrdermodeAddResponseData) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 // 新建总价促销订单规则

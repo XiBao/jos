@@ -1,8 +1,6 @@
 package adkcunit
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/adkcunit"
@@ -60,7 +58,7 @@ func (r AdkcunitStatusUpdateResult) IsError() bool {
 }
 
 func (r AdkcunitStatusUpdateResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+	return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
 }
 
 // 更新单元状态

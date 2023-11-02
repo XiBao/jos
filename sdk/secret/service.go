@@ -1,8 +1,9 @@
 package secret
 
 import (
-	"fmt"
 	"sync"
+
+	"github.com/XiBao/jos/sdk"
 )
 
 type Service struct {
@@ -21,7 +22,7 @@ func NewService(host string, env string) *Service {
 }
 
 func instanceKey(appKey string, accessToken string) string {
-	return fmt.Sprintf("%s-%s", appKey, accessToken)
+	return sdk.StringsJoin(appKey, "-", accessToken)
 }
 
 func (this *Service) Instance(appKey string, secret string, accessToken string) *Client {

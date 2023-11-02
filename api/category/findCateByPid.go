@@ -32,12 +32,12 @@ func (r FindCateByPidResponse) Error() string {
 }
 
 type FindCateByPidData struct {
-	Code       string      `json:"code,omitempty" codec:"code,omitempty"`
-	Categories []*Category `json:"categories,omitempty" codec:"categories,omitempty"`
+	Code       string     `json:"code,omitempty" codec:"code,omitempty"`
+	Categories []Category `json:"categories,omitempty" codec:"categories,omitempty"`
 }
 
 // 获取单个SKU
-func FindCateByPid(req *FindCateByPidRequest) ([]*Category, error) {
+func FindCateByPid(req *FindCateByPidRequest) ([]Category, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := category.NewFindCateByPidRequest()

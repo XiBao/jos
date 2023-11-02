@@ -20,7 +20,7 @@ type ReportAttribute struct {
 	Msg     string      `json:"msg,omitempty"`
 	Heap    string      `json:"heap,omitempty"`
 	Enccnt  uint        `json:"enccnt,omitempty"`
-	deccnt  uint        `json:"deccnt,omitempty"`
+	Deccnt  uint        `json:"deccnt,omitempty"`
 }
 
 type ReportStatistcAttribute struct {

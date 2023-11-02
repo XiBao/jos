@@ -1,8 +1,6 @@
 package center
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/interact/center"
@@ -48,7 +46,7 @@ func (r GetPersonLabelListData) Error() string {
 		return r.Result.Error()
 	}
 	if r.Code != "0" {
-		return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+		return sdk.ErrorString(r.Code, r.ErrorDesc)
 	}
 	return "no result data"
 }
@@ -64,7 +62,7 @@ func (r GetPersonLabelListResult) IsError() bool {
 }
 
 func (r GetPersonLabelListResult) Error() string {
-	return fmt.Sprintf("code:%d, msg:%s", r.Code, r.Msg)
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
 type GetPersonLabelListLabel struct {

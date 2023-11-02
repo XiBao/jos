@@ -1,8 +1,6 @@
 package areas
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/areas"
@@ -42,10 +40,10 @@ func (r AreasCityGetResponse) IsError() bool {
 }
 
 func (r AreasCityGetResponse) Error() string {
-	return fmt.Sprintf("code: %s, error: %s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func CityGet(req *CityGetRequest) ([]*Result, error) {
+func CityGet(req *CityGetRequest) ([]Result, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := areas.NewAreasCityGetRequest()

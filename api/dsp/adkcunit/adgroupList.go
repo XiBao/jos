@@ -1,8 +1,6 @@
 package adkcunit
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -63,14 +61,14 @@ func (r AdkcunitAdgroupListResult) IsError() bool {
 
 func (r AdkcunitAdgroupListResult) Error() string {
 	if !r.Success {
-		return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+		return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
 	}
 	return "no result data"
 }
 
 type AdkcunitAdgroupListValue struct {
-	Paginator *dsp.Paginator  `json:"paginator,omitempty" codec:"paginator,omitempty"` // 分页组件
-	Datas     []*ADGroupQuery `json:"datas,omitempty" codec:"datas,omitempty"`
+	Paginator *dsp.Paginator `json:"paginator,omitempty" codec:"paginator,omitempty"` // 分页组件
+	Datas     []ADGroupQuery `json:"datas,omitempty" codec:"datas,omitempty"`
 }
 
 type ADGroupQuery struct {
@@ -91,7 +89,7 @@ type ADGroupQuery struct {
 }
 
 // 获取计划下的推广单元列表
-func AdkcunitAdgroupList(req *AdkcunitAdgroupListRequest) ([]*ADGroupQuery, int, error) {
+func AdkcunitAdgroupList(req *AdkcunitAdgroupListRequest) ([]ADGroupQuery, int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := adkcunit.NewAdkcunitAdgroupListRequest()

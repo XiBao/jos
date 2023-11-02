@@ -44,8 +44,8 @@ func (r FindJoinActivitiesData) Error() string {
 }
 
 type FindJoinActivitiesResult struct {
-	Err     string      `json:"error,omitempty" codec:"error,omitempty"`
-	Coupons []*CouponVo `json:"coupons,omitempty" codec:"coupons,omitempty"`
+	Err     string     `json:"error,omitempty" codec:"error,omitempty"`
+	Coupons []CouponVo `json:"coupons,omitempty" codec:"coupons,omitempty"`
 }
 
 func (r FindJoinActivitiesResult) IsError() bool {

@@ -1,8 +1,6 @@
 package goods
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/goods"
@@ -48,7 +46,7 @@ func (r LinkQueryResult) IsError() bool {
 }
 
 func (r LinkQueryResult) Error() string {
-	return fmt.Sprintf("code: %d, msg: %s", r.Code, r.Message)
+	return sdk.ErrorString(r.Code, r.Message)
 }
 
 type LinkGoodsResp struct {

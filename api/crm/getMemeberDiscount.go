@@ -1,8 +1,6 @@
 package crm
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
@@ -47,9 +45,9 @@ func (r GetMemeberDiscountData) Error() string {
 }
 
 type GetMemeberDiscountReturnType struct {
-	Desc string                 `json:"desc,omitempty" codec:"desc,omitempty"` //返回值code码
-	Code string                 `json:"code,omitempty" codec:"code,omitempty"` //返回值code码描述
-	Data []*ShopRuleDiscountDTO `json:"data,omitempty" codec:"data,omitempty"` //折扣信息数组   返回值：code码为200时，可能为空；code码为400、500时，为空；
+	Desc string                `json:"desc,omitempty" codec:"desc,omitempty"` //返回值code码
+	Code string                `json:"code,omitempty" codec:"code,omitempty"` //返回值code码描述
+	Data []ShopRuleDiscountDTO `json:"data,omitempty" codec:"data,omitempty"` //折扣信息数组   返回值：code码为200时，可能为空；code码为400、500时，为空；
 }
 
 func (r GetMemeberDiscountReturnType) IsError() bool {
@@ -57,7 +55,7 @@ func (r GetMemeberDiscountReturnType) IsError() bool {
 }
 
 func (r GetMemeberDiscountReturnType) Error() string {
-	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 type ShopRuleDiscountDTO struct {
@@ -68,7 +66,7 @@ type ShopRuleDiscountDTO struct {
 }
 
 // TODO 查询会员折扣信息
-func GetMemeberDiscount(req *GetMemeberDiscountRequest) ([]*ShopRuleDiscountDTO, error) {
+func GetMemeberDiscount(req *GetMemeberDiscountRequest) ([]ShopRuleDiscountDTO, error) {
 
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug

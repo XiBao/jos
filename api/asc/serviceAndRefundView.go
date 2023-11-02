@@ -1,8 +1,6 @@
 package asc
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/asc"
@@ -69,7 +67,7 @@ func (r ServiceAndRefundViewPageResult) IsError() bool {
 }
 
 func (r ServiceAndRefundViewPageResult) Error() string {
-	return fmt.Sprintf("code: %s, error: %s", r.Code, r.Msg)
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
 type OrderAfsAndRefund struct {

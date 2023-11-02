@@ -1,7 +1,6 @@
 package ware
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/XiBao/jos/api"
@@ -81,14 +80,14 @@ func (r SearchWare4ValidSubResponse) IsError() bool {
 }
 
 func (r SearchWare4ValidSubResponse) Error() string {
-	return fmt.Sprintf("code: %s, desc: %s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type SearchWare4ValidPage struct {
-	Data      []*Ware `json:"data,omitempty" codec:"data,omitempty"`
-	PageNo    int     `json:"pageNo,omitempty" codec:"pageNo,omitempty"`
-	PageSize  int     `json:"pageSize,omitempty" codec:"pageSize,omitempty"`
-	TotalItem int     `json:"totalItem,omitempty" codec:"totalItem,omitempty"`
+	Data      []Ware `json:"data,omitempty" codec:"data,omitempty"`
+	PageNo    int    `json:"pageNo,omitempty" codec:"pageNo,omitempty"`
+	PageSize  int    `json:"pageSize,omitempty" codec:"pageSize,omitempty"`
+	TotalItem int    `json:"totalItem,omitempty" codec:"totalItem,omitempty"`
 }
 
 // 根据条件检索订单信息 （仅适用于SOP、LBP，SOPL类型，FBP类型请调取FBP订单检索 ）

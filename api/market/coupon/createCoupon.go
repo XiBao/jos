@@ -1,8 +1,6 @@
 package coupon
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/market/coupon"
@@ -83,15 +81,15 @@ func (r MarketCreateCouponData) IsError() bool {
 }
 
 func (r MarketCreateCouponData) Error() string {
-	if r.ReturnType != nil {
+	if r.ReturnType != nil && r.ReturnType.IsError() {
 		return r.ReturnType.Error()
 	}
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type MarketCreateCouponDataReturnType struct {
 	Msg     string `json:"msg,omitempty" codec:"msg,omitempty"`
-	Code    uint   `json:"code,omitempty" codec:"code,omitempty"`
+	Code    int    `json:"code,omitempty" codec:"code,omitempty"`
 	Success bool   `json:"success,omitempty" codec:"success,omitempty"`
 	Data    uint64 `json:"data,omitempty" codec:"data,omitempty"`
 }
@@ -101,7 +99,7 @@ func (r MarketCreateCouponDataReturnType) IsError() bool {
 }
 
 func (r MarketCreateCouponDataReturnType) Error() string {
-	return fmt.Sprintf("code:%d, msg:%s", r.Code, r.Msg)
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
 func MarketCreateCoupon(req *MarketCreateCouponRequest) (uint64, error) {

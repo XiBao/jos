@@ -1,8 +1,6 @@
 package campaign
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -62,13 +60,13 @@ func (r ListResult) IsError() bool {
 
 func (r ListResult) Error() string {
 	if !r.Success {
-		return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+		return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
 	}
 	return "no result data"
 }
 
 type ListValue struct {
-	Datas     []*Query       `json:"datas,omitempty" codec:"datas,omitempty"`
+	Datas     []Query        `json:"datas,omitempty" codec:"datas,omitempty"`
 	Paginator *dsp.Paginator `json:"paginator,omitempty" codec:"paginator,omitempty"`
 }
 
@@ -86,8 +84,7 @@ type Query struct {
 }
 
 // 快车.计划信息（批量获取）
-func List(req *ListRequest) ([]*Query, int, error) {
-
+func List(req *ListRequest) ([]Query, int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := campaign.NewCampainListRequest()

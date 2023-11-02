@@ -1,8 +1,6 @@
 package vender
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/vender"
@@ -57,7 +55,7 @@ func (r VenderStatusReturnType) IsError() bool {
 }
 
 func (r VenderStatusReturnType) Error() string {
-	return fmt.Sprintf("code:%s desc:%s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 // TODO 查询会员体系状态

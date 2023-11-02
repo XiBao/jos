@@ -1,8 +1,6 @@
 package vender
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/vender"
@@ -58,7 +56,7 @@ func (r MemberLevelReturnType) IsError() bool {
 }
 
 func (r MemberLevelReturnType) Error() string {
-	return fmt.Sprintf("code: %s, desc: %s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 type MemberLevelInfo struct {

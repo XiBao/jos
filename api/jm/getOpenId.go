@@ -1,8 +1,6 @@
 package jm
 
 import (
-	"fmt"
-
 	. "github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/jm"
@@ -55,7 +53,7 @@ func (r GetOpenIdReturnType) IsError() bool {
 }
 
 func (r GetOpenIdReturnType) Error() string {
-	return fmt.Sprintf("code:%d, msg:%s", r.Code, r.Message)
+	return sdk.ErrorString(r.Code, r.Message)
 }
 
 func GetOpenId(req GetOpenIdRequest) (GetOpenIdReturnType, error) {

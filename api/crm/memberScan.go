@@ -43,9 +43,9 @@ type MemberScanData struct {
 }
 
 type MemberScanResult struct {
-	TotalResult int       `json:"total_result,omitempty" codec:"total_result,omitempty"`
-	Members     []*Member `json:"crm_members,omitempty" codec:"crm_members,omitempty"`
-	ScrollId    string    `json:"scroll_id,omitempty" codec:"scroll_id,omitempty"`
+	TotalResult int      `json:"total_result,omitempty" codec:"total_result,omitempty"`
+	Members     []Member `json:"crm_members,omitempty" codec:"crm_members,omitempty"`
+	ScrollId    string   `json:"scroll_id,omitempty" codec:"scroll_id,omitempty"`
 }
 
 func MemberScan(req *MemberScanRequest) (*MemberScanResult, error) {

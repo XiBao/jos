@@ -1,8 +1,6 @@
 package fullcoupon
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/fullcoupon"
@@ -61,7 +59,7 @@ func (r FullCouponGetPromoDetailInfoResponseData) IsError() bool {
 }
 
 func (r FullCouponGetPromoDetailInfoResponseData) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Msg)
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
 func GetPromoDetailInfo(req *FullCouponGetPromoDetailInfoRequest) (*PromoDetailsInfo, error) {

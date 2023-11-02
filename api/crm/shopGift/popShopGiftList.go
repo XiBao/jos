@@ -1,8 +1,6 @@
 package crm
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	crm "github.com/XiBao/jos/sdk/request/crm/shopGift"
@@ -49,13 +47,13 @@ func (r PopShopGiftListData) Error() string {
 	if r.Result != nil && r.Result.IsError() {
 		return r.Result.Error()
 	}
-	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type PopShopGiftListResult struct {
-	Code string                  `json:"code,omitempty" codec:"code,omitempty"`
-	Desc string                  `json:"desc,omitempty" codec:"desc,omitempty"`
-	Data []*PopShopGiftListModel `json:"data,omitempty" codec:"data,omitempty"`
+	Code string                 `json:"code,omitempty" codec:"code,omitempty"`
+	Desc string                 `json:"desc,omitempty" codec:"desc,omitempty"`
+	Data []PopShopGiftListModel `json:"data,omitempty" codec:"data,omitempty"`
 }
 
 func (r PopShopGiftListResult) IsError() bool {
@@ -63,7 +61,7 @@ func (r PopShopGiftListResult) IsError() bool {
 }
 
 func (r PopShopGiftListResult) Error() string {
-	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 type PopShopGiftListModel struct {
@@ -76,7 +74,7 @@ type PopShopGiftListModel struct {
 	ModelNameList []string `json:"modelNameList"` // 人群列表
 }
 
-func PopShopGiftList(req *PopShopGiftListRequest) ([]*PopShopGiftListModel, error) {
+func PopShopGiftList(req *PopShopGiftListRequest) ([]PopShopGiftListModel, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewPopShopGiftListRequest()

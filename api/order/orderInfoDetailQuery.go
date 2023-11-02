@@ -1,8 +1,6 @@
 package order
 
 import (
-	"fmt"
-
 	. "github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/order"
@@ -45,14 +43,14 @@ type OrderInfoDetailQueryData struct {
 }
 
 func (r OrderInfoDetailQueryData) IsError() bool {
-	return r.Code != "0" || r.Result == nil
+	return r.Code != "0" || r.Result == nil || r.Result.IsError()
 }
 
 func (r OrderInfoDetailQueryData) Error() string {
-	if r.Result != nil {
+	if r.Result != nil && r.Result.IsError() {
 		return r.Result.Error()
 	}
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type OrderInfoDetailQueryResult struct {

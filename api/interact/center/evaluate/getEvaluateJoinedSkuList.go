@@ -1,8 +1,6 @@
 package center
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	center "github.com/XiBao/jos/sdk/request/interact/center/evaluate"
@@ -39,9 +37,9 @@ func (r GetEvaluateJoinedSkuListResponse) Error() string {
 }
 
 type GetEvaluateJoinedSkuListData struct {
-	Code      string       `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string       `json:"error_description,omitempty" codec:"error_description,omitempty"`
-	Result    []*JoinedSku `json:"result,omitempty" codec:"result,omitempty"`
+	Code      string      `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc string      `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	Result    []JoinedSku `json:"result,omitempty" codec:"result,omitempty"`
 }
 
 func (r GetEvaluateJoinedSkuListData) IsError() bool {
@@ -49,7 +47,7 @@ func (r GetEvaluateJoinedSkuListData) IsError() bool {
 }
 
 func (r GetEvaluateJoinedSkuListData) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type JoinedSku struct {
@@ -70,7 +68,7 @@ type JoinedSku struct {
 	StockNum    int     `json:"stock_num"`
 }
 
-func GetEvaluateJoinedSkuList(req *GetEvaluateJoinedSkuListRequest) ([]*JoinedSku, error) {
+func GetEvaluateJoinedSkuList(req *GetEvaluateJoinedSkuListRequest) ([]JoinedSku, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewGetEvaluateJoinedSkuListRequest()

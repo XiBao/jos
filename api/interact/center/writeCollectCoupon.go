@@ -1,8 +1,6 @@
 package center
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/interact/center"
@@ -53,7 +51,7 @@ func (r WriteCollectCouponData) IsError() bool {
 
 func (r WriteCollectCouponData) Error() string {
 	if r.Code != "0" {
-		return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+		return sdk.ErrorString(r.Code, r.ErrorDesc)
 	}
 	return "no result data"
 }

@@ -1,8 +1,6 @@
 package secret
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/secret"
@@ -59,7 +57,7 @@ func (r SecretApiReportResult) IsError() bool {
 }
 
 func (r SecretApiReportResult) Error() string {
-	return fmt.Sprintf("code:%d, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 // 对加解密等调用信息上报，不包含敏感信息，只负责统计系统性能

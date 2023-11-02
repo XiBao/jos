@@ -1,8 +1,6 @@
 package campaign
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/campaign"
@@ -58,7 +56,7 @@ func (r DeleteResult) IsError() bool {
 }
 
 func (r DeleteResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+	return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
 }
 
 // 删除计划

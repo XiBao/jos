@@ -1,8 +1,6 @@
 package vender
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/vender"
@@ -58,7 +56,7 @@ func (r SyncBindData) Error() string {
 	if r.Result != nil && r.Result.IsError() {
 		return r.Result.Error()
 	}
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type SyncResult struct {
@@ -72,7 +70,7 @@ func (r SyncResult) IsError() bool {
 }
 
 func (r SyncResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 func SyncBind(req *SyncBindRequest) (bool, error) {

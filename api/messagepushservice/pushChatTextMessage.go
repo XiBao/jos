@@ -1,8 +1,6 @@
 package messagepushservice
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/messagepushservice"
@@ -56,7 +54,7 @@ func (r PushChatTextMessageReturnType) IsError() bool {
 }
 
 func (r PushChatTextMessageReturnType) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrMsg)
+	return sdk.ErrorString(r.Code, r.ErrMsg)
 }
 
 // 新提供发送咚咚消息接口，方便打标pin

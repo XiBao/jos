@@ -1,8 +1,6 @@
 package center
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	center "github.com/XiBao/jos/sdk/request/interact/center/evaluate"
@@ -74,7 +72,7 @@ func (r CreateEvaluateActivityWithResultData) IsError() bool {
 }
 
 func (r CreateEvaluateActivityWithResultData) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 func CreateEvaluateActivityWithResult(req *CreateEvaluateActivityWithResultRequest) (uint64, error) {

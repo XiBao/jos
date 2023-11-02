@@ -1,8 +1,6 @@
 package points
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/points"
@@ -47,9 +45,9 @@ func (r GetPointsExchangeGiftListData) Error() string {
 }
 
 type GetPointsExchangeGiftListJsfResult struct {
-	Code   string                   `json:"code,omitempty" codec:"code,omitempty"`     //返回码
-	Desc   string                   `json:"desc,omitempty" codec:"desc,omitempty"`     //返回描述
-	Result []*PointsExchangeGiftDTO `json:"result,omitempty" codec:"result,omitempty"` //活动列表
+	Code   string                  `json:"code,omitempty" codec:"code,omitempty"`     //返回码
+	Desc   string                  `json:"desc,omitempty" codec:"desc,omitempty"`     //返回描述
+	Result []PointsExchangeGiftDTO `json:"result,omitempty" codec:"result,omitempty"` //活动列表
 }
 
 func (r GetPointsExchangeGiftListJsfResult) IsError() bool {
@@ -57,7 +55,7 @@ func (r GetPointsExchangeGiftListJsfResult) IsError() bool {
 }
 
 func (r GetPointsExchangeGiftListJsfResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 type PointsExchangeGiftDTO struct {
@@ -73,7 +71,7 @@ type PointsExchangeGiftDTO struct {
 }
 
 // TODO 查询正在进行中的积分兑换商品活动列表
-func GetPointsExchangeGiftList(req *GetPointsExchangeGiftListRequest) ([]*PointsExchangeGiftDTO, error) {
+func GetPointsExchangeGiftList(req *GetPointsExchangeGiftListRequest) ([]PointsExchangeGiftDTO, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := points.NewGetPointsExchangeGiftListRequest()

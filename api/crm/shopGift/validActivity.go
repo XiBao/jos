@@ -1,8 +1,6 @@
 package crm
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	crm "github.com/XiBao/jos/sdk/request/crm/shopGift"
@@ -47,7 +45,7 @@ func (r ShopGiftValidActivityData) Error() string {
 	if r.Result != nil && r.Result.IsError() {
 		return r.Result.Error()
 	}
-	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type ShopGiftValidActivityResult struct {
@@ -61,7 +59,7 @@ func (r ShopGiftValidActivityResult) IsError() bool {
 }
 
 func (r ShopGiftValidActivityResult) Error() string {
-	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 type ShopGiftActivityDomain struct {

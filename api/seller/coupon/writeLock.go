@@ -1,8 +1,6 @@
 package coupon
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/coupon"
@@ -48,7 +46,7 @@ func (r CouponWriteLockData) IsError() bool {
 }
 
 func (r CouponWriteLockData) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 func CouponWriteLock(req *CouponWriteLockRequest) (bool, error) {

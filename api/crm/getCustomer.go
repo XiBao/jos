@@ -1,8 +1,6 @@
 package crm
 
 import (
-	"fmt"
-
 	. "github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
@@ -52,7 +50,7 @@ func (r GetCustomerResult) IsError() bool {
 }
 
 func (r GetCustomerResult) Error() string {
-	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 func GetCustomer(req GetCustomerRequest) (CardMember, error) {

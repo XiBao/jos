@@ -18,11 +18,11 @@ type FindSkuByIdResponse struct {
 	Data      *FindSkuByIdData    `json:"jingdong_sku_read_findSkuById_responce,omitempty" codec:"jingdong_sku_read_findSkuById_responce,omitempty"`
 }
 
-func (r *FindSkuByIdResponse) IsError() bool {
+func (r FindSkuByIdResponse) IsError() bool {
 	return r.ErrorResp != nil || r.Data == nil || r.Data.Sku == nil
 }
 
-func (r *FindSkuByIdResponse) Error() string {
+func (r FindSkuByIdResponse) Error() string {
 	if r.ErrorResp != nil {
 		return r.ErrorResp.Error()
 	}

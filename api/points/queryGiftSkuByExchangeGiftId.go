@@ -1,8 +1,6 @@
 package points
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/points"
@@ -48,9 +46,9 @@ func (r QueryGiftSkuByExchangeGiftIdData) Error() string {
 }
 
 type QueryGiftSkuByExchangeGiftIdJsfResult struct {
-	Code   string                      `json:"code,omitempty" codec:"code,omitempty"` //返回码
-	Desc   string                      `json:"desc,omitempty" codec:"desc,omitempty"` //返回描述
-	Result []*PointsExchangeGiftSkuDTO `json:"result,omitempty" codec:"result,omitempty"`
+	Code   string                     `json:"code,omitempty" codec:"code,omitempty"` //返回码
+	Desc   string                     `json:"desc,omitempty" codec:"desc,omitempty"` //返回描述
+	Result []PointsExchangeGiftSkuDTO `json:"result,omitempty" codec:"result,omitempty"`
 }
 
 func (r QueryGiftSkuByExchangeGiftIdJsfResult) IsError() bool {
@@ -58,7 +56,7 @@ func (r QueryGiftSkuByExchangeGiftIdJsfResult) IsError() bool {
 }
 
 func (r QueryGiftSkuByExchangeGiftIdJsfResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 type PointsExchangeGiftSkuDTO struct {
@@ -81,7 +79,7 @@ type PointsExchangeGiftSkuDTO struct {
 }
 
 // TODO  根据积分兑换商品活动id 获取商品信息
-func QueryGiftSkuByExchangeGiftId(req *QueryGiftSkuByExchangeGiftIdRequest) ([]*PointsExchangeGiftSkuDTO, error) {
+func QueryGiftSkuByExchangeGiftId(req *QueryGiftSkuByExchangeGiftIdRequest) ([]PointsExchangeGiftSkuDTO, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := points.NewQueryGiftSkuByExchangeGiftIdRequest()

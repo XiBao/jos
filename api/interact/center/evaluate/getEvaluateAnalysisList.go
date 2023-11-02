@@ -1,8 +1,6 @@
 package center
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	center "github.com/XiBao/jos/sdk/request/interact/center/evaluate"
@@ -35,9 +33,9 @@ func (r GetEvaluateAnalysisListResponse) Error() string {
 }
 
 type GetEvaluateAnalysisListData struct {
-	Code      string              `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string              `json:"error_description,omitempty" codec:"error_description,omitempty"`
-	Result    []*EvaluateAnalysis `json:"result,omitempty" codec:"result,omitempty"`
+	Code      string             `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc string             `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	Result    []EvaluateAnalysis `json:"result,omitempty" codec:"result,omitempty"`
 }
 
 func (r GetEvaluateAnalysisListData) IsError() bool {
@@ -45,7 +43,7 @@ func (r GetEvaluateAnalysisListData) IsError() bool {
 }
 
 func (r GetEvaluateAnalysisListData) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type EvaluateAnalysis struct {
@@ -60,7 +58,7 @@ type EvaluateAnalysis struct {
 	PrizeCount    uint    `json:"prize_count"`    // 获奖评价的数量
 }
 
-func GetEvaluateAnalysisList(req *GetEvaluateAnalysisListRequest) ([]*EvaluateAnalysis, error) {
+func GetEvaluateAnalysisList(req *GetEvaluateAnalysisListRequest) ([]EvaluateAnalysis, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewGetEvaluateAnalysisListRequest()

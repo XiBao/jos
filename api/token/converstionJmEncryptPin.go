@@ -1,8 +1,6 @@
 package token
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/token"
@@ -19,11 +17,11 @@ type ConverstionJmEncryptPinResponse struct {
 	Data      *ConverstionJmEncryptPinData `json:"jingdong_TokenToPinCenter_converstionJmEncryptPin_responce,omitempty" codec:"jingdong_TokenToPinCenter_converstionJmEncryptPin_responce,omitempty"`
 }
 
-func (r *ConverstionJmEncryptPinResponse) IsError() bool {
+func (r ConverstionJmEncryptPinResponse) IsError() bool {
 	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
 }
 
-func (r *ConverstionJmEncryptPinResponse) Error() string {
+func (r ConverstionJmEncryptPinResponse) Error() string {
 	if r.ErrorResp != nil {
 		return r.ErrorResp.Error()
 	}
@@ -44,7 +42,7 @@ func (r ConverstionJmEncryptPinData) IsError() bool {
 }
 
 func (r ConverstionJmEncryptPinData) Error() string {
-	return fmt.Sprintf("code: %s, error_description: %s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type ConverstionJmEncryptPinResult struct {
@@ -60,7 +58,7 @@ func (r ConverstionJmEncryptPinResult) IsError() bool {
 }
 
 func (r ConverstionJmEncryptPinResult) Error() string {
-	return fmt.Sprintf("code: %d, error_description: %s", r.Code, r.Message)
+	return sdk.ErrorString(r.Code, r.Message)
 }
 
 // 输入单个订单id，得到所有相关订单信息

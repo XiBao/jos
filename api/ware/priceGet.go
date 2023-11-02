@@ -1,7 +1,6 @@
 package ware
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/XiBao/jos/api"
@@ -31,7 +30,7 @@ func (r *PriceGetResponse) Error() string {
 }
 
 type PriceChangesData struct {
-	PriceChanges []*PriceChangeOrig `json:"price_changes,omitempty" codec:"price_changes,omitempty"`
+	PriceChanges []PriceChangeOrig `json:"price_changes,omitempty" codec:"price_changes,omitempty"`
 }
 
 type PriceChangeOrig struct {
@@ -51,14 +50,14 @@ func PriceGet(req *PriceGetRequest) (*PriceChange, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := ware.NewWarePriceGetRequest()
-	r.SetSkuId(fmt.Sprintf("J_%d", req.SkuId))
+	r.SetSkuId(sdk.StringsJoin("J_", strconv.FormatUint(req.SkuId, 10)))
 
 	var response PriceGetResponse
 	err := client.Execute(r.Request, req.Session, &response)
 	if err != nil {
 		return nil, err
 	}
-	priceChange := &PriceChange{}
+	priceChange := new(PriceChange)
 	priceChange.SkuId = req.SkuId
 	priceChange.Price, err = strconv.ParseFloat(response.Data.PriceChanges[0].Price, 64)
 	if err != nil {

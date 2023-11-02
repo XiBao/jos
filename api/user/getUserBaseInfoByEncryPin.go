@@ -1,8 +1,6 @@
 package user
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/user"
@@ -44,7 +42,7 @@ func (r GetUserBaseInfoByEncryPinSubResponse) IsError() bool {
 }
 
 func (r GetUserBaseInfoByEncryPinSubResponse) Error() string {
-	return fmt.Sprintf("code: %s, error_description: %s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 // 店铺信息查询

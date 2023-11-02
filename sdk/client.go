@@ -5,10 +5,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"sort"
 	"strings"
 	"time"
@@ -42,7 +40,15 @@ type Client struct {
 }
 
 func GetOauthURL(appKey, rURI, state, scope string) string {
-	return fmt.Sprintf("https://open-oauth.jd.com/oauth2/to_login?app_key=%s&response_type=code&redirect_uri=%s&state=%s&scope=%s", appKey, url.QueryEscape(rURI), state, scope)
+	values := GetUrlValues()
+	values.Set("app_key", appKey)
+	values.Set("response_type", "code")
+	values.Set("redirect_uri", rURI)
+	values.Set("state", state)
+	values.Set("scope", scope)
+	enc := values.Encode()
+	PutUrlValues(values)
+	return StringsJoin("https://open-oauth.jd.com/oauth2/to_login?", enc)
 }
 
 // create new client
@@ -61,7 +67,14 @@ func (c *Client) Logger() logger.Logger {
 }
 
 func (c *Client) GetAccessTokenNew(code string) (string, error) {
-	gatewayUrl := fmt.Sprintf("https://open-oauth.jd.com/oauth2/access_token?app_key=%s&app_secret=%s&grant_type=authorization_code&code=%s", c.AppKey, c.SecretKey, code)
+	values := GetUrlValues()
+	values.Set("app_key", c.AppKey)
+	values.Set("app_secret", c.SecretKey)
+	values.Set("grant_type", "authorization_code")
+	values.Set("code", code)
+	payload := values.Encode()
+	PutUrlValues(values)
+	gatewayUrl := StringsJoin("https://open-oauth.jd.com/oauth2/access_token?", payload)
 	debug := c.Logger()
 	debug.DebugPrintGetRequest(gatewayUrl)
 	response, err := http.DefaultClient.Get(gatewayUrl)
@@ -81,15 +94,16 @@ func (c *Client) GetAccessTokenNew(code string) (string, error) {
 }
 
 func (c *Client) GetAccessToken(code, state, redirectUri string) (string, error) {
-	values := url.Values{}
-	values.Add("grant_type", "authorization_code")
-	values.Add("client_id", c.AppKey)
-	values.Add("redirect_uri", redirectUri)
-	values.Add("code", code)
-	values.Add("state", state)
-	values.Add("client_secret", c.SecretKey)
-
-	gatewayUrl := fmt.Sprintf(`%s?%s`, `https://oauth.jd.com/oauth/token`, values.Encode())
+	values := GetUrlValues()
+	values.Set("grant_type", "authorization_code")
+	values.Set("client_id", c.AppKey)
+	values.Set("redirect_uri", redirectUri)
+	values.Set("code", code)
+	values.Set("state", state)
+	values.Set("client_secret", c.SecretKey)
+	payload := values.Encode()
+	PutUrlValues(values)
+	gatewayUrl := StringsJoin(`https://oauth.jd.com/oauth/token?`, payload)
 	debug := c.Logger()
 	debug.DebugPrintGetRequest(gatewayUrl)
 	response, err := http.DefaultClient.Get(gatewayUrl)
@@ -135,10 +149,12 @@ func (c *Client) Execute(req *Request, token string, rep IResponse) error {
 	}
 	rawSign := c.GenerateRawSign(sysParams)
 	sysParams["sign"] = c.GenerateSign(rawSign)
-	values := url.Values{}
+	values := GetUrlValues()
 	for k, v := range sysParams {
-		values.Add(k, v)
+		values.Set(k, v)
 	}
+	payload := values.Encode()
+	PutUrlValues(values)
 	gwURL := GATEWAY_URL
 	if c.Dev {
 		gwURL = GATEWAY_DEV_URL
@@ -149,7 +165,7 @@ func (c *Client) Execute(req *Request, token string, rep IResponse) error {
 	}
 	debug := c.Logger()
 	debug.DebugPrintPostJSONRequest(gwURL, Json(sysParams))
-	gatewayUrl := fmt.Sprintf(`%s?%s`, gwURL, values.Encode())
+	gatewayUrl := StringsJoin(`%s?%s`, gwURL, "?", payload)
 	debug.DebugPrintGetRequest(gatewayUrl)
 
 	response, err := http.DefaultClient.Get(gatewayUrl)
@@ -197,9 +213,9 @@ func (c *Client) PostExecute(req *Request, token string, rep IResponse) error {
 	}
 	rawSign := c.GenerateRawSign(sysParams)
 	sysParams["sign"] = c.GenerateSign(rawSign)
-	values := url.Values{}
+	values := GetUrlValues()
 	for k, v := range sysParams {
-		values.Add(k, v)
+		values.Set(k, v)
 	}
 	gwURL := GATEWAY_URL
 	if c.Dev {
@@ -213,6 +229,7 @@ func (c *Client) PostExecute(req *Request, token string, rep IResponse) error {
 	debug.DebugPrintPostJSONRequest(gwURL, Json(sysParams))
 
 	response, err := http.PostForm(gwURL, values)
+	PutUrlValues(values)
 	if err != nil {
 		debug.DebugPrintError(err)
 		return err

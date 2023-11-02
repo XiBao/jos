@@ -1,8 +1,6 @@
 package jm
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/user"
 	"github.com/XiBao/jos/sdk"
@@ -45,7 +43,7 @@ func (r GetUserBaseInfoByPinSubResponse) IsError() bool {
 }
 
 func (r GetUserBaseInfoByPinSubResponse) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 // 店铺信息查询

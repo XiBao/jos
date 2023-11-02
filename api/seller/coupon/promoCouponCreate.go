@@ -1,8 +1,6 @@
 package coupon
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	coupon "github.com/XiBao/jos/sdk/request/seller/coupon"
@@ -47,7 +45,7 @@ func (r PromoCouponCreateData) Error() string {
 	if r.Result != nil && r.Result.IsError() {
 		return r.Result.Error()
 	}
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type PromoCouponCreateResult struct {
@@ -62,7 +60,7 @@ func (r PromoCouponCreateResult) IsError() bool {
 }
 
 func (r PromoCouponCreateResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Msg)
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
 func PromoCouponCreate(req *PromoCouponCreateRequest) (uint64, error) {

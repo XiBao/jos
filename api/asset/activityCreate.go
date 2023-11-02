@@ -1,8 +1,6 @@
 package asset
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/asset"
@@ -65,7 +63,7 @@ func (r ActivityCreateData) IsError() bool {
 }
 
 func (r ActivityCreateData) Error() string {
-	return fmt.Sprintf("code: %s, message: %s", r.Code, r.Message)
+	return sdk.ErrorString(r.Code, r.Message)
 }
 
 type ActivityCreateToken struct {
