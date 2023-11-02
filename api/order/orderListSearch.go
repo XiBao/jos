@@ -68,7 +68,7 @@ func (r ReturnType) IsError() bool {
 }
 
 func (r ReturnType) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Message)
+	return fmt.Sprintf("code:%d, msg:%s", r.Code, r.Message)
 }
 
 // 自营订单列表查询
