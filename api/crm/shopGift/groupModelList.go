@@ -1,8 +1,6 @@
 package crm
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	crm "github.com/XiBao/jos/sdk/request/crm/shopGift"
@@ -47,13 +45,13 @@ func (r ShopGiftGroupModelListData) Error() string {
 	if r.Result != nil && r.Result.IsError() {
 		return r.Result.Error()
 	}
-	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type ShopGiftGroupModelListResult struct {
-	Code string                `json:"code,omitempty" codec:"code,omitempty"`
-	Desc string                `json:"desc,omitempty" codec:"desc,omitempty"`
-	Data []*ShopGiftGroupModel `json:"data,omitempty" codec:"data,omitempty"`
+	Code string               `json:"code,omitempty" codec:"code,omitempty"`
+	Desc string               `json:"desc,omitempty" codec:"desc,omitempty"`
+	Data []ShopGiftGroupModel `json:"data,omitempty" codec:"data,omitempty"`
 }
 
 func (r ShopGiftGroupModelListResult) IsError() bool {
@@ -61,7 +59,7 @@ func (r ShopGiftGroupModelListResult) IsError() bool {
 }
 
 func (r ShopGiftGroupModelListResult) Error() string {
-	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 type ShopGiftGroupModel struct {
@@ -82,7 +80,7 @@ type ShopGiftGroupModel struct {
 	ModelDescList []string `json:"modelDescList"`    // 人群信息描述
 }
 
-func ShopGiftGroupModelList(req *ShopGiftGroupModelListRequest) ([]*ShopGiftGroupModel, error) {
+func ShopGiftGroupModelList(req *ShopGiftGroupModelListRequest) ([]ShopGiftGroupModel, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewShopGiftGroupModelListRequest()

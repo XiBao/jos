@@ -1,8 +1,6 @@
 package vender
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/vender"
@@ -58,7 +56,7 @@ func (r GetCustomerResult) IsError() bool {
 }
 
 func (r GetCustomerResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 type CardMemberInfo struct {

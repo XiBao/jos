@@ -1,8 +1,6 @@
 package asset
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/asset"
@@ -50,9 +48,9 @@ func (r AccountBalanceQueryRes) Error() string {
 }
 
 type AccountBalanceQueryData struct {
-	Code      string            `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string            `json:"error_description,omitempty" codec:"error_description,omitempty"`
-	Data      []*AccountBalance `json:"data,omitempty" codec:"data,omitempty"`
+	Code      string           `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc string           `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	Data      []AccountBalance `json:"data,omitempty" codec:"data,omitempty"`
 }
 
 func (r AccountBalanceQueryData) IsError() bool {
@@ -60,7 +58,7 @@ func (r AccountBalanceQueryData) IsError() bool {
 }
 
 func (r AccountBalanceQueryData) Error() string {
-	return fmt.Sprintf("code: %s, error: %s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type AccountBalance struct {
@@ -75,7 +73,7 @@ type AccountBalance struct {
 	Signed          bool   `json:"signed" codec:"signed"`
 }
 
-func AccountBalanceQuery(req *AccountBalanceQueryRequest) ([]*AccountBalance, error) {
+func AccountBalanceQuery(req *AccountBalanceQueryRequest) ([]AccountBalance, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := asset.NewAccountBalanceQueryRequest()

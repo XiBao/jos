@@ -1,8 +1,6 @@
 package points
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/points"
@@ -47,9 +45,9 @@ func (r GetCouponInfoData) Error() string {
 }
 
 type GetCouponInfoJsfResult struct {
-	Code   string              `json:"code,omitempty" codec:"code,omitempty"`     //返回码
-	Desc   string              `json:"desc,omitempty" codec:"desc,omitempty"`     //返回描述
-	Result []*PointsCouponInfo `json:"result,omitempty" codec:"result,omitempty"` //优惠券信息
+	Code   string             `json:"code,omitempty" codec:"code,omitempty"`     //返回码
+	Desc   string             `json:"desc,omitempty" codec:"desc,omitempty"`     //返回描述
+	Result []PointsCouponInfo `json:"result,omitempty" codec:"result,omitempty"` //优惠券信息
 }
 
 func (r GetCouponInfoJsfResult) IsError() bool {
@@ -57,7 +55,7 @@ func (r GetCouponInfoJsfResult) IsError() bool {
 }
 
 func (r GetCouponInfoJsfResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 type PointsCouponInfo struct {
@@ -82,7 +80,7 @@ type PointsCouponInfo struct {
 }
 
 // TODO 通过venderId查询商家设置的积分可兑换优惠券信息
-func GetCouponInfo(req *GetCouponInfoRequest) ([]*PointsCouponInfo, error) {
+func GetCouponInfo(req *GetCouponInfoRequest) ([]PointsCouponInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := points.NewGetCouponInfoRequest()

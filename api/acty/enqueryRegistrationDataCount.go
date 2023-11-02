@@ -35,10 +35,10 @@ func (r EnqueryRegistrationDataCountResponse) Error() string {
 }
 
 type EnqueryRegistrationDataCountResult struct {
-	Message           string              `json:"message,omitempty" codec:"message,omitempty"`
-	ResultCode        uint                `json:"resultCode" codec:"resultCode,omitempty"`
-	Count             uint                `json:"count" codec:"count"`
-	RegistrationItems []*RegistrationItem `json:"registrationItems,omitempty" codec:"registrationItems,omitempty"`
+	Message           string             `json:"message,omitempty" codec:"message,omitempty"`
+	ResultCode        uint               `json:"resultCode" codec:"resultCode,omitempty"`
+	Count             uint               `json:"count" codec:"count"`
+	RegistrationItems []RegistrationItem `json:"registrationItems,omitempty" codec:"registrationItems,omitempty"`
 }
 
 func EnqueryRegistrationDataCount(req *EnqueryRegistrationDataCountRequest) (*EnqueryRegistrationDataCountResult, error) {

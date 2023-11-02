@@ -58,7 +58,7 @@ func (r PopOrderEnSearchData) Error() string {
 }
 
 type SearchOrderInfo struct {
-	OrderInfoList []*OrderInfo   `json:"orderInfoList,omitempty" codec:"orderInfoList,omitempty"`
+	OrderInfoList []OrderInfo    `json:"orderInfoList,omitempty" codec:"orderInfoList,omitempty"`
 	OrderTotal    int            `json:"orderTotal,omitempty" codec:"orderTotal,omitempty"`
 	ApiResult     *api.ApiResult `json:"apiResult,omitempty" codec:"apiResult,omitempty"`
 }
@@ -75,7 +75,7 @@ func (r SearchOrderInfo) Error() string {
 }
 
 // 根据条件检索订单信息 （仅适用于SOP、LBP，SOPL类型，FBP类型请调取FBP订单检索 ）
-func PopOrderEnSearch(req *PopOrderEnSearchRequest) ([]*OrderInfo, int, error) {
+func PopOrderEnSearch(req *PopOrderEnSearchRequest) ([]OrderInfo, int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := order.NewPopOrderEnSearchRequest()

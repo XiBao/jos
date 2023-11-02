@@ -1,8 +1,6 @@
 package eco
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/eco"
@@ -70,7 +68,7 @@ func (r ReturnType) IsError() bool {
 
 func (r ReturnType) Error() string {
 	if r.Code != "200" {
-		return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Desc)
+		return sdk.ErrorString(r.Code, r.Desc)
 	}
 	return "no result data"
 }
@@ -105,7 +103,7 @@ func (r ReturnTypeDataHeader) IsError() bool {
 }
 
 func (r ReturnTypeDataHeader) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 type ReturnTypeDataBody struct {

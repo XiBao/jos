@@ -1,8 +1,6 @@
 package ad
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/ad"
@@ -60,7 +58,7 @@ func (r DspKcAdUpdateResult) IsError() bool {
 }
 
 func (r DspKcAdUpdateResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+	return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
 }
 
 // 修改创意状态

@@ -1,8 +1,6 @@
 package center
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/interact/center"
@@ -56,7 +54,7 @@ func (r FindCollectInfoData) Error() string {
 		return r.Result.Error()
 	}
 	if r.Code != "0" {
-		return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+		return sdk.ErrorString(r.Code, r.ErrorDesc)
 	}
 	return "no result data"
 }
@@ -80,9 +78,9 @@ type FindCollectInfoDetails struct {
 }
 
 type FindCollectInfoResult struct {
-	Data []*FindCollectInfoDetails `json:"data,omitempty" codec:"data,omitempty"`
-	Code uint32                    `json:"code" codec:"code"`
-	Msg  string                    `json:"msg" codec:"msg"`
+	Data []FindCollectInfoDetails `json:"data,omitempty" codec:"data,omitempty"`
+	Code int                      `json:"code" codec:"code"`
+	Msg  string                   `json:"msg" codec:"msg"`
 }
 
 func (r FindCollectInfoResult) IsError() bool {
@@ -90,10 +88,10 @@ func (r FindCollectInfoResult) IsError() bool {
 }
 
 func (r FindCollectInfoResult) Error() string {
-	return fmt.Sprintf("code:%d, msg:%s", r.Code, r.Msg)
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
-func FindCollectInfo(req *FindCollectInfoRequest) ([]*FindCollectInfoDetails, error) {
+func FindCollectInfo(req *FindCollectInfoRequest) ([]FindCollectInfoDetails, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewFindCollectInfoRequest()

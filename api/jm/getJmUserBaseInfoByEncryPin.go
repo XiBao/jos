@@ -1,8 +1,6 @@
 package jm
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/user"
 	"github.com/XiBao/jos/sdk"
@@ -45,7 +43,7 @@ func (r GetJmUserBaseInfoByEncryPinSubResponse) IsError() bool {
 }
 
 func (r GetJmUserBaseInfoByEncryPinSubResponse) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 // 用户信息查询

@@ -1,8 +1,6 @@
 package order
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/order"
@@ -50,7 +48,7 @@ func (r UnionOrderQueryResult) IsError() bool {
 }
 
 func (r UnionOrderQueryResult) Error() string {
-	return fmt.Sprintf("code: %d, message: %s", r.Code, r.Message)
+	return sdk.ErrorString(r.Code, r.Message)
 }
 
 type OrderResp struct {

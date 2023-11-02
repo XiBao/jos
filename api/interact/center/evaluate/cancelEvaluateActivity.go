@@ -1,8 +1,6 @@
 package center
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	center "github.com/XiBao/jos/sdk/request/interact/center/evaluate"
@@ -45,7 +43,7 @@ func (r CancelEvaluateActivityData) IsError() bool {
 }
 
 func (r CancelEvaluateActivityData) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 func CancelEvaluateActivity(req *CancelEvaluateActivityRequest) (bool, error) {

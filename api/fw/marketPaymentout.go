@@ -1,8 +1,6 @@
 package fw
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/fw"
@@ -63,7 +61,7 @@ func (r MarketPaymentoutData) Error() string {
 }
 
 type MarketPaymentoutReturnType struct {
-	ErrorCode uint64                          `json:"errorCode,omitempty" codec:"errorCode,omitempty"` //错误码
+	ErrorCode int64                           `json:"errorCode,omitempty" codec:"errorCode,omitempty"` //错误码
 	Success   bool                            `json:"success,omitempty" codec:"success,omitempty"`     //是否成功
 	ErrorMsg  string                          `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`   // 错误信息
 	Body      *MarketPaymentoutReturnTypeBody `json:"body,omitempty" codec:"body,omitempty"`           //订单列表
@@ -74,7 +72,7 @@ func (r MarketPaymentoutReturnType) IsError() bool {
 }
 
 func (r MarketPaymentoutReturnType) Error() string {
-	return fmt.Sprintf("code:%d, msg:%s", r.ErrorCode, r.ErrorMsg)
+	return sdk.ErrorString(r.ErrorCode, r.ErrorMsg)
 }
 
 type MarketPaymentoutReturnTypeBody struct {

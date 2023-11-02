@@ -1,8 +1,6 @@
 package vender
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/vender"
@@ -47,9 +45,9 @@ func (r GetVenderLevelRuleData) Error() string {
 }
 
 type GetVenderLevelRuleReturnType struct {
-	Desc string              `json:"desc,omitempty" codec:"desc,omitempty"`
-	Code string              `json:"code,omitempty" codec:"code,omitempty"`
-	List []*ShopLevelRuleDTO `json:"shopLevelRuleDTOList,omitempty" codec:"shopLevelRuleDTOList,omitempty"`
+	Desc string             `json:"desc,omitempty" codec:"desc,omitempty"`
+	Code string             `json:"code,omitempty" codec:"code,omitempty"`
+	List []ShopLevelRuleDTO `json:"shopLevelRuleDTOList,omitempty" codec:"shopLevelRuleDTOList,omitempty"`
 }
 
 func (r GetVenderLevelRuleReturnType) IsError() bool {
@@ -57,7 +55,7 @@ func (r GetVenderLevelRuleReturnType) IsError() bool {
 }
 
 func (r GetVenderLevelRuleReturnType) Error() string {
-	return fmt.Sprintf("code: %s, desc: %s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 type ShopLevelRuleDTO struct {
@@ -71,7 +69,7 @@ type ShopLevelRuleDTO struct {
 }
 
 // TODO 获取店铺等级体系规则
-func GetVenderLevelRule(req *GetVenderLevelRuleRequest) ([]*ShopLevelRuleDTO, error) {
+func GetVenderLevelRule(req *GetVenderLevelRuleRequest) ([]ShopLevelRuleDTO, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := vender.NewGetVenderLevelRuleRequest()

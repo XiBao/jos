@@ -40,10 +40,10 @@ func (r CouponReadGetCouponListResponse) Error() string {
 }
 
 type CouponReadGetCouponListResponseData struct {
-	List []*Coupon `json:"couponList,omitempty" codec:"couponList,omitempty"`
+	List []Coupon `json:"couponList,omitempty" codec:"couponList,omitempty"`
 }
 
-func CouponReadGetCouponList(req *CouponReadGetCouponListRequest) ([]*Coupon, error) {
+func CouponReadGetCouponList(req *CouponReadGetCouponListRequest) ([]Coupon, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := coupon.NewSellerCouponReadGetCouponListRequest()

@@ -1,8 +1,6 @@
 package adkckeyword
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/adkckeyword"
@@ -58,18 +56,18 @@ func (r KeywordpricesuggestQueryResult) IsError() bool {
 
 func (r KeywordpricesuggestQueryResult) Error() string {
 	if !r.Success {
-		return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+		return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
 	}
 	return "no result data"
 }
 
 type KeywordpricesuggestQueryValue struct {
-	HourHigh   []*DspDayForeCast `json:"hourHigh,omitempty" codec:"hourHigh,omitempty"`
-	DayLow     []*DspDayForeCast `json:"dayLow,omitempty" codec:"dayLow,omitempty"`
-	HourLow    []*DspDayForeCast `json:"hourLow,omitempty" codec:"hourLow,omitempty"`
-	HourMiddle []*DspDayForeCast `json:"hourMiddle,omitempty" codec:"hourMiddle,omitempty"`
-	DayMiddle  []*DspDayForeCast `json:"dayMiddle,omitempty" codec:"dayMiddle,omitempty"`
-	DayHigh    []*DspDayForeCast `json:"dayHigh,omitempty" codec:"dayHigh,omitempty"`
+	HourHigh   []DspDayForeCast `json:"hourHigh,omitempty" codec:"hourHigh,omitempty"`
+	DayLow     []DspDayForeCast `json:"dayLow,omitempty" codec:"dayLow,omitempty"`
+	HourLow    []DspDayForeCast `json:"hourLow,omitempty" codec:"hourLow,omitempty"`
+	HourMiddle []DspDayForeCast `json:"hourMiddle,omitempty" codec:"hourMiddle,omitempty"`
+	DayMiddle  []DspDayForeCast `json:"dayMiddle,omitempty" codec:"dayMiddle,omitempty"`
+	DayHigh    []DspDayForeCast `json:"dayHigh,omitempty" codec:"dayHigh,omitempty"`
 }
 
 // 查询.快车.关键词出价建议

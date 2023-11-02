@@ -1,8 +1,6 @@
 package adkckeyword
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/adkckeyword"
@@ -58,7 +56,7 @@ func (r KeywordInsertResult) IsError() bool {
 }
 
 func (r KeywordInsertResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+	return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
 }
 
 // 插入关键词

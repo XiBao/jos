@@ -1,8 +1,6 @@
 package adkckeyword
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/adkckeyword"
@@ -56,7 +54,7 @@ func (r KeywordDeleteResult) IsError() bool {
 }
 
 func (r KeywordDeleteResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+	return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
 }
 
 // 删除关键词

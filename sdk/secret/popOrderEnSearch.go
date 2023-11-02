@@ -16,7 +16,7 @@ type PopOrderEnSearchRequest struct {
 	DateType       uint8    `json:"date_type,omitempty" codec:"date_type,omitempty"`
 }
 
-func (this *Client) PopOrderEnSearch(searchReq *PopOrderEnSearchRequest, decrypt bool) ([]*order.OrderInfo, int, error) {
+func (this *Client) PopOrderEnSearch(searchReq *PopOrderEnSearchRequest, decrypt bool) ([]order.OrderInfo, int, error) {
 	req := &order.PopOrderEnSearchRequest{
 		BaseRequest: api.BaseRequest{
 			AnApiKey: &api.ApiKey{
@@ -39,11 +39,11 @@ func (this *Client) PopOrderEnSearch(searchReq *PopOrderEnSearchRequest, decrypt
 		return nil, 0, err
 	}
 	if decrypt {
-		for _, orderInfo := range orders {
-			err = this.DecryptOrderInfo(orderInfo, false)
-			if err != nil {
+		for idx, orderInfo := range orders {
+			if err := this.DecryptOrderInfo(&orderInfo, false); err != nil {
 				return nil, 0, err
 			}
+			orders[idx] = orderInfo
 		}
 	}
 

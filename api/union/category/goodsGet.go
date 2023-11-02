@@ -1,8 +1,6 @@
 package category
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/category"
@@ -45,7 +43,7 @@ func (r GoodsGetResult) IsError() bool {
 }
 
 func (r GoodsGetResult) Error() string {
-	return fmt.Sprintf("code: %d, msg: %s", r.Code, r.Message)
+	return sdk.ErrorString(r.Code, r.Message)
 }
 
 type CategoryResp struct {

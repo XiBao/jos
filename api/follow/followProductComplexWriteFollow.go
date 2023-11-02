@@ -1,8 +1,6 @@
 package follow
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/follow"
@@ -60,7 +58,7 @@ func (r FollowProductResult) IsError() bool {
 }
 
 func (r FollowProductResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Msg)
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
 // TODO  通过pin将商品加入用户关注栏

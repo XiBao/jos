@@ -1,8 +1,6 @@
 package fullcoupon
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/fullcoupon"
@@ -60,7 +58,7 @@ func (r CreateFullCouponResponseReturnType) IsError() bool {
 }
 
 func (r CreateFullCouponResponseReturnType) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Msg)
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
 func CreateFullCoupon(req *CreateFullCouponRequest) (*CreateFullCouponResponseReturnType, error) {

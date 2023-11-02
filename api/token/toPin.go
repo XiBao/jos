@@ -1,8 +1,6 @@
 package token
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/token"
@@ -44,7 +42,7 @@ func (r TokenToPinData) IsError() bool {
 }
 
 func (r TokenToPinData) Error() string {
-	return fmt.Sprintf("code: %s, error_description: %s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type GetencryptPinResult struct {

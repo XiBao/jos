@@ -53,7 +53,7 @@ func (r GetPointsDetailData) Error() string {
 }
 
 type GetPointsDetailResult struct {
-	PointsDetailViews []*PointsDetailView    `json:"pointsDetailViews,omitempty" codec:"pointsDetailViews,omitempty"`
+	PointsDetailViews []PointsDetailView     `json:"pointsDetailViews,omitempty" codec:"pointsDetailViews,omitempty"`
 	PageRowKeys       map[string]interface{} `json:"pageRowKeys,omitempty" codec:"pageRowKeys,omitempty"`
 	HasNext           bool                   `json:"hasNext,omitempty" codec:"hasNext,omitempty"`
 }
@@ -69,7 +69,7 @@ type PointsDetailView struct {
 	Msg        string `json:"msg,omitempty" codec:"msg,omitempty"`
 }
 
-func GetPointsDetail(req *GetPointsDetailRequest) ([]*PointsDetailView, error) {
+func GetPointsDetail(req *GetPointsDetailRequest) ([]PointsDetailView, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewGetPointsDetailRequest()

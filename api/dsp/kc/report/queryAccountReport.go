@@ -1,8 +1,6 @@
 package report
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/report"
@@ -56,7 +54,7 @@ func (r QueryAccountReportData) Error() string {
 		return r.Result.Error()
 	}
 	if r.Code != "0" {
-		return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+		return sdk.ErrorString(r.Code, r.ErrorDesc)
 	}
 	return "no result data"
 }
@@ -74,13 +72,13 @@ func (r QueryAccountReportResult) IsError() bool {
 
 func (r QueryAccountReportResult) Error() string {
 	if !r.Success {
-		return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+		return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
 	}
 	return "no result data"
 }
 
 type QueryAccountReportResultValue struct {
-	Datas []*AccountReport `json:"datas" codec:"datas"`
+	Datas []AccountReport `json:"datas" codec:"datas"`
 	// Ext          *DspAccountReport    `json:"ext" codec:"ext"`
 	// Paginator    string               `json:"paginator" codec:"paginator"`
 }
@@ -123,7 +121,7 @@ type AccountReport struct {
 	CouponCnt         uint64  `json:"couponCnt"`
 }
 
-func QueryAccountReport(req *QueryAccountReportRequest) ([]*AccountReport, error) {
+func QueryAccountReport(req *QueryAccountReportRequest) ([]AccountReport, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := report.NewDspReportQueryAccountReportRequest()

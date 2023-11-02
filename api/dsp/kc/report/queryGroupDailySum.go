@@ -1,7 +1,6 @@
 package report
 
 import (
-	"fmt"
 	"sort"
 	"strconv"
 	"time"
@@ -60,12 +59,12 @@ func (r QueryGroupDailySumData) Error() string {
 }
 
 type QueryGroupDailySumResult struct {
-	Success    bool          `json:"success,omitempty" codec:"success,omitempty"`
-	ResultCode string        `json:"resultCode,omitempty" codec:"resultCode,omitempty"`
-	ErrorMsg   string        `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
-	Total      int           `json:"total,omitempty" codec:"total,omitempty"`
-	Page       int           `json:"page,omitempty" codec:"page,omitempty"`
-	Value      []*ReportInfo `json:"value,omitempty" codec:"value,omitempty"`
+	Success    bool         `json:"success,omitempty" codec:"success,omitempty"`
+	ResultCode string       `json:"resultCode,omitempty" codec:"resultCode,omitempty"`
+	ErrorMsg   string       `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
+	Total      int          `json:"total,omitempty" codec:"total,omitempty"`
+	Page       int          `json:"page,omitempty" codec:"page,omitempty"`
+	Value      []ReportInfo `json:"value,omitempty" codec:"value,omitempty"`
 }
 
 func (r QueryGroupDailySumResult) IsError() bool {
@@ -73,7 +72,7 @@ func (r QueryGroupDailySumResult) IsError() bool {
 }
 
 func (r QueryGroupDailySumResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+	return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
 }
 
 type GroupDailyRpt struct {
@@ -125,7 +124,7 @@ type GroupDailyRpt struct {
 }
 
 // 查询.快车.单元报表数据
-func QueryGroupDailySum(req *QueryGroupDailySumRequest) ([]*GroupDailyRpt, int, error) {
+func QueryGroupDailySum(req *QueryGroupDailySumRequest) ([]GroupDailyRpt, int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := report.NewQueryGroupDailySumRequest()
@@ -155,10 +154,10 @@ func QueryGroupDailySum(req *QueryGroupDailySumRequest) ([]*GroupDailyRpt, int, 
 		return nil, 0, err
 	}
 
-	rpts := make([]*GroupDailyRpt, 0, len(response.Data.Result.Value))
+	rpts := make([]GroupDailyRpt, 0, len(response.Data.Result.Value))
 	loc := time.Now().Location()
 	for _, data := range response.Data.Result.Value {
-		rpt := &GroupDailyRpt{
+		rpt := GroupDailyRpt{
 			GroupId: uint64(data.Id),
 		}
 		for k, v := range data.FigureData {

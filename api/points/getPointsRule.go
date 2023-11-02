@@ -1,8 +1,6 @@
 package points
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/points"
@@ -48,9 +46,9 @@ func (r GetPointsRuleData) Error() string {
 }
 
 type JsfResult struct {
-	Result []*PointsRule `json:"jsfResult,omitempty" codec:"jsfResult,omitempty"`
-	Code   string        `json:"code,omitempty" codec:"code,omitempty"`
-	Desc   string        `json:"desc,omitempty" codec:"desc,omitempty"`
+	Result []PointsRule `json:"jsfResult,omitempty" codec:"jsfResult,omitempty"`
+	Code   string       `json:"code,omitempty" codec:"code,omitempty"`
+	Desc   string       `json:"desc,omitempty" codec:"desc,omitempty"`
 }
 
 func (r JsfResult) IsError() bool {
@@ -58,10 +56,10 @@ func (r JsfResult) IsError() bool {
 }
 
 func (r JsfResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
-func GetPointsRule(req *GetPointsRuleRequest) ([]*PointsRule, error) {
+func GetPointsRule(req *GetPointsRuleRequest) ([]PointsRule, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := points.NewGetPointsRuleRequest()

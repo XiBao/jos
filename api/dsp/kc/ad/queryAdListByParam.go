@@ -1,8 +1,6 @@
 package ad
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -63,23 +61,23 @@ func (r AdQueryAdListByParamResult) IsError() bool {
 
 func (r AdQueryAdListByParamResult) Error() string {
 	if !r.Success {
-		return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+		return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
 	}
 	return "no result data"
 }
 
 type AdQueryAdListByParamValues struct {
 	Paginator *dsp.Paginator `json:"paginator,omitempty" codec:"paginator,omitempty"`
-	Datas     []*DspADQuery  `json:"datas,omitempty" codec:"datas,omitempty"`
+	Datas     []DspADQuery   `json:"datas,omitempty" codec:"datas,omitempty"`
 }
 
 type DspADQuery struct {
-	ImgUrl        string       `json:"imgUrl,omitempty" codec:"imgUrl,omitempty"`               // 图片地址
-	Id            uint64       `json:"id,omitempty" codec:"id,omitempty"`                       // 创意id
-	Status        uint8        `json:"status,omitempty" codec:"status,omitempty"`               // 状态
-	Name          string       `json:"name,omitempty" codec:"name,omitempty"`                   // 创意名称
-	SkuId         string       `json:"skuId,omitempty" codec:"skuId,omitempty"`                 // SkuId
-	AuditInfoList []*AuditInfo `json:"auditInfoList,omitempty" codec:"auditInfoList,omitempty"` // 审核List
+	ImgUrl        string      `json:"imgUrl,omitempty" codec:"imgUrl,omitempty"`               // 图片地址
+	Id            uint64      `json:"id,omitempty" codec:"id,omitempty"`                       // 创意id
+	Status        uint8       `json:"status,omitempty" codec:"status,omitempty"`               // 状态
+	Name          string      `json:"name,omitempty" codec:"name,omitempty"`                   // 创意名称
+	SkuId         string      `json:"skuId,omitempty" codec:"skuId,omitempty"`                 // SkuId
+	AuditInfoList []AuditInfo `json:"auditInfoList,omitempty" codec:"auditInfoList,omitempty"` // 审核List
 }
 
 type AuditInfo struct {
@@ -87,7 +85,7 @@ type AuditInfo struct {
 }
 
 // 查询.快车.指定单元下创意基本信息
-func AdQueryAdListByParam(req *AdQueryAdListByParamRequest) ([]*DspADQuery, int, error) {
+func AdQueryAdListByParam(req *AdQueryAdListByParamRequest) ([]DspADQuery, int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := ad.NewAdQueryAdListByParamRequest()

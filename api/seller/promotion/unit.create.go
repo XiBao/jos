@@ -1,8 +1,6 @@
 package promotion
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	promo "github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -44,10 +42,10 @@ func (r UnitCreateResponseData) IsError() bool {
 }
 
 func (r UnitCreateResponseData) Error() string {
-	if r.Result != nil {
+	if r.Result != nil && r.Result.IsError() {
 		return r.Result.Error()
 	}
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type UnitCreateResponseResult struct {
@@ -62,7 +60,7 @@ func (r UnitCreateResponseResult) IsError() bool {
 }
 
 func (r UnitCreateResponseResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Msg)
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
 func UnitCreate(req *UnitCreateRequest) (uint64, error) {

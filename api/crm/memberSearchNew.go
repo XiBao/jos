@@ -43,8 +43,8 @@ type MemberSearchNewData struct {
 }
 
 type MemberSearchNewResult struct {
-	TotalResult int       `json:"total_result,omitempty" codec:"total_result,omitempty"`
-	Members     []*Member `json:"crm_members,omitempty" codec:"crm_members,omitempty"`
+	TotalResult int      `json:"total_result,omitempty" codec:"total_result,omitempty"`
+	Members     []Member `json:"crm_members,omitempty" codec:"crm_members,omitempty"`
 }
 
 func MemberSearchNew(req *MemberSearchNewRequest) (*MemberSearchNewResult, error) {

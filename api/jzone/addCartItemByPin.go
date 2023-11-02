@@ -1,8 +1,6 @@
 package jzone
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/jzone"
@@ -60,7 +58,7 @@ func (r AddCartItemByPinReturnType) IsError() bool {
 }
 
 func (r AddCartItemByPinReturnType) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Message)
+	return sdk.ErrorString(r.Code, r.Message)
 }
 
 // TODO  通过Pin将商品加入用户购物车

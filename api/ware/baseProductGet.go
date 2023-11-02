@@ -32,12 +32,12 @@ func (r WareBaseProductGetResponse) Error() string {
 }
 
 type WareBaseProductGetData struct {
-	Code   string          `json:"code,omitempty" codec:"code,omitempty"`
-	Result []*ProductsBase `json:"listproductbase_result,omitempty" codec:"listproductbase_result,omitempty"`
+	Code   string         `json:"code,omitempty" codec:"code,omitempty"`
+	Result []ProductsBase `json:"listproductbase_result,omitempty" codec:"listproductbase_result,omitempty"`
 }
 
 // 获取单个SKU
-func WareBaseProductGet(req *WareBaseProductGetRequest) ([]*ProductsBase, error) {
+func WareBaseProductGet(req *WareBaseProductGetRequest) ([]ProductsBase, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := ware.NewWareBaseproductGetRequest()

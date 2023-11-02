@@ -1,8 +1,6 @@
 package asset
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/asset"
@@ -68,7 +66,7 @@ func (r BenefitSendData) IsError() bool {
 }
 
 func (r BenefitSendData) Error() string {
-	return fmt.Sprintf("code: %s, error: %s", r.Code, r.Message)
+	return sdk.ErrorString(r.Code, r.Message)
 }
 
 type BenefitSendDataConsumptionId struct {

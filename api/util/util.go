@@ -12,9 +12,3 @@ func Json(obj interface{}) string {
 
 	return buf.String()
 }
-
-func RemoveJsonSpace(data []byte) []byte {
-	rs := bytes.Replace(data, []byte("\n"), []byte(""), -1)
-	rs = bytes.Replace(rs, []byte("\t"), []byte(""), -1)
-	return rs
-}

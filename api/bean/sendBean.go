@@ -1,8 +1,6 @@
 package bean
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/bean"
@@ -52,7 +50,7 @@ func (r SendBeanData) IsError() bool {
 }
 
 func (r SendBeanData) Error() string {
-	return fmt.Sprintf("code:%s, desc:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type SendBeanResult struct {

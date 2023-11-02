@@ -53,14 +53,14 @@ func (r MasterKeyResponse) Error() string {
 }
 
 type MasterKeyResult struct {
-	Code              int                `json:"status_code,omitempty" codec:"status_code,omitempty"`
-	ErrorDesc         string             `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
-	Tid               string             `json:"tid,omitempty" codec:"tid,omitempty"`
-	Ts                int64              `json:"ts,omitempty" codec:"ts,omitempty"`
-	EncService        string             `json:"enc_service,omitempty" codec:"enc_service,omitempty"`
-	KeyCacheDisabled  int                `json:"key_cache_disabled,omitempty" codec:"key_cache_disabled,omitempty"`
-	KeyBackupDisabled int                `json:"key_backup_disabled,omitempty" codec:"key_backup_disabled,omitempty"`
-	ServiceKeyList    []*crypto.KeyStore `json:"service_key_list,omitempty" codec:"service_key_list,omitempty"`
+	Code              int               `json:"status_code,omitempty" codec:"status_code,omitempty"`
+	ErrorDesc         string            `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
+	Tid               string            `json:"tid,omitempty" codec:"tid,omitempty"`
+	Ts                int64             `json:"ts,omitempty" codec:"ts,omitempty"`
+	EncService        string            `json:"enc_service,omitempty" codec:"enc_service,omitempty"`
+	KeyCacheDisabled  int               `json:"key_cache_disabled,omitempty" codec:"key_cache_disabled,omitempty"`
+	KeyBackupDisabled int               `json:"key_backup_disabled,omitempty" codec:"key_backup_disabled,omitempty"`
+	ServiceKeyList    []crypto.KeyStore `json:"service_key_list,omitempty" codec:"service_key_list,omitempty"`
 }
 
 func (r MasterKeyResult) IsError() bool {
@@ -69,13 +69,13 @@ func (r MasterKeyResult) IsError() bool {
 
 func (r MasterKeyResult) Error() string {
 	if r.Code != 0 {
-		return fmt.Sprintf("code:%d, msg:%s", r.Code, r.ErrorDesc)
+		return sdk.ErrorString(r.Code, r.ErrorDesc)
 	}
 	return "no result data"
 }
 
 // 获取数据解密的密钥
-func MasterKeyGet(req *MasterKeyGetRequest) (keyStore *crypto.KeyStore, err error) {
+func MasterKeyGet(req *MasterKeyGetRequest) ([]crypto.KeyStore, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := master.NewMasterKeyGet()
@@ -88,7 +88,7 @@ func MasterKeyGet(req *MasterKeyGetRequest) (keyStore *crypto.KeyStore, err erro
 	js := fmt.Sprintf(`{"sdk_ver":%d,"ts":%d,"tid":"%s"}`, req.SdkVer, req.Ts, req.Tid)
 	sig, err := crypto.HmacSha256(req.Key, js)
 	if err != nil {
-		return
+		return nil, err
 	}
 	r.SetSig(sig)
 	r.SetSdkVer(req.SdkVer)
@@ -99,5 +99,5 @@ func MasterKeyGet(req *MasterKeyGetRequest) (keyStore *crypto.KeyStore, err erro
 	if err := client.Execute(r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	return response.Response.Result.ServiceKeyList[0], nil
+	return response.Response.Result.ServiceKeyList, nil
 }

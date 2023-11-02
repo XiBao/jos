@@ -1,8 +1,6 @@
 package points
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/points"
@@ -60,7 +58,7 @@ func (r BatchInsertOrUpdateRuleJsfResult) IsError() bool {
 }
 
 func (r BatchInsertOrUpdateRuleJsfResult) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 // TODO 设置积分规则   按商家后台规则进行设置

@@ -1,8 +1,6 @@
 package fullcoupon
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/fullcoupon"
@@ -69,7 +67,7 @@ func (r FullCouponGetPromoListInfoResponseData) IsError() bool {
 }
 
 func (r FullCouponGetPromoListInfoResponseData) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.Msg)
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
 type FullCouponGetPromoListInfoResponseDataList struct {

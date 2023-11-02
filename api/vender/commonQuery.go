@@ -1,8 +1,6 @@
 package vender
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/vender"
@@ -47,7 +45,7 @@ func (r CommonQuerySubResponse) Error() string {
 	if r.Response != nil && r.Response.IsError() {
 		return r.Response.Error()
 	}
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type CommonQuerySecResponse struct {
@@ -61,7 +59,7 @@ func (r CommonQuerySecResponse) IsError() bool {
 }
 
 func (r CommonQuerySecResponse) Error() string {
-	return fmt.Sprintf("code:%d, msg:%s", r.Code, r.Msg)
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
 type CommonQueryResult struct {

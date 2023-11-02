@@ -53,8 +53,8 @@ type OrderInfo struct {
 	OrderStartTime      string           `json:"orderStartTime,omitempty" codec:"orderStartTime,omitempty"`           // 下单时间
 	OrderEndTime        string           `json:"orderEndTime,omitempty" codec:"orderEndTime,omitempty"`               // 	结单时间 如返回信息为“0001-01-01 00:00:00”和“1970-01-01 00:00:00”，可认为此订单为未完成状态。
 	ConsigneeInfo       *ConsigneeInfo   `json:"consigneeInfo,omitempty" codec:"consigneeInfo,omitempty"`             // 收货人基本信息
-	ItemInfoList        []*ItemInfo      `json:"itemInfoList,omitempty" codec:"itemInfoList,omitempty"`               // 商品详细信息
-	CouponDetailList    []*CouponDetail  `json:"couponDetailList,omitempty" codec:"couponDetailList,omitempty"`       // 优惠详细信息
+	ItemInfoList        []ItemInfo       `json:"itemInfoList,omitempty" codec:"itemInfoList,omitempty"`               // 商品详细信息
+	CouponDetailList    []CouponDetail   `json:"couponDetailList,omitempty" codec:"couponDetailList,omitempty"`       // 优惠详细信息
 	VenderRemark        string           `json:"venderRemark,omitempty" codec:"venderRemark,omitempty"`               // 商家订单备注（不大于500字符） 可选字段，需要在输入参数optional_fields中写入才能返回
 	BalanceUsed         string           `json:"balanceUsed,omitempty" codec:"balanceUsed,omitempty"`                 // 余额支付金额 可选字段，需要在输入参数optional_fields中写入才能返回
 	Pin                 string           `json:"pin,omitempty" codec:"pin,omitempty"`                                 // 买家的账号信息 可选字段，需要在输入参数optional_fields中写入才能返回

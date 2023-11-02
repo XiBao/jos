@@ -1,6 +1,6 @@
 package dsp
 
-import "fmt"
+import "github.com/XiBao/jos/sdk"
 
 type DataCommonResponse struct {
 	Msg     string                             `json:"msg,omitempty"`
@@ -14,7 +14,7 @@ func (r DataCommonResponse) IsError() bool {
 }
 
 func (r DataCommonResponse) Error() string {
-	return fmt.Sprintf("code: %d, msg: %s", r.Code, r.Msg)
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
 type Paginator struct {

@@ -1,8 +1,6 @@
 package jm
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/jm"
@@ -43,7 +41,7 @@ func (r GetEncryptPinNewData) IsError() bool {
 }
 
 func (r GetEncryptPinNewData) Error() string {
-	if r.ReturnType != nil {
+	if r.ReturnType != nil && r.ReturnType.IsError() {
 		return r.ReturnType.Error()
 	}
 	return "no result data"
@@ -52,7 +50,7 @@ func (r GetEncryptPinNewData) Error() string {
 type GetEncryptPinNewReturnType struct {
 	Message   string `json:"message,omitempty" codec:"message,omitempty"`     //接口的执行信息
 	Pin       string `json:"pin,omitempty" codec:"pin,omitempty"`             //用户pin
-	Code      uint64 `json:"code,omitempty" codec:"code,omitempty"`           //状态码
+	Code      int64  `json:"code,omitempty" codec:"code,omitempty"`           //状态码
 	RequestId string `json:"requestId,omitempty" codec:"requestId,omitempty"` //请求id
 }
 
@@ -61,7 +59,7 @@ func (r GetEncryptPinNewReturnType) IsError() bool {
 }
 
 func (r GetEncryptPinNewReturnType) Error() string {
-	return fmt.Sprintf("code:%d, msg:%s", r.Code, r.Message)
+	return sdk.ErrorString(r.Code, r.Message)
 }
 
 func GetEncryptPinNew(req *GetEncryptPinNewRequest) (string, error) {

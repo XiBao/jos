@@ -1,8 +1,6 @@
 package vender
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/vender"
@@ -47,7 +45,7 @@ func (r GetBasicVenderInfoResult) Error() string {
 	if r.Result != nil && r.Result.IsError() {
 		return r.Result.Error()
 	}
-	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type BasicVenderInfoResult struct {
@@ -63,7 +61,7 @@ func (r BasicVenderInfoResult) IsError() bool {
 }
 
 func (r BasicVenderInfoResult) Error() string {
-	return fmt.Sprintf("code: %s, msg: %s", r.ErrorCode, r.ErrorMsg)
+	return sdk.ErrorString(r.ErrorCode, r.ErrorMsg)
 }
 
 // 店铺信息查询

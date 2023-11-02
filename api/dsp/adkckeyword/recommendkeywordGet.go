@@ -1,8 +1,6 @@
 package adkckeyword
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/adkckeyword"
@@ -64,13 +62,13 @@ func (r RecommendkeywordGetResult) IsError() bool {
 
 func (r RecommendkeywordGetResult) Error() string {
 	if !r.Success {
-		return fmt.Sprintf("code:%s, msg:%s", r.ResultCode, r.ErrorMsg)
+		return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
 	}
 	return "no result data"
 }
 
 type RecommendkeywordGetValue struct {
-	Datas []*KeyWordRecommendQuery `json:"datas,omitempty" codec:"datas,omitempty"`
+	Datas []KeyWordRecommendQuery `json:"datas,omitempty" codec:"datas,omitempty"`
 }
 
 type KeyWordRecommendQuery struct {
@@ -81,7 +79,7 @@ type KeyWordRecommendQuery struct {
 }
 
 // 获取推荐关键词
-func RecommendkeywordGet(req *RecommendkeywordGetRequest) ([]*KeyWordRecommendQuery, error) {
+func RecommendkeywordGet(req *RecommendkeywordGetRequest) ([]KeyWordRecommendQuery, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := adkckeyword.NewRecommendkeywordGetRequest()

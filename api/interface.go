@@ -1,7 +1,9 @@
 package api
 
 import (
-	"fmt"
+	"strconv"
+
+	"github.com/XiBao/jos/sdk"
 )
 
 // ApiKey jd APP key/secret
@@ -26,7 +28,7 @@ type ErrorResponnse struct {
 }
 
 func (e ErrorResponnse) Error() string {
-	return fmt.Sprintf("Code:%v, ZhDesc:%v, EnDesc:%v", e.Code, e.ZhDesc, e.EnDesc)
+	return sdk.StringsJoin("Code:", e.Code, ", ZhDesc:", e.ZhDesc, ", EnDesc:", e.EnDesc)
 }
 
 type ApiResult struct {
@@ -41,5 +43,5 @@ func (e ApiResult) IsError() bool {
 }
 
 func (e ApiResult) Error() string {
-	return fmt.Sprintf("Success:%v, EnglishErrCode:%v, ChineseErrCode:%v, NumberCode:%v", e.Success, e.EnglishErrCode, e.ChineseErrCode, e.NumberCode)
+	return sdk.StringsJoin("EnglishErrCode:", e.EnglishErrCode, ", ChineseErrCode:", e.ChineseErrCode, ", NumberCode:", strconv.Itoa(e.NumberCode))
 }

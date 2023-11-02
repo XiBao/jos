@@ -1,7 +1,6 @@
 package order
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/XiBao/jos/api"
@@ -63,7 +62,7 @@ func (r OrderDetailResult) IsError() bool {
 }
 
 func (r OrderDetailResult) Error() string {
-	return fmt.Sprintf("code:%d, msg:%s", r.Code, r.Message)
+	return sdk.ErrorString(r.Code, r.Message)
 }
 
 // 输入单个自营订单id，得到所有相关订单信息

@@ -1,8 +1,6 @@
 package center
 
 import (
-	"fmt"
-
 	. "github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/interact/center"
@@ -62,7 +60,7 @@ func (r WritePersonInfoResponse1) Error() string {
 
 type WritePersonInfoResult struct {
 	Data bool   `json:"data" codec:"data"` //请求是否成功
-	Code uint   `json:"code" codec:"code"` //返回状态码
+	Code int    `json:"code" codec:"code"` //返回状态码
 	Msg  string `json:"msg" codec:"msg"`
 }
 
@@ -71,7 +69,7 @@ func (r WritePersonInfoResult) IsError() bool {
 }
 
 func (r WritePersonInfoResult) Error() string {
-	return fmt.Sprintf("code:%d, msg:%s", r.Code, r.Msg)
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
 func WritePersonInfo(req WritePersonInfoRequest) (bool, error) {

@@ -1,8 +1,6 @@
 package center
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	center "github.com/XiBao/jos/sdk/request/interact/center/evaluate"
@@ -35,9 +33,9 @@ func (r GetEvaluateRuleListByIdResponse) Error() string {
 }
 
 type GetEvaluateRuleListByIdData struct {
-	Code      string          `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string          `json:"error_description,omitempty" codec:"error_description,omitempty"`
-	Result    []*EvaluateRule `json:"result,omitempty" codec:"result,omitempty"`
+	Code      string         `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc string         `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	Result    []EvaluateRule `json:"result,omitempty" codec:"result,omitempty"`
 }
 
 func (r GetEvaluateRuleListByIdData) IsError() bool {
@@ -45,7 +43,7 @@ func (r GetEvaluateRuleListByIdData) IsError() bool {
 }
 
 func (r GetEvaluateRuleListByIdData) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type EvaluateRule struct {
@@ -65,7 +63,7 @@ type EvaluateRule struct {
 	ExpireType   uint8   `json:"expire_type"`
 }
 
-func GetEvaluateRuleListById(req *GetEvaluateRuleListByIdRequest) ([]*EvaluateRule, error) {
+func GetEvaluateRuleListById(req *GetEvaluateRuleListByIdRequest) ([]EvaluateRule, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewGetEvaluateRuleListByIdRequest()

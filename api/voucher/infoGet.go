@@ -60,7 +60,7 @@ func (r VoucherInfoResult) IsError() bool {
 }
 
 func (r VoucherInfoResult) Error() string {
-	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type VoucherInfoData struct {
@@ -82,7 +82,7 @@ type VoucherData struct {
 	SType     int    `json:"stype"`     //ignore
 }
 
-func (this *Voucher) Verify() error {
+func (this Voucher) Verify() error {
 	js := []byte(fmt.Sprintf(`{"act":"%s","effective":%d,"expired":%d,"id":"%s","key":"%s","service":"%s","stype":%d}`, this.Data.Act, this.Data.Effective, this.Data.Expired, this.Data.Id, this.Data.Key, this.Data.Service, this.Data.SType))
 	return crypto.RSAVerifySignWithSha256([]byte(crypto.PublicKey), js, this.Sig)
 }

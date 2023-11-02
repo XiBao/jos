@@ -1,7 +1,6 @@
 package goods
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -46,7 +45,7 @@ func (r PromotionQueryResult) IsError() bool {
 }
 
 func (r PromotionQueryResult) Error() string {
-	return fmt.Sprintf("code: %d, msg: %s", r.Code, r.Message)
+	return sdk.ErrorString(r.Code, r.Message)
 }
 
 type PromotionGoodsResp struct {

@@ -1,8 +1,6 @@
 package crm
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
@@ -57,7 +55,7 @@ func (r GetShopRuleTypeReturnResult) IsError() bool {
 }
 
 func (r GetShopRuleTypeReturnResult) Error() string {
-	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 // TODO 查询商家是否开通会 员开卡功能/开卡类 型

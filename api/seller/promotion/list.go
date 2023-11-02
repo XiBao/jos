@@ -1,8 +1,6 @@
 package promotion
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -42,9 +40,9 @@ func (r ListResponse) Error() string {
 }
 
 type ListResponseData struct {
-	Code          string           `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc     string           `json:"error_description,omitempty" codec:"error_description,omitempty"`
-	PromotionList []*PromotionList `json:"promotion_list,omitempty" codec:"promotion_list,omitempty"`
+	Code          string          `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc     string          `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	PromotionList []PromotionList `json:"promotion_list,omitempty" codec:"promotion_list,omitempty"`
 }
 
 func (r ListResponseData) IsError() bool {
@@ -52,11 +50,11 @@ func (r ListResponseData) IsError() bool {
 }
 
 func (r ListResponseData) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 // 店铺促销查询
-func List(req *ListRequest) ([]*PromotionList, error) {
+func List(req *ListRequest) ([]PromotionList, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionListRequest()

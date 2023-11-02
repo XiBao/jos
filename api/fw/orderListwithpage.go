@@ -1,8 +1,6 @@
 package fw
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/fw"
@@ -52,14 +50,14 @@ func (r OrderListWithPageData) Error() string {
 }
 
 type OrderListWithPageReturnType struct {
-	TotalPage   uint64     `json:"totalPage,omitempty" codec:"totalPage,omitempty"`     //实际页数
-	PageSize    uint64     `json:"pageSize,omitempty" codec:"pageSize,omitempty"`       //每页个数
-	ErrorCode   uint64     `json:"errorCode,omitempty" codec:"errorCode,omitempty"`     //错误码
-	CurrentPage uint64     `json:"currentPage,omitempty" codec:"currentPage,omitempty"` //当前页
-	TotalCount  uint64     `json:"totalCount,omitempty" codec:"totalCount,omitempty"`   //总个数
-	IsSuccess   bool       `json:"isSuccess,omitempty" codec:"isSuccess,omitempty"`     //是否成功
-	ErrorMsg    string     `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`       // 错误信息
-	OrderList   []*FWOrder `json:"orderList,omitempty" codec:"orderList,omitempty"`     //订单列表
+	TotalPage   uint64    `json:"totalPage,omitempty" codec:"totalPage,omitempty"`     //实际页数
+	PageSize    uint64    `json:"pageSize,omitempty" codec:"pageSize,omitempty"`       //每页个数
+	ErrorCode   int64     `json:"errorCode,omitempty" codec:"errorCode,omitempty"`     //错误码
+	CurrentPage uint64    `json:"currentPage,omitempty" codec:"currentPage,omitempty"` //当前页
+	TotalCount  uint64    `json:"totalCount,omitempty" codec:"totalCount,omitempty"`   //总个数
+	IsSuccess   bool      `json:"isSuccess,omitempty" codec:"isSuccess,omitempty"`     //是否成功
+	ErrorMsg    string    `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`       // 错误信息
+	OrderList   []FWOrder `json:"orderList,omitempty" codec:"orderList,omitempty"`     //订单列表
 }
 
 func (r OrderListWithPageReturnType) IsError() bool {
@@ -67,7 +65,7 @@ func (r OrderListWithPageReturnType) IsError() bool {
 }
 
 func (r OrderListWithPageReturnType) Error() string {
-	return fmt.Sprintf("code:%d, msg:%s", r.ErrorCode, r.ErrorMsg)
+	return sdk.ErrorString(r.ErrorCode, r.ErrorMsg)
 }
 
 type FWOrder struct {

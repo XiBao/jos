@@ -3,7 +3,6 @@ package promotion
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -53,7 +52,7 @@ func (r UnionPromotioncodeResult) IsError() bool {
 }
 
 func (r UnionPromotioncodeResult) Error() string {
-	return fmt.Sprintf("code: %d, message: %s", r.Code, r.Message)
+	return sdk.ErrorString(r.Code, r.Message)
 }
 
 type PromotionCodeResp struct {

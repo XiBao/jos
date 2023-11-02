@@ -1,8 +1,6 @@
 package plan
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/plan"
@@ -59,7 +57,7 @@ func (r AddBeanPlanData) IsError() bool {
 }
 
 func (r AddBeanPlanData) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 func AddBeanPlan(req *AddBeanPlanRequest) (uint64, error) {

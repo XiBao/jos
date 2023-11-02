@@ -1,8 +1,6 @@
 package crm
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
@@ -44,7 +42,7 @@ func (r DeleteCustomerOpenInfoData) Error() string {
 	if r.Result != nil && r.Result.IsError() {
 		return r.Result.Error()
 	}
-	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.Result.Error())
+	return "no result data"
 }
 
 type DeleteCustomerOpenInfoResult struct {
@@ -58,7 +56,7 @@ func (r DeleteCustomerOpenInfoResult) IsError() bool {
 }
 
 func (r DeleteCustomerOpenInfoResult) Error() string {
-	return fmt.Sprintf("code: %s, msg: %s", r.Code, r.Desc)
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 // 获取单个SKU

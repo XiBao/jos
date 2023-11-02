@@ -27,8 +27,8 @@ func (r GetGradesResponse) Error() string {
 }
 
 type GetGradesData struct {
-	Code   string             `json:"code,omitempty" codec:"code,omitempty"`
-	Result []*GetGradesResult `json:"grade_promotions,omitempty" codec:"grade_promotions,omitempty"`
+	Code   string            `json:"code,omitempty" codec:"code,omitempty"`
+	Result []GetGradesResult `json:"grade_promotions,omitempty" codec:"grade_promotions,omitempty"`
 }
 
 type GetGradesResult struct {
@@ -40,7 +40,7 @@ type GetGradesResult struct {
 	NextGradeName     string `json:"next_grade_name,omitempty" codec:"next_grade_name,omitempty"`
 }
 
-func GetGrades(req *GetGradesRequest) ([]*GetGradesResult, error) {
+func GetGrades(req *GetGradesRequest) ([]GetGradesResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewGetGradesRequest()

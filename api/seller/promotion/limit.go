@@ -1,8 +1,6 @@
 package promotion
 
 import (
-	"fmt"
-
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -47,7 +45,10 @@ func (r LimitData) IsError() bool {
 }
 
 func (r LimitData) Error() string {
-	return fmt.Sprintf("code:%s, msg:%s", r.Code, r.ErrorDesc)
+	if r.Code != "0" {
+		return sdk.ErrorString(r.Code, r.ErrorDesc)
+	}
+	return "no result data"
 }
 
 type PromoLimit struct {
