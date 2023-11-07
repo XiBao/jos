@@ -119,8 +119,8 @@ type GoodsResp struct {
 	Book               *JFBook            `json:"bookInfo,omitempty"`               // 图书信息
 	Spec               *JFSpec            `json:"specInfo,omitempty"`               // 扩展信息
 	StockState         uint               `json:"stockState,omitempty"`             // 库存状态：1有货、0无货（供tob选品场景参考，toc场景不适用）
-	EliteType          []uint             `json:"eliteType,omitempty"`              // 资源位17：极速版商品
-	ForbidTypes        []uint             `json:"forbidTypes,omitempty"`            // 0普通商品，10微信京东购物小程序禁售，11微信京喜小程序禁售
+	EliteType          []int              `json:"eliteType,omitempty"`              // 资源位17：极速版商品
+	ForbidTypes        []int              `json:"forbidTypes,omitempty"`            // 0普通商品，10微信京东购物小程序禁售，11微信京喜小程序禁售
 	DeliveryType       uint               `json:"deliveryType,omitempty"`           // 京东配送 1：是，0：不是
 	SkuLabel           *JFSkuLabel        `json:"skuLabelInfo,omitempty"`           // 商品标签
 	PromotionLabel     []JFPromotionLabel `json:"promotionLabelInfoList,omitempty"` // 商品促销标签集
