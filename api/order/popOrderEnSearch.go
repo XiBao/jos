@@ -64,7 +64,7 @@ type SearchOrderInfo struct {
 }
 
 func (r SearchOrderInfo) IsError() bool {
-	return r.ApiResult == nil || !r.ApiResult.IsError()
+	return r.ApiResult == nil || r.ApiResult.IsError()
 }
 
 func (r SearchOrderInfo) Error() string {
