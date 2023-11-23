@@ -155,7 +155,7 @@ type JFPreSale struct {
 	BalanceEndTime   uint64  `json:"balanceEndTime,omitempty"`   // 尾款结束时间
 	ShipTime         uint64  `json:"shipTime,omitempty"`         // 预计发货时间
 	PreSaleStatus    uint    `json:"preSaleStatus,omitempty"`    // 预售状态（0 未开始；1 预售中；2 预售结束；3 尾款进行中；4 尾款结束）
-	AmountDeposit    uint    `json:"amountDeposit,omitempty"`    // 定金膨胀金额（定金可抵XXX）
+	AmountDeposit    float64 `json:"amountDeposit,omitempty"`    // 定金膨胀金额（定金可抵XXX）
 }
 
 type JFSecondPrice struct {
