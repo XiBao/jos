@@ -17,7 +17,7 @@ type JingfenQueryRequest struct {
 
 type JingfenQueryResponse struct {
 	ErrorResp *api.ErrorResponnse       `json:"error_response,omitempty"`
-	Data      *JingfenQueryResponseData `json:"jd_union_open_goods_jingfen_query_response,omitempty"`
+	Data      *JingfenQueryResponseData `json:"jd_union_open_goods_jingfen_query_responce,omitempty"`
 }
 
 func (r JingfenQueryResponse) IsError() bool {
@@ -32,7 +32,7 @@ func (r JingfenQueryResponse) Error() string {
 }
 
 type JingfenQueryResponseData struct {
-	Result string `json:"result,omitempty"`
+	Result string `json:"queryResult,omitempty"`
 }
 
 type JingfenQueryResult struct {
