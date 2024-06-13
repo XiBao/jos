@@ -33,7 +33,7 @@ func (r MixPinToXidResponse) Error() string {
 
 type MixPinToXidData struct {
 	Code   string             `json:"code,omitempty" codec:"code,omitempty"`
-	Result *MixPinToXidResult `json:"result,omitempty" codec:"result,omitempty"`
+	Result *MixPinToXidResult `json:"returnType,omitempty" codec:"returnType,omitempty"`
 }
 
 func (r MixPinToXidData) IsError() bool {
@@ -54,7 +54,7 @@ type MixPinToXidResult struct {
 }
 
 func (r MixPinToXidResult) IsError() bool {
-	return r.Code != 200
+	return r.Code != 200 && r.Code != 0
 }
 
 func (r MixPinToXidResult) Error() string {

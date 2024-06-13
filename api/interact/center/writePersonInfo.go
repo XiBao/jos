@@ -14,12 +14,12 @@ type WritePersonInfoRequest struct {
 	OpenIdBuyer string `json:"open_id_buyer,omitempty" codec:"open_id_buyer,omitempty"` // 用户pin
 	XIdBuyer    string `json:"xid_buyer,omitempty" codec:"xid_buyer,omitempty"`         // 用户pin
 	ProfileUrl  string `json:"profileUrl,omitempty" codec:"profileUrl,omitempty"`       // 用户头像连接 非必填
-	ActivityId  string `json:"activityId,omitempty" codec:"activityId,omitempty"`       // 活动id
+	ActivityId  uint64 `json:"activityId,omitempty" codec:"activityId,omitempty"`       // 活动id
 	Created     string `json:"created,omitempty" codec:"created,omitempty"`             // 创建时间
 	StartTime   string `json:"startTime,omitempty" codec:"startTime,omitempty"`         // 活动开始时间
 	EndTime     string `json:"endTime,omitempty" codec:"endTime,omitempty"`             // 结束时间
 	Id          string `json:"id,omitempty" codec:"id,omitempty"`                       // id（isv自己的活动id） 非必填
-	Type        string `json:"type,omitempty" codec:"type,omitempty"`                   // 活动类型
+	Type        uint8  `json:"type,omitempty" codec:"type,omitempty"`                   // 活动类型
 	/*
 	   投票有礼 6：购物车红包 8: 盖楼有礼 11：拼购定向投放 19: 分享有礼
 	    20: 集卡有礼 23 锦鲤圈抽奖 25 抽奖 26 加购 27 签到 28 积分兑换 29 商品收藏 30 游戏 31 砍价拼团 32 专享价
@@ -72,7 +72,7 @@ func (r WritePersonInfoResult) Error() string {
 	return sdk.ErrorString(r.Code, r.Msg)
 }
 
-func WritePersonInfo(req WritePersonInfoRequest) (bool, error) {
+func WritePersonInfo(req *WritePersonInfoRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewWritePersonInfoRequest()
