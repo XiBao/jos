@@ -9,10 +9,9 @@ import (
 )
 
 type GetAccountInfoRequest struct {
-	api.BaseRequest
-
-	AccountType uint8  `json:"accountType" codec:"accountType"`
 	AccountCode string `json:"accountCode" codec:"accountCode"`
+	api.BaseRequest
+	AccountType uint8 `json:"accountType" codec:"accountType"`
 }
 
 type GetAccountInfoResponse struct {
@@ -35,10 +34,9 @@ func (r GetAccountInfoResponse) Error() string {
 }
 
 type GetAccountInfoData struct {
-	Code      string `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
-
-	Result *AccountInfo `json:"beanAccount,omitempty" codec:"beanAccount,omitempty"`
+	Result    *AccountInfo `json:"beanAccount,omitempty" codec:"beanAccount,omitempty"`
+	Code      string       `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc string       `json:"error_description,omitempty" codec:"error_description,omitempty"`
 }
 
 func (r GetAccountInfoData) IsError() bool {

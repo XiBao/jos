@@ -10,15 +10,14 @@ import (
 type ApiKey struct {
 	Key    string
 	Secret string
-	Id     uint8  `json:"id,omitempty" codec:"id,omitempty"`
 	Name   string `json:"name,omitempty" codec:"name,omitempty"`
+	Id     uint8  `json:"id,omitempty" codec:"id,omitempty"`
 }
 
 type BaseRequest struct {
-	Session  string
 	AnApiKey *ApiKey `json:",omitempty" codec:",omitempty"`
-
-	Debug bool `json:"-"`
+	Session  string
+	Debug    bool `json:"-"`
 }
 
 type ErrorResponnse struct {
@@ -32,10 +31,10 @@ func (e ErrorResponnse) Error() string {
 }
 
 type ApiResult struct {
-	Success        bool   `json:"success,omitempty" codec:"success,omitempty"`
 	EnglishErrCode string `json:"englishErrCode,omitempty" codec:"englishErrCode,omitempty"`
 	ChineseErrCode string `json:"chineseErrCode,omitempty" codec:"chineseErrCode,omitempty"`
 	NumberCode     int    `json:"numberCode,omitempty" codec:"numberCode,omitempty"`
+	Success        bool   `json:"success,omitempty" codec:"success,omitempty"`
 }
 
 func (e ApiResult) IsError() bool {
