@@ -1,6 +1,8 @@
 package adkckeyword
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/adkckeyword"
@@ -8,8 +10,8 @@ import (
 
 type KeywordDeleteRequest struct {
 	api.BaseRequest
-	AdGroupId    uint64 `json:"ad_group_id,omitempty" codec:"ad_group_id,omitempty"`       //单元id
-	KeyWordsName string `json:"key_words_name,omitempty" codec:"key_words_name,omitempty"` //关键词
+	AdGroupId    uint64 `json:"ad_group_id,omitempty" codec:"ad_group_id,omitempty"`       // 单元id
+	KeyWordsName string `json:"key_words_name,omitempty" codec:"key_words_name,omitempty"` // 关键词
 }
 
 type KeywordDeleteResponse struct {
@@ -58,7 +60,7 @@ func (r KeywordDeleteResult) Error() string {
 }
 
 // 删除关键词
-func KeywordDelete(req *KeywordDeleteRequest) (bool, error) {
+func KeywordDelete(ctx context.Context, req *KeywordDeleteRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := adkckeyword.NewKeywordDeleteRequest()
@@ -66,7 +68,7 @@ func KeywordDelete(req *KeywordDeleteRequest) (bool, error) {
 	r.SetKeyWordsName(req.KeyWordsName)
 
 	var response KeywordDeleteResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return true, nil

@@ -1,6 +1,8 @@
 package plan
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/plan"
@@ -60,7 +62,7 @@ func (r AddBeanPlanData) Error() string {
 	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func AddBeanPlan(req *AddBeanPlanRequest) (uint64, error) {
+func AddBeanPlan(ctx context.Context, req *AddBeanPlanRequest) (uint64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := plan.NewAddBeanPlanRequest()
@@ -89,7 +91,7 @@ func AddBeanPlan(req *AddBeanPlanRequest) (uint64, error) {
 	}
 
 	var response AddBeanPlanResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
 

@@ -1,6 +1,8 @@
 package vender
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/vender"
@@ -73,7 +75,7 @@ func (r SyncResult) Error() string {
 	return sdk.ErrorString(r.Code, r.Desc)
 }
 
-func SyncBind(req *SyncBindRequest) (bool, error) {
+func SyncBind(ctx context.Context, req *SyncBindRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := vender.NewVenderSyncBindRequest()
@@ -112,7 +114,7 @@ func SyncBind(req *SyncBindRequest) (bool, error) {
 	}
 
 	var response SyncBindResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 

@@ -1,6 +1,8 @@
 package campaign
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type CampainShopAddRequest struct {
 	Request *sdk.Request

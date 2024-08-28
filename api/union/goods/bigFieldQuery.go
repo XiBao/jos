@@ -1,6 +1,8 @@
 package goods
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/goods"
@@ -113,7 +115,7 @@ type VideoBigFieldInfo struct {
 }
 
 // 大字段商品查询接口
-func BidFieldQuery(req *BidFieldQueryRequest) ([]BidFieldQueryResp, error) {
+func BidFieldQuery(ctx context.Context, req *BidFieldQueryRequest) ([]BidFieldQueryResp, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := goods.NewBigFieldQueryRequest()
@@ -124,7 +126,7 @@ func BidFieldQuery(req *BidFieldQueryRequest) ([]BidFieldQueryResp, error) {
 	r.SetGoodsReq(goodsReq)
 
 	var response BidFieldQueryResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	var ret BidFieldQueryResult

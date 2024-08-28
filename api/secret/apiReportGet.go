@@ -1,6 +1,8 @@
 package secret
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/secret"
@@ -61,7 +63,7 @@ func (r SecretApiReportResult) Error() string {
 }
 
 // 对加解密等调用信息上报，不包含敏感信息，只负责统计系统性能
-func SecretApiReportGet(req *SecretApiReportGetRequest) error {
+func SecretApiReportGet(ctx context.Context, req *SecretApiReportGetRequest) error {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := secret.NewSecretApiReportGetRequest()
@@ -72,7 +74,7 @@ func SecretApiReportGet(req *SecretApiReportGetRequest) error {
 	r.SetServerUrl(req.ServerUrl)
 
 	var response SecretApiReportGetResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return err
 	}
 	return nil

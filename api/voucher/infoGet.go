@@ -1,6 +1,7 @@
 package voucher
 
 import (
+	"context"
 	"encoding/base64"
 	"fmt"
 
@@ -75,11 +76,11 @@ type Voucher struct {
 type VoucherData struct {
 	Id        string `json:"id"`        // 凭证id
 	Key       string `json:"key"`       // 该凭证对应的密钥，请求密钥时，需要使用该key对业务入参签名，用于获取加密密钥
-	Service   string `json:"service"`   //服务识别码
-	Act       string `json:"act"`       //ignore
-	Effective int64  `json:"effective"` //生效时间戳，客户端需要检查凭证是否已生效，未生效的凭证无法获取密钥
-	Expired   int64  `json:"expired"`   //过期时间戳，客户端需要检查凭证是否已过期，已过期的凭证无法获取密钥
-	SType     int    `json:"stype"`     //ignore
+	Service   string `json:"service"`   // 服务识别码
+	Act       string `json:"act"`       // ignore
+	Effective int64  `json:"effective"` // 生效时间戳，客户端需要检查凭证是否已生效，未生效的凭证无法获取密钥
+	Expired   int64  `json:"expired"`   // 过期时间戳，客户端需要检查凭证是否已过期，已过期的凭证无法获取密钥
+	SType     int    `json:"stype"`     // ignore
 }
 
 func (this Voucher) Verify() error {
@@ -88,14 +89,14 @@ func (this Voucher) Verify() error {
 }
 
 // 凭证获取
-func VoucherInfoGet(req *VoucherInfoGetRequest) (voucherData VoucherData, err error) {
+func VoucherInfoGet(ctx context.Context, req *VoucherInfoGetRequest) (voucherData VoucherData, err error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := voucher.NewVoucherInfoGet()
 	r.SetCustomerUserId(req.CustomerUserId)
 
 	var response VoucherInfoGetResponse
-	if err = client.Execute(r.Request, req.Session, &response); err != nil {
+	if err = client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return
 	}
 

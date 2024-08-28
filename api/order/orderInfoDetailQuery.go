@@ -1,6 +1,8 @@
 package order
 
 import (
+	"context"
+
 	. "github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/order"
@@ -78,7 +80,7 @@ type OrderInfoDetailQueryContent struct {
 	TotalRows  uint    `json:"totalRows"`
 }
 
-func OrderInfoDetailQuery(req *OrderInfoDetailQueryRequest) ([]OrderInfoDetailQueryContent, error) {
+func OrderInfoDetailQuery(ctx context.Context, req *OrderInfoDetailQueryRequest) ([]OrderInfoDetailQueryContent, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := order.NewOrderInfoDetailQueryRequest()
@@ -95,7 +97,7 @@ func OrderInfoDetailQuery(req *OrderInfoDetailQueryRequest) ([]OrderInfoDetailQu
 	}
 
 	var response OrderInfoDetailQueryResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result.Content, nil

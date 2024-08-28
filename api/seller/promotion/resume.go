@@ -1,6 +1,8 @@
 package promotion
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -48,7 +50,7 @@ func (r ResumeData) Error() string {
 	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func Resume(req *ResumeRequest) (bool, error) {
+func Resume(ctx context.Context, req *ResumeRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionResumeRequest()
@@ -61,7 +63,7 @@ func Resume(req *ResumeRequest) (bool, error) {
 	}
 
 	var response ResumeResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Data.ResumeResult, nil

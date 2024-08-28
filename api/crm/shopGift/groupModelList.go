@@ -1,6 +1,8 @@
 package crm
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	crm "github.com/XiBao/jos/sdk/request/crm/shopGift"
@@ -80,14 +82,14 @@ type ShopGiftGroupModel struct {
 	ModelDescList []string `json:"modelDescList"`    // 人群信息描述
 }
 
-func ShopGiftGroupModelList(req *ShopGiftGroupModelListRequest) ([]ShopGiftGroupModel, error) {
+func ShopGiftGroupModelList(ctx context.Context, req *ShopGiftGroupModelListRequest) ([]ShopGiftGroupModel, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewShopGiftGroupModelListRequest()
 	r.SetChannel(req.Channel)
 
 	var response ShopGiftGroupModelListResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result.Data, nil

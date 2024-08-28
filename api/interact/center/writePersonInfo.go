@@ -1,6 +1,8 @@
 package center
 
 import (
+	"context"
+
 	. "github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/interact/center"
@@ -59,8 +61,8 @@ func (r WritePersonInfoResponse1) Error() string {
 }
 
 type WritePersonInfoResult struct {
-	Data bool   `json:"data" codec:"data"` //请求是否成功
-	Code int    `json:"code" codec:"code"` //返回状态码
+	Data bool   `json:"data" codec:"data"` // 请求是否成功
+	Code int    `json:"code" codec:"code"` // 返回状态码
 	Msg  string `json:"msg" codec:"msg"`
 }
 
@@ -72,7 +74,7 @@ func (r WritePersonInfoResult) Error() string {
 	return sdk.ErrorString(r.Code, r.Msg)
 }
 
-func WritePersonInfo(req *WritePersonInfoRequest) (bool, error) {
+func WritePersonInfo(ctx context.Context, req *WritePersonInfoRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewWritePersonInfoRequest()
@@ -93,10 +95,9 @@ func WritePersonInfo(req *WritePersonInfoRequest) (bool, error) {
 	}
 
 	var response WritePersonInfoResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 
 	return response.Response.Result.Data, nil
-
 }

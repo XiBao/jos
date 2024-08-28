@@ -1,6 +1,8 @@
 package order
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/order"
@@ -70,7 +72,7 @@ func (r ReturnType) Error() string {
 }
 
 // 自营订单列表查询
-func OrderListSearch(req *OrderListSearchRequest) ([]uint64, int, error) {
+func OrderListSearch(ctx context.Context, req *OrderListSearchRequest) ([]uint64, int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := order.NewOrderListSearchRequest()
@@ -81,7 +83,7 @@ func OrderListSearch(req *OrderListSearchRequest) ([]uint64, int, error) {
 	r.SetSize(req.Size)
 
 	var response OrderListSearchResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, 0, err
 	}
 

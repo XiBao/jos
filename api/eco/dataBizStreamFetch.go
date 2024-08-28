@@ -1,6 +1,8 @@
 package eco
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/eco"
@@ -125,7 +127,7 @@ type Meta struct {
 }
 
 // 数据数据开放接口
-func BizStreamFetch(req *BizStreamFetchRequest) ([]map[string]interface{}, error) {
+func BizStreamFetch(ctx context.Context, req *BizStreamFetchRequest) ([]map[string]interface{}, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := eco.NewBizStreamFetchRequest()
@@ -161,7 +163,7 @@ func BizStreamFetch(req *BizStreamFetchRequest) ([]map[string]interface{}, error
 		r.SetTicketType(req.TicketType)
 	}
 	var response BizStreamFetchResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	var returnTypeData ReturnTypeData

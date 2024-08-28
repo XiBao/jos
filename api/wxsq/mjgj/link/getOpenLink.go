@@ -1,6 +1,8 @@
 package link
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/wxsq/mjgj/link"
@@ -45,7 +47,7 @@ func (r GetOpenLinkData) Error() string {
 	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func GetOpenLink(req *GetOpenLinkRequest) (string, error) {
+func GetOpenLink(ctx context.Context, req *GetOpenLinkRequest) (string, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := link.NewGetOpenLinkRequest()
@@ -53,7 +55,7 @@ func GetOpenLink(req *GetOpenLinkRequest) (string, error) {
 	r.SetRUrl(req.RUrl)
 
 	var response GetOpenLinkResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return "", err
 	}
 	return response.Data.Result, nil

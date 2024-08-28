@@ -1,6 +1,8 @@
 package goods
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/goods"
@@ -291,7 +293,7 @@ type JFCoupon struct {
 }
 
 type JFCommission struct {
-	Commission          float64 `json:"commission,omitempty"`          //佣金
+	Commission          float64 `json:"commission,omitempty"`          // 佣金
 	CommissionShare     float64 `json:"commissionShare,omitempty"`     // 佣金比例
 	CouponCommission    float64 `json:"couponCommission,omitempty"`    // 券后佣金，（促销价-优惠券面额）*佣金比例
 	PlusCommissionShare float64 `json:"plusCommissionShare,omitempty"` // plus佣金比例，plus用户购买推广者能获取到的佣金比例
@@ -310,7 +312,7 @@ type JFCategory struct {
 }
 
 // 京东联盟精选优质商品，每日更新，可通过频道ID查询各个频道下的精选商品。
-func JingfenQuery(req *JingfenQueryRequest) (*JingfenQueryResult, error) {
+func JingfenQuery(ctx context.Context, req *JingfenQueryRequest) (*JingfenQueryResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := goods.NewJingfenQueryRequest()
@@ -324,7 +326,7 @@ func JingfenQuery(req *JingfenQueryRequest) (*JingfenQueryResult, error) {
 	r.SetGoodsReq(goodsReq)
 
 	var response JingfenQueryResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	var resp JingfenQueryResult

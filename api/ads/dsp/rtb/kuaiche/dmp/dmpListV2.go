@@ -1,6 +1,8 @@
 package dmp
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -61,7 +63,7 @@ type KuaicheDmpListV2ResponseDataData struct {
 	Paginator *dsp.Paginator  `json:"paginator,omitempty" codec:"paginator,omitempty"`
 }
 
-func KuaicheDmpListV2(req *KuaicheDmpListV2Request) (*KuaicheDmpListV2ResponseDataData, error) {
+func KuaicheDmpListV2(ctx context.Context, req *KuaicheDmpListV2Request) (*KuaicheDmpListV2ResponseDataData, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := dmp.NewKuaicheDmpListV2Request()
@@ -71,7 +73,7 @@ func KuaicheDmpListV2(req *KuaicheDmpListV2Request) (*KuaicheDmpListV2ResponseDa
 	}
 
 	var response KuaicheDmpListV2Response
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Responce.Data.Data, nil

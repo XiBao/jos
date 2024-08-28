@@ -1,6 +1,8 @@
 package delivery
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -60,7 +62,7 @@ type KuaicheDeliveryListV2ResponseDataData struct {
 	Paginator  *dsp.Paginator     `json:"paginator,omitempty" codec:"paginator,omitempty"`
 }
 
-func KuaicheDeliveryListV2(req *KuaicheDeliveryListV2Request) (*KuaicheDeliveryListV2ResponseDataData, error) {
+func KuaicheDeliveryListV2(ctx context.Context, req *KuaicheDeliveryListV2Request) (*KuaicheDeliveryListV2ResponseDataData, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := delivery.NewKuaicheDeliveryListV2Request()
@@ -70,7 +72,7 @@ func KuaicheDeliveryListV2(req *KuaicheDeliveryListV2Request) (*KuaicheDeliveryL
 	}
 
 	var response KuaicheDeliveryListV2Response
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Responce.ReturnType.Data, nil

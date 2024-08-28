@@ -1,6 +1,8 @@
 package center
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	center "github.com/XiBao/jos/sdk/request/interact/center/evaluate"
@@ -58,7 +60,7 @@ type EvaluateAnalysis struct {
 	PrizeCount    uint    `json:"prize_count"`    // 获奖评价的数量
 }
 
-func GetEvaluateAnalysisList(req *GetEvaluateAnalysisListRequest) ([]EvaluateAnalysis, error) {
+func GetEvaluateAnalysisList(ctx context.Context, req *GetEvaluateAnalysisListRequest) ([]EvaluateAnalysis, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewGetEvaluateAnalysisListRequest()
@@ -67,7 +69,7 @@ func GetEvaluateAnalysisList(req *GetEvaluateAnalysisListRequest) ([]EvaluateAna
 	r.SetActivityId(req.ActivityId)
 
 	var response GetEvaluateAnalysisListResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result, nil

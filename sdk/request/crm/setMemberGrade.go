@@ -1,6 +1,8 @@
 package crm
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type SetMemberGradeRequest struct {
 	Request *sdk.Request

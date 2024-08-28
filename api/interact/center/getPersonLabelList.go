@@ -1,6 +1,8 @@
 package center
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/interact/center"
@@ -77,7 +79,7 @@ type GetPersonLabelListLabelVal struct {
 	Desc  string `json:"desc" codec:"desc"`
 }
 
-func GetPersonLabelList(req *GetPersonLabelListRequest) ([]GetPersonLabelListLabel, error) {
+func GetPersonLabelList(ctx context.Context, req *GetPersonLabelListRequest) ([]GetPersonLabelListLabel, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewGetPersonLabelListRequest()
@@ -85,7 +87,7 @@ func GetPersonLabelList(req *GetPersonLabelListRequest) ([]GetPersonLabelListLab
 	r.SetChannel(req.Channel)
 
 	var response GetPersonLabelListResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result.DataList, nil

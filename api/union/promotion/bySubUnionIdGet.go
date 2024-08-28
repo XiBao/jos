@@ -1,6 +1,7 @@
 package promotion
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 
@@ -26,7 +27,7 @@ func (r *UnionPromotionBySubUnionIdGetResponse) Error() string {
 }
 
 // 获取通用推广链接
-func UnionPromotionBySubUnionIdGet(req *UnionPromotionCodeRequest) (*PromotionCodeResp, error) {
+func UnionPromotionBySubUnionIdGet(ctx context.Context, req *UnionPromotionCodeRequest) (*PromotionCodeResp, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewUnionPromotionBySubUnionIdRequest()
@@ -43,7 +44,7 @@ func UnionPromotionBySubUnionIdGet(req *UnionPromotionCodeRequest) (*PromotionCo
 	r.SetPromotionCodeReq(codeReq)
 
 	var response UnionPromotionBySubUnionIdGetResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 

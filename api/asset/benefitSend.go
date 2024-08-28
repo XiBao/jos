@@ -1,6 +1,8 @@
 package asset
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/asset"
@@ -73,7 +75,7 @@ type BenefitSendDataConsumptionId struct {
 	ConsumptionId int `json:"consumption_id" codec:"consumption_id"`
 }
 
-func BenefitSend(req *BenefitSendRequest) (int, error) {
+func BenefitSend(ctx context.Context, req *BenefitSendRequest) (int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := asset.NewBenefitSendRequest()
@@ -88,7 +90,7 @@ func BenefitSend(req *BenefitSendRequest) (int, error) {
 	r.SetOpenIdBuyer(req.OpenIdBuyer)
 
 	var response BenefitSendResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
 	return response.Response.Res.Data.ConsumptionId, nil

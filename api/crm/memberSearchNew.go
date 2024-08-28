@@ -1,6 +1,8 @@
 package crm
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
@@ -47,7 +49,7 @@ type MemberSearchNewResult struct {
 	Members     []Member `json:"crm_members,omitempty" codec:"crm_members,omitempty"`
 }
 
-func MemberSearchNew(req *MemberSearchNewRequest) (*MemberSearchNewResult, error) {
+func MemberSearchNew(ctx context.Context, req *MemberSearchNewRequest) (*MemberSearchNewResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewMemberSearchNewRequest()
@@ -88,7 +90,7 @@ func MemberSearchNew(req *MemberSearchNewRequest) (*MemberSearchNewResult, error
 	}
 
 	var response MemberSearchNewResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result, nil

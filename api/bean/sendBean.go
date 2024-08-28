@@ -1,6 +1,8 @@
 package bean
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/bean"
@@ -59,7 +61,7 @@ type SendBeanResult struct {
 	Desc          string `json:"desc" codec:"desc"`
 }
 
-func SendBean(req *SendBeanRequest) (*SendBeanResult, error) {
+func SendBean(ctx context.Context, req *SendBeanRequest) (*SendBeanResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := bean.NewSendBeanRequest()
@@ -81,7 +83,7 @@ func SendBean(req *SendBeanRequest) (*SendBeanResult, error) {
 	}
 
 	var response SendBeanResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result, nil

@@ -1,6 +1,8 @@
 package dmp
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -49,7 +51,7 @@ func (r KuaicheDmpUpdatePriceResponce) Error() string {
 	return "no result data"
 }
 
-func KuaicheDmpUpdatePrice(req *KuaicheDmpUpdatePriceRequest) (bool, error) {
+func KuaicheDmpUpdatePrice(ctx context.Context, req *KuaicheDmpUpdatePriceRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := dmp.NewKuaicheDmpUpdatePriceRequest()
@@ -59,7 +61,7 @@ func KuaicheDmpUpdatePrice(req *KuaicheDmpUpdatePriceRequest) (bool, error) {
 	}
 
 	var response KuaicheDmpUpdatePriceResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Responce.ReturnType.Success, nil

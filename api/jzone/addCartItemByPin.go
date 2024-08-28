@@ -1,6 +1,8 @@
 package jzone
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/jzone"
@@ -8,9 +10,9 @@ import (
 
 type AddCartItemByPinRequest struct {
 	api.BaseRequest
-	Pin    string `json:"pin,omitempty" codec:"pin,omitempty"`       //加密pin
-	ItemId uint64 `json:"itemId,omitempty" codec:"itemId,omitempty"` //skuid
-	Num    uint64 `json:"num,omitempty" codec:"num,omitempty"`       //数量
+	Pin    string `json:"pin,omitempty" codec:"pin,omitempty"`       // 加密pin
+	ItemId uint64 `json:"itemId,omitempty" codec:"itemId,omitempty"` // skuid
+	Num    uint64 `json:"num,omitempty" codec:"num,omitempty"`       // 数量
 }
 
 type AddCartItemByPinResponse struct {
@@ -62,7 +64,7 @@ func (r AddCartItemByPinReturnType) Error() string {
 }
 
 // TODO  通过Pin将商品加入用户购物车
-func AddCartItemByPin(req *AddCartItemByPinRequest) (bool, error) {
+func AddCartItemByPin(ctx context.Context, req *AddCartItemByPinRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := jzone.NewAddCartItemByPinRequest()
@@ -74,7 +76,7 @@ func AddCartItemByPin(req *AddCartItemByPinRequest) (bool, error) {
 	r.SetNum(1)
 
 	var response AddCartItemByPinResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return true, nil

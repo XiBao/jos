@@ -1,6 +1,8 @@
 package adkcunit
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -89,7 +91,7 @@ type ADGroupQuery struct {
 }
 
 // 获取计划下的推广单元列表
-func AdkcunitAdgroupList(req *AdkcunitAdgroupListRequest) ([]ADGroupQuery, int, error) {
+func AdkcunitAdgroupList(ctx context.Context, req *AdkcunitAdgroupListRequest) ([]ADGroupQuery, int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := adkcunit.NewAdkcunitAdgroupListRequest()
@@ -98,10 +100,9 @@ func AdkcunitAdgroupList(req *AdkcunitAdgroupListRequest) ([]ADGroupQuery, int, 
 	r.SetPageNum(req.PageNum)
 
 	var response AdkcunitAdgroupListResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, 0, err
 	}
 
 	return response.Data.Result.Value.Datas, response.Data.Result.Value.Paginator.Items, nil
-
 }

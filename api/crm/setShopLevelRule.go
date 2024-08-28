@@ -1,6 +1,8 @@
 package crm
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
@@ -8,7 +10,7 @@ import (
 
 type SetShopLevelRuleRequest struct {
 	api.BaseRequest
-	CustomerLevelName []string `json:"customerLevelName,omitempty"` //按顺序填写店铺会员等级名称
+	CustomerLevelName []string `json:"customerLevelName,omitempty"` // 按顺序填写店铺会员等级名称
 }
 
 type SetShopLevelRuleResponse struct {
@@ -46,7 +48,7 @@ func (r SetShopLevelRuleData) Error() string {
 }
 
 // TODO 修改会员体系规则
-func SetShopLevelRule(req *SetShopLevelRuleRequest) (bool, error) {
+func SetShopLevelRule(ctx context.Context, req *SetShopLevelRuleRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewSetShopLevelRuleRequest()
@@ -56,9 +58,8 @@ func SetShopLevelRule(req *SetShopLevelRuleRequest) (bool, error) {
 	}
 
 	var response SetShopLevelRuleResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Data.ReturnType.Data, nil
-
 }

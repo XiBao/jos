@@ -1,6 +1,8 @@
 package promotion
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -46,7 +48,7 @@ func (r UserListResponseData) Error() string {
 }
 
 // 店铺促销用户查询
-func UserList(req *UserListRequest) ([]PromotionUserList, error) {
+func UserList(ctx context.Context, req *UserListRequest) ([]PromotionUserList, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionUserListRequest()
@@ -65,7 +67,7 @@ func UserList(req *UserListRequest) ([]PromotionUserList, error) {
 	}
 
 	var response UserListResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.PromotionUserList, nil

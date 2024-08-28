@@ -1,6 +1,8 @@
 package order
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type OrderBonusQueryReq struct {
 	// OptType 时间类型（1.下单时间拉取、2.更新时间拉取）

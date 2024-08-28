@@ -1,6 +1,8 @@
 package promotion
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -47,7 +49,7 @@ func (r GetResponseData) Error() string {
 }
 
 // 促销详情查询
-func Get(req *GetRequest) (*PromotionList, error) {
+func Get(ctx context.Context, req *GetRequest) (*PromotionList, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionGetRequest()
@@ -57,7 +59,7 @@ func Get(req *GetRequest) (*PromotionList, error) {
 	r.SetPromoType(req.PromoType)
 
 	var response GetResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.JosPromotion, nil

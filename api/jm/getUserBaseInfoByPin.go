@@ -1,6 +1,8 @@
 package jm
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/user"
 	"github.com/XiBao/jos/sdk"
@@ -47,7 +49,7 @@ func (r GetUserBaseInfoByPinSubResponse) Error() string {
 }
 
 // 店铺信息查询
-func GetUserBaseInfoByPin(req *GetUserBaseInfoByPinRequest) (*user.UserInfo, error) {
+func GetUserBaseInfoByPin(ctx context.Context, req *GetUserBaseInfoByPinRequest) (*user.UserInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := jm.NewGetUserBaseInfoByPinRequest()
@@ -55,7 +57,7 @@ func GetUserBaseInfoByPin(req *GetUserBaseInfoByPinRequest) (*user.UserInfo, err
 	r.SetLoadType(req.LoadType)
 
 	var response GetUserBaseInfoByPinResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 

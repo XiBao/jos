@@ -1,6 +1,8 @@
 package promotion
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -15,7 +17,6 @@ type SkuAddRequest struct {
 	Seq         string `json:"seq" codec:"seq"`                   // 套装商品展示次序，相同商品的SKU上次序必须一致。（只对套装促销、总价满赠类促销有效）
 	Num         string `json:"num" codec:"num"`                   // 赠品赠送数量，只能送1-3个。(只对赠品促销有效)
 	BindType    string `json:"bind_type" codec:"bind_type"`       // 绑定类型, 可选值：主商品（1），赠品（2), bound == 3 部分商品不参与(3)。(赠品促销、满减送促销中的赠品需要设置为2，其余均设置为1)
-
 }
 type SkuAddResponse struct {
 	ErrorResp *api.ErrorResponnse `json:"error_response,omitempty" codec:"error_response,omitempty"`
@@ -51,7 +52,7 @@ func (r SkuAddResponseData) Error() string {
 }
 
 // 添加参加促销的sku，单次最多添加100个SKU，一个促销最多支持1000个SKU，当基于套装促销添加SKU时，最多可设置3个商品的SKU，并且相同商品的次序要一致；当基于赠品促销添加SKU时，赠品SKU只能是1-5个，每个赠品只能赠送1-3个，赠品的总价应低于主商品中的最小京东价。
-func SkuAdd(req *SkuAddRequest) ([]uint64, error) {
+func SkuAdd(ctx context.Context, req *SkuAddRequest) ([]uint64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionSkuAddRequest()
@@ -72,7 +73,7 @@ func SkuAdd(req *SkuAddRequest) ([]uint64, error) {
 	}
 
 	var response SkuAddResponse
-	if err := client.PostExecute(r.Request, req.Session, &response); err != nil {
+	if err := client.PostExecute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Ids, nil

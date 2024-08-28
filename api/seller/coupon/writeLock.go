@@ -1,6 +1,8 @@
 package coupon
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/coupon"
@@ -49,7 +51,7 @@ func (r CouponWriteLockData) Error() string {
 	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func CouponWriteLock(req *CouponWriteLockRequest) (bool, error) {
+func CouponWriteLock(ctx context.Context, req *CouponWriteLockRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := coupon.NewSellerCouponWriteLockRequest()
@@ -61,7 +63,7 @@ func CouponWriteLock(req *CouponWriteLockRequest) (bool, error) {
 	r.SetCouponId(req.CouponId)
 
 	var response CouponWriteLockResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return true, nil

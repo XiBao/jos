@@ -1,6 +1,8 @@
 package promotion
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -48,7 +50,7 @@ func (r SuspendData) Error() string {
 	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func Suspend(req *SuspendRequest) (bool, error) {
+func Suspend(ctx context.Context, req *SuspendRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionSuspendRequest()
@@ -61,7 +63,7 @@ func Suspend(req *SuspendRequest) (bool, error) {
 	}
 
 	var response SuspendResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Data.SuspendResult, nil

@@ -1,6 +1,8 @@
 package keyword
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -73,7 +75,7 @@ type KuaicheKeywordShopListResponseDataData struct {
 	Paginator *dsp.Paginator      `json:"paginator,omitempty" codec:"paginator,omitempty"`
 }
 
-func KuaicheKeywordShopList(req *KuaicheKeywordShopListRequest) (*KuaicheKeywordShopListResponseDataData, error) {
+func KuaicheKeywordShopList(ctx context.Context, req *KuaicheKeywordShopListRequest) (*KuaicheKeywordShopListResponseDataData, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := keyword.NewKuaicheKeywordShopListRequest()
@@ -111,7 +113,7 @@ func KuaicheKeywordShopList(req *KuaicheKeywordShopListRequest) (*KuaicheKeyword
 	}
 
 	var response KuaicheKeywordShopListResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Responce.ReturnType.Data, nil

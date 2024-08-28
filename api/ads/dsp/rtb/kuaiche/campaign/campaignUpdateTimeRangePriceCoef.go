@@ -1,6 +1,8 @@
 package campaign
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -56,7 +58,7 @@ type KuaicheCampaignUpdateTimeRangePriceCoefResponseReturnType struct {
 	dsp.DataCommonResponse
 }
 
-func KuaicheCampaignUpdateTimeRangePriceCoef(req *KuaicheCampaignUpdateTimeRangePriceCoefRequest) (uint64, error) {
+func KuaicheCampaignUpdateTimeRangePriceCoef(ctx context.Context, req *KuaicheCampaignUpdateTimeRangePriceCoefRequest) (uint64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := campaign.NewKuaicheCampaignUpdateTimeRangePriceCoefRequest()
@@ -73,7 +75,7 @@ func KuaicheCampaignUpdateTimeRangePriceCoef(req *KuaicheCampaignUpdateTimeRange
 	}
 
 	var response KuaicheCampaignUpdateTimeRangePriceCoefResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
 	return response.Responce.ReturnType.Data, nil

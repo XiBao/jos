@@ -1,6 +1,8 @@
 package category
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/category"
@@ -35,7 +37,7 @@ type FindCateByIdData struct {
 }
 
 // 获取单个SKU
-func FindCateById(req *FindCateByIdRequest) (*Category, error) {
+func FindCateById(ctx context.Context, req *FindCateByIdRequest) (*Category, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := category.NewFindCateByIdRequest()
@@ -45,7 +47,7 @@ func FindCateById(req *FindCateByIdRequest) (*Category, error) {
 	r.SetCid(req.Cid)
 
 	var response FindCateByIdResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Category, nil

@@ -1,6 +1,8 @@
 package jm
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/user"
 	"github.com/XiBao/jos/sdk"
@@ -47,7 +49,7 @@ func (r GetJmUserBaseInfoByEncryPinSubResponse) Error() string {
 }
 
 // 用户信息查询
-func GetJmUserBaseInfoByEncryPin(req *GetJmUserBaseInfoByEncryPinRequest) (*user.UserInfo, error) {
+func GetJmUserBaseInfoByEncryPin(ctx context.Context, req *GetJmUserBaseInfoByEncryPinRequest) (*user.UserInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := jm.NewGetJmUserBaseInfoByEncryPinRequest()
@@ -55,7 +57,7 @@ func GetJmUserBaseInfoByEncryPin(req *GetJmUserBaseInfoByEncryPinRequest) (*user
 	r.SetLoadType(req.LoadType)
 
 	var response GetJmUserBaseInfoByEncryPinResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	user := response.Data.UserJosResult

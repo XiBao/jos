@@ -1,6 +1,7 @@
 package goods
 
 import (
+	"context"
 	"strconv"
 	"strings"
 
@@ -75,7 +76,7 @@ type PromotionGoodsResp struct {
 }
 
 // 大字段商品查询接口
-func PromotionGoodsInfoQuery(req *PromotionGoodsInfoQueryRequest) ([]PromotionGoodsResp, error) {
+func PromotionGoodsInfoQuery(ctx context.Context, req *PromotionGoodsInfoQueryRequest) ([]PromotionGoodsResp, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := goods.NewPromotionGoodsInfoQueryRequest()
@@ -86,7 +87,7 @@ func PromotionGoodsInfoQuery(req *PromotionGoodsInfoQueryRequest) ([]PromotionGo
 	r.SetSkuIds(strings.Join(skuIds, ","))
 
 	var response PromotionGoodsInfoQueryResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	var ret PromotionQueryResult

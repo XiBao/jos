@@ -1,6 +1,8 @@
 package center
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	center "github.com/XiBao/jos/sdk/request/interact/center/evaluate"
@@ -68,7 +70,7 @@ type JoinedSku struct {
 	StockNum    int     `json:"stock_num"`
 }
 
-func GetEvaluateJoinedSkuList(req *GetEvaluateJoinedSkuListRequest) ([]JoinedSku, error) {
+func GetEvaluateJoinedSkuList(ctx context.Context, req *GetEvaluateJoinedSkuListRequest) ([]JoinedSku, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewGetEvaluateJoinedSkuListRequest()
@@ -84,7 +86,7 @@ func GetEvaluateJoinedSkuList(req *GetEvaluateJoinedSkuListRequest) ([]JoinedSku
 	}
 
 	var response GetEvaluateJoinedSkuListResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 

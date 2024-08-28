@@ -45,19 +45,16 @@ type Member struct {
 	CustomerEncryPin string `json:"customer_encrypin,omitempty" codec:"customer_encrypin,omitempty"`
 }
 
-
-
-
 type CardMember struct {
-    LevelAtShop     uint8   `json:"levelAtShop,omitempty" codec:"levelAtShop,omitempty"`         // 店铺会员等级
-    AvgOrderPrice   float64 `json:"avgOrderPrice,omitempty" codec:"avgOrderPrice,omitempty"`     // 平均客单价
-    TotalOrderPrice float64 `json:"totalOrderPrice,omitempty" codec:"totalOrderPrice,omitempty"` // 订单总金额
-    FirstOrderDate  string  `json:"firstOrderDate,omitempty" codec:"firstOrderDate,omitempty"`   // 首次订单时间
-    LastOrderDate   string  `json:"lastOrderDate,omitempty" codec:"lastOrderDate,omitempty"`     // 上次订单时间
-    CustomerType    string  `json:"customerType,omitempty" codec:"customerType,omitempty"`       // OPEN_CARD_MEMBER, ORDER_MEMBER    OPEN_CARD_MEMBER, ORDER_MEMBER
-    CustomerPin     string  `json:"customerPin,omitempty" codec:"customerPin,omitempty"`         // pin
-    VenderId        uint64  `json:"venderId,omitempty" codec:"venderId,omitempty"`               // 商家ID
-    Channel         uint    `json:"channel,omitempty" codec:"channel,omitempty"`                 // 渠道码
-    ActivationDate  string  `json:"activationDate,omitempty" codec:"activationDate,omitempty"`   // 开卡时间
-    TotalOrderCount uint    `json:"totalOrderCount,omitempty" codec:"totalOrderCount,omitempty"` // 开卡时间
+	LevelAtShop     uint8   `json:"levelAtShop,omitempty" codec:"levelAtShop,omitempty"`         // 店铺会员等级
+	AvgOrderPrice   float64 `json:"avgOrderPrice,omitempty" codec:"avgOrderPrice,omitempty"`     // 平均客单价
+	TotalOrderPrice float64 `json:"totalOrderPrice,omitempty" codec:"totalOrderPrice,omitempty"` // 订单总金额
+	FirstOrderDate  string  `json:"firstOrderDate,omitempty" codec:"firstOrderDate,omitempty"`   // 首次订单时间
+	LastOrderDate   string  `json:"lastOrderDate,omitempty" codec:"lastOrderDate,omitempty"`     // 上次订单时间
+	CustomerType    string  `json:"customerType,omitempty" codec:"customerType,omitempty"`       // OPEN_CARD_MEMBER, ORDER_MEMBER    OPEN_CARD_MEMBER, ORDER_MEMBER
+	CustomerPin     string  `json:"customerPin,omitempty" codec:"customerPin,omitempty"`         // pin
+	VenderId        uint64  `json:"venderId,omitempty" codec:"venderId,omitempty"`               // 商家ID
+	Channel         uint    `json:"channel,omitempty" codec:"channel,omitempty"`                 // 渠道码
+	ActivationDate  string  `json:"activationDate,omitempty" codec:"activationDate,omitempty"`   // 开卡时间
+	TotalOrderCount uint    `json:"totalOrderCount,omitempty" codec:"totalOrderCount,omitempty"` // 开卡时间
 }

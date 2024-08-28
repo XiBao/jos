@@ -1,6 +1,8 @@
 package promotion
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -55,7 +57,7 @@ func (r CountResponseData) Error() string {
 	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func Count(req *CountRequest) (uint64, error) {
+func Count(ctx context.Context, req *CountRequest) (uint64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionCountRequest()
@@ -109,9 +111,8 @@ func Count(req *CountRequest) (uint64, error) {
 	}
 
 	var response CountResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
 	return response.Data.Count, nil
-
 }

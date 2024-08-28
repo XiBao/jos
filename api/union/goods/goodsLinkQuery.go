@@ -1,6 +1,8 @@
 package goods
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/goods"
@@ -64,7 +66,7 @@ type LinkGoodsResp struct {
 }
 
 // 链接商品查询接口
-func GoodsLinkQuery(req *GoodsLinkQueryRequest) ([]LinkGoodsResp, error) {
+func GoodsLinkQuery(ctx context.Context, req *GoodsLinkQueryRequest) ([]LinkGoodsResp, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := goods.NewGoodsLinkQueryRequest()
@@ -75,7 +77,7 @@ func GoodsLinkQuery(req *GoodsLinkQueryRequest) ([]LinkGoodsResp, error) {
 	r.SetGoodsReq(goodsReq)
 
 	var response GoodsLinkQueryResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result.Data, nil

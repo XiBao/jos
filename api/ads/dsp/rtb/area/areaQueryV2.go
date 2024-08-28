@@ -1,6 +1,8 @@
 package area
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -54,7 +56,7 @@ type AreaQueryV2ResponseData struct {
 	dsp.DataCommonResponse
 }
 
-func AreaQueryV2(req *AreaQueryV2Request) (string, error) {
+func AreaQueryV2(ctx context.Context, req *AreaQueryV2Request) (string, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := area.NewAreaQueryV2Request()
@@ -63,7 +65,7 @@ func AreaQueryV2(req *AreaQueryV2Request) (string, error) {
 	}
 
 	var response AreaQueryV2Response
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return "", err
 	}
 	return response.Responce.Data.Data, nil

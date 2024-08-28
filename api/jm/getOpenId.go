@@ -1,6 +1,8 @@
 package jm
 
 import (
+	"context"
+
 	. "github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/jm"
@@ -56,7 +58,7 @@ func (r GetOpenIdReturnType) Error() string {
 	return sdk.ErrorString(r.Code, r.Message)
 }
 
-func GetOpenId(req GetOpenIdRequest) (GetOpenIdReturnType, error) {
+func GetOpenId(ctx context.Context, req GetOpenIdRequest) (GetOpenIdReturnType, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := jm.NewGetOpenIdRequest()
@@ -64,9 +66,8 @@ func GetOpenId(req GetOpenIdRequest) (GetOpenIdReturnType, error) {
 	r.SetToken(req.Token)
 
 	var response GetOpenIdResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return GetOpenIdReturnType{}, err
 	}
 	return response.Data.ReturnType, nil
-
 }

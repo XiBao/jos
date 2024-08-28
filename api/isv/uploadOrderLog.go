@@ -1,6 +1,8 @@
 package isv
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/isv"
@@ -41,8 +43,8 @@ func (r UploadOrderLogResponse) Error() string {
 }
 
 type UploadOrderLogResult struct {
-	Code string `json:"code,omitempty" codec:"code,omitempty"`     //返回码
-	C    int    `json:"result,omitempty" codec:"result,omitempty"` //是否成功
+	Code string `json:"code,omitempty" codec:"code,omitempty"`     // 返回码
+	C    int    `json:"result,omitempty" codec:"result,omitempty"` // 是否成功
 }
 
 func (r UploadOrderLogResult) IsError() bool {
@@ -53,7 +55,7 @@ func (r UploadOrderLogResult) Error() string {
 	return r.Code
 }
 
-func UploadOrderLog(req *UploadOrderLogRequest) (int, error) {
+func UploadOrderLog(ctx context.Context, req *UploadOrderLogRequest) (int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := isv.NewIsvUploadOrderLogRequest()
@@ -72,7 +74,7 @@ func UploadOrderLog(req *UploadOrderLogRequest) (int, error) {
 	r.Request.IsLogGW = true
 
 	var response UploadOrderLogResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return -1, err
 	}
 	return response.Data.C, nil

@@ -1,6 +1,8 @@
 package adkcunit
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/adkcunit"
@@ -9,7 +11,7 @@ import (
 type AdkcunitStatusUpdateRequest struct {
 	api.BaseRequest
 	Status    uint8  `json:"status"`      // 0 1 2
-	AdGroupId string `json:"ad_group_id"` //支持批量修改  "id1,id2,id3"
+	AdGroupId string `json:"ad_group_id"` // 支持批量修改  "id1,id2,id3"
 }
 
 type AdkcunitStatusUpdateResponse struct {
@@ -62,7 +64,7 @@ func (r AdkcunitStatusUpdateResult) Error() string {
 }
 
 // 更新单元状态
-func AdkcunitStatusUpdate(req *AdkcunitStatusUpdateRequest) (bool, error) {
+func AdkcunitStatusUpdate(ctx context.Context, req *AdkcunitStatusUpdateRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := adkcunit.NewAdkcunitStatusUpdateRequest()
@@ -70,9 +72,8 @@ func AdkcunitStatusUpdate(req *AdkcunitStatusUpdateRequest) (bool, error) {
 	r.SetAdGroupId(req.AdGroupId)
 
 	var response AdkcunitStatusUpdateResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return true, nil
-
 }

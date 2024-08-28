@@ -1,6 +1,8 @@
 package promotion
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -51,7 +53,7 @@ func (r OrdermodeAddResponseData) Error() string {
 }
 
 // 新建总价促销订单规则
-func OrdermodeAdd(req *OrdermodeAddRequest) ([]uint64, error) {
+func OrdermodeAdd(ctx context.Context, req *OrdermodeAddRequest) ([]uint64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionOrdermodeAddRequest()
@@ -75,7 +77,7 @@ func OrdermodeAdd(req *OrdermodeAddRequest) ([]uint64, error) {
 	}
 
 	var response OrdermodeAddResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Ids, nil

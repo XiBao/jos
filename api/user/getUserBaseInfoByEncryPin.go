@@ -1,6 +1,8 @@
 package user
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/user"
@@ -46,7 +48,7 @@ func (r GetUserBaseInfoByEncryPinSubResponse) Error() string {
 }
 
 // 店铺信息查询
-func GetUserBaseInfoByEncryPin(req *GetUserBaseInfoByEncryPinRequest) (*UserInfo, error) {
+func GetUserBaseInfoByEncryPin(ctx context.Context, req *GetUserBaseInfoByEncryPinRequest) (*UserInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := user.NewGetUserBaseInfoByEncryPinRequest()
@@ -54,7 +56,7 @@ func GetUserBaseInfoByEncryPin(req *GetUserBaseInfoByEncryPinRequest) (*UserInfo
 	r.SetLoadType(req.LoadType)
 
 	var response GetUserBaseInfoByEncryPinResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	user := response.Data.UserJosResult

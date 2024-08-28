@@ -1,6 +1,8 @@
 package center
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	center "github.com/XiBao/jos/sdk/request/interact/center/evaluate"
@@ -61,7 +63,7 @@ type GetEvaluateActivityListResult struct {
 	Status    uint8  `json:"status"`
 }
 
-func GetEvaluateActivityList(req *GetEvaluateActivityListRequest) ([]GetEvaluateActivityListResult, error) {
+func GetEvaluateActivityList(ctx context.Context, req *GetEvaluateActivityListRequest) ([]GetEvaluateActivityListResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewGetEvaluateActivityListRequest()
@@ -79,7 +81,7 @@ func GetEvaluateActivityList(req *GetEvaluateActivityListRequest) ([]GetEvaluate
 	}
 
 	var response GetEvaluateActivityListResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result, nil

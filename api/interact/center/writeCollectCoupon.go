@@ -1,6 +1,8 @@
 package center
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/interact/center"
@@ -62,7 +64,7 @@ type WriteCollectCouponResult struct {
 	Msg  string `json:"msg" codec:"msg"`
 }
 
-func WriteCollectCoupon(req *WriteCollectCouponRequest) (bool, error) {
+func WriteCollectCoupon(ctx context.Context, req *WriteCollectCouponRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewWriteCollectCouponRequest()
@@ -78,7 +80,7 @@ func WriteCollectCoupon(req *WriteCollectCouponRequest) (bool, error) {
 	r.SetType(req.Type)
 
 	var response WriteCollectCouponResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Data.Result.Data, nil

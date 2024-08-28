@@ -1,6 +1,7 @@
 package category
 
 import (
+	"context"
 	"strings"
 
 	"github.com/XiBao/jos/api"
@@ -37,7 +38,7 @@ type FindCateByPidData struct {
 }
 
 // 获取单个SKU
-func FindCateByPid(req *FindCateByPidRequest) ([]Category, error) {
+func FindCateByPid(ctx context.Context, req *FindCateByPidRequest) ([]Category, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := category.NewFindCateByPidRequest()
@@ -47,7 +48,7 @@ func FindCateByPid(req *FindCateByPidRequest) ([]Category, error) {
 	r.SetParentCid(req.ParentCid)
 
 	var response FindCateByPidResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Categories, nil

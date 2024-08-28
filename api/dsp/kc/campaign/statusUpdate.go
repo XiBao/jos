@@ -1,6 +1,8 @@
 package campaign
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/campaign"
@@ -62,7 +64,7 @@ func (r StatusUpdateResult) Error() string {
 }
 
 // 修改计划状态
-func StatusUpdate(req *StatusUpdateRequest) (bool, error) {
+func StatusUpdate(ctx context.Context, req *StatusUpdateRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := campaign.NewCampainStatusUpdateRequest()
@@ -71,7 +73,7 @@ func StatusUpdate(req *StatusUpdateRequest) (bool, error) {
 	r.SetCompaignId(req.CompaignId)
 
 	var response StatusUpdateResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return true, nil

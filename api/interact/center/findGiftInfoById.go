@@ -1,6 +1,8 @@
 package center
 
 import (
+	"context"
+
 	. "github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/interact/center"
@@ -44,8 +46,8 @@ func (r FindGiftInfoByIdResponse1) Error() string {
 }
 
 type FindGiftInfoByIdResult struct {
-	Data *GiftInfo `json:"data" codec:"data"` //互动活动信息
-	Code int       `json:"code" codec:"code"` //返回状态码
+	Data *GiftInfo `json:"data" codec:"data"` // 互动活动信息
+	Code int       `json:"code" codec:"code"` // 返回状态码
 	Msg  string    `json:"msg" codec:"msg"`
 }
 
@@ -84,7 +86,7 @@ type GiftInfo struct {
 	Status          uint8  `json:"status"`                    // 活动状态(仅说明，写接口不需要传该值)：1：正在创建中 2: 已经创建 4：活动被商家取消 5: 活动已经结束(包含奖项发完及活动自然结束) 6：活动创建异常 9：进行中
 }
 
-func FindGiftInfoById(req *FindGiftInfoByIdRequest) (*GiftInfo, error) {
+func FindGiftInfoById(ctx context.Context, req *FindGiftInfoByIdRequest) (*GiftInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewFindGiftInfoByIdRequest()
@@ -95,7 +97,7 @@ func FindGiftInfoById(req *FindGiftInfoByIdRequest) (*GiftInfo, error) {
 	r.SetActivityId(req.ActivityId)
 
 	var response FindGiftInfoByIdResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 

@@ -1,6 +1,8 @@
 package promotion
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -48,7 +50,7 @@ func (r RemoveData) Error() string {
 	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func Remove(req *RemoveRequest) (bool, error) {
+func Remove(ctx context.Context, req *RemoveRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionRemoveRequest()
@@ -61,7 +63,7 @@ func Remove(req *RemoveRequest) (bool, error) {
 	}
 
 	var response RemoveResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 

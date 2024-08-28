@@ -1,6 +1,8 @@
 package adkckeyword
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/adkckeyword"
@@ -61,7 +63,7 @@ func (r UpdateKeyWordsResult) Error() string {
 }
 
 // 更新关键词状态
-func UpdateKeyWords(req *UpdateKeyWordsRequest) (bool, error) {
+func UpdateKeyWords(ctx context.Context, req *UpdateKeyWordsRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := adkckeyword.NewUpdateKeyWordsRequest()
@@ -74,9 +76,8 @@ func UpdateKeyWords(req *UpdateKeyWordsRequest) (bool, error) {
 	r.SetAdGroupId(req.AdGroupId)
 
 	var response UpdateKeyWordsResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return true, nil
-
 }

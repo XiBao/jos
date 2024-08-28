@@ -1,6 +1,7 @@
 package order
 
 import (
+	"context"
 	"strings"
 
 	"github.com/XiBao/jos/api"
@@ -66,7 +67,7 @@ func (r OrderDetailResult) Error() string {
 }
 
 // 输入单个自营订单id，得到所有相关订单信息
-func OrderGet(req *OrderGetRequest) ([]JdOrderInfo, error) {
+func OrderGet(ctx context.Context, req *OrderGetRequest) ([]JdOrderInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := order.NewOrderGetRequest()
@@ -74,7 +75,7 @@ func OrderGet(req *OrderGetRequest) ([]JdOrderInfo, error) {
 	r.SetOptionalFields(strings.Join(req.OptionalFields, ","))
 
 	var response OrderGetResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.OrderDetailResult.Orders, nil

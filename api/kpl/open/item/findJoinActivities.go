@@ -1,6 +1,8 @@
 package item
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/kpl/open/item"
@@ -90,7 +92,7 @@ type Coupon struct {
 }
 
 // 输入单个订单id，得到所有相关订单信息
-func FindJoinActivities(req *FindJoinActivitiesRequest) ([]Coupon, error) {
+func FindJoinActivities(ctx context.Context, req *FindJoinActivitiesRequest) ([]Coupon, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := item.NewFindJoinActivitiesRequest()
@@ -98,7 +100,7 @@ func FindJoinActivities(req *FindJoinActivitiesRequest) ([]Coupon, error) {
 	r.SetSku(req.Sku)
 
 	var response FindJoinActivitiesResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	var coupons []Coupon

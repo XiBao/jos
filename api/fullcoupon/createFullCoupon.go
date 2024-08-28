@@ -1,6 +1,8 @@
 package fullcoupon
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/fullcoupon"
@@ -61,14 +63,14 @@ func (r CreateFullCouponResponseReturnType) Error() string {
 	return sdk.ErrorString(r.Code, r.Msg)
 }
 
-func CreateFullCoupon(req *CreateFullCouponRequest) (*CreateFullCouponResponseReturnType, error) {
+func CreateFullCoupon(ctx context.Context, req *CreateFullCouponRequest) (*CreateFullCouponResponseReturnType, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := fullcoupon.NewCreateFullCouponRequest()
 	r.SetParam(req.Param)
 
 	var response CreateFullCouponResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.ReturnType, nil

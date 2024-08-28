@@ -1,6 +1,8 @@
 package messagepushservice
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/messagepushservice"
@@ -58,7 +60,7 @@ func (r PushChatTextMessageReturnType) Error() string {
 }
 
 // 新提供发送咚咚消息接口，方便打标pin
-func PushChatTextMessage(req *PushChatTextMessageRequest) (*PushChatTextMessageReturnType, error) {
+func PushChatTextMessage(ctx context.Context, req *PushChatTextMessageRequest) (*PushChatTextMessageReturnType, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := messagepushservice.NewPushChatTextMessageRequest()
@@ -80,7 +82,7 @@ func PushChatTextMessage(req *PushChatTextMessageRequest) (*PushChatTextMessageR
 	}
 
 	var response PushChatTextMessageResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.ReturnType, nil

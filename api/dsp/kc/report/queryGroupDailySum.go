@@ -1,6 +1,7 @@
 package report
 
 import (
+	"context"
 	"sort"
 	"strconv"
 	"time"
@@ -124,7 +125,7 @@ type GroupDailyRpt struct {
 }
 
 // 查询.快车.单元报表数据
-func QueryGroupDailySum(req *QueryGroupDailySumRequest) ([]GroupDailyRpt, int, error) {
+func QueryGroupDailySum(ctx context.Context, req *QueryGroupDailySumRequest) ([]GroupDailyRpt, int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := report.NewQueryGroupDailySumRequest()
@@ -150,7 +151,7 @@ func QueryGroupDailySum(req *QueryGroupDailySumRequest) ([]GroupDailyRpt, int, e
 	r.SetPageSize(req.PageSize)
 
 	var response QueryGroupDailySumResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, 0, err
 	}
 
@@ -261,8 +262,6 @@ func QueryGroupDailySum(req *QueryGroupDailySumRequest) ([]GroupDailyRpt, int, e
 		sort.Slice(rpts, func(i, j int) bool {
 			return rpts[i].Date.Before(rpts[j].Date)
 		})
-
 	}
 	return rpts, response.Data.Result.Total, nil
-
 }

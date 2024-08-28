@@ -1,6 +1,8 @@
 package vender
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/vender"
@@ -45,9 +47,9 @@ func (r GetVenderStatusData) Error() string {
 }
 
 type VenderStatusReturnType struct {
-	Status uint   `json:"status"` //会员体系状态：0:未开启状态；1:ISV计算；2：官方计算
-	Code   string `json:"code"`   //200：成功，201：信息不存在，400：参数错误，500：系统错误
-	Desc   string `json:"desc"`   //成功，信息不存在，参数错误，服务端异常
+	Status uint   `json:"status"` // 会员体系状态：0:未开启状态；1:ISV计算；2：官方计算
+	Code   string `json:"code"`   // 200：成功，201：信息不存在，400：参数错误，500：系统错误
+	Desc   string `json:"desc"`   // 成功，信息不存在，参数错误，服务端异常
 }
 
 func (r VenderStatusReturnType) IsError() bool {
@@ -59,14 +61,13 @@ func (r VenderStatusReturnType) Error() string {
 }
 
 // TODO 查询会员体系状态
-func GetVenderStatus(req *GetVenderStatusRequest) (uint, error) {
-
+func GetVenderStatus(ctx context.Context, req *GetVenderStatusRequest) (uint, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := vender.NewGetVenderStatusRequest()
 
 	var response GetVenderStatusResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
 	return response.Data.ReturnType.Status, nil

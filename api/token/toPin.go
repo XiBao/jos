@@ -1,6 +1,8 @@
 package token
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/token"
@@ -50,7 +52,7 @@ type GetencryptPinResult struct {
 }
 
 // 输入单个订单id，得到所有相关订单信息
-func TokenToPin(req *TokenToPinRequest) (string, error) {
+func TokenToPin(ctx context.Context, req *TokenToPinRequest) (string, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := token.NewTokenToPinRequest()
@@ -58,7 +60,7 @@ func TokenToPin(req *TokenToPinRequest) (string, error) {
 	r.SetSource(req.Source)
 
 	var response TokenToPinResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return "", err
 	}
 	return response.Data.Result.Pin, nil

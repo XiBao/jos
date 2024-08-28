@@ -1,6 +1,8 @@
 package jm
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/jm"
@@ -48,10 +50,10 @@ func (r GetEncryptPinNewData) Error() string {
 }
 
 type GetEncryptPinNewReturnType struct {
-	Message   string `json:"message,omitempty" codec:"message,omitempty"`     //接口的执行信息
-	Pin       string `json:"pin,omitempty" codec:"pin,omitempty"`             //用户pin
-	Code      int64  `json:"code,omitempty" codec:"code,omitempty"`           //状态码
-	RequestId string `json:"requestId,omitempty" codec:"requestId,omitempty"` //请求id
+	Message   string `json:"message,omitempty" codec:"message,omitempty"`     // 接口的执行信息
+	Pin       string `json:"pin,omitempty" codec:"pin,omitempty"`             // 用户pin
+	Code      int64  `json:"code,omitempty" codec:"code,omitempty"`           // 状态码
+	RequestId string `json:"requestId,omitempty" codec:"requestId,omitempty"` // 请求id
 }
 
 func (r GetEncryptPinNewReturnType) IsError() bool {
@@ -62,7 +64,7 @@ func (r GetEncryptPinNewReturnType) Error() string {
 	return sdk.ErrorString(r.Code, r.Message)
 }
 
-func GetEncryptPinNew(req *GetEncryptPinNewRequest) (string, error) {
+func GetEncryptPinNew(ctx context.Context, req *GetEncryptPinNewRequest) (string, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := jm.NewGetEncryptPinNewRequest()
@@ -70,9 +72,8 @@ func GetEncryptPinNew(req *GetEncryptPinNewRequest) (string, error) {
 	r.SetSource(req.Source)
 
 	var response GetEncryptPinNewResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return "", err
 	}
 	return response.Data.ReturnType.Pin, nil
-
 }

@@ -1,6 +1,8 @@
 package fullcoupon
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/fullcoupon"
@@ -65,7 +67,7 @@ func (r FullCouponGetTrendDataResponseData) Error() string {
 	return sdk.ErrorString(r.Code, r.Msg)
 }
 
-func GetTrendData(req *FullCouponGetTrendDataRequest) ([]PromoTrendData, error) {
+func GetTrendData(ctx context.Context, req *FullCouponGetTrendDataRequest) ([]PromoTrendData, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := fullcoupon.NewFullCouponGetTrendDataRequest()
@@ -76,7 +78,7 @@ func GetTrendData(req *FullCouponGetTrendDataRequest) ([]PromoTrendData, error) 
 	r.SetEndDate(req.EndDate)
 
 	var response FullCouponGetTrendDataResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result.Data, nil

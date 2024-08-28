@@ -1,6 +1,8 @@
 package campaign
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/campaign"
@@ -8,8 +10,8 @@ import (
 
 type DaybudgetUpdateRequest struct {
 	api.BaseRequest
-	CampaignId int    `json:"campaignId,omitempty" codec:"campaignId,omitempty"` //计划id
-	DayBudget  uint64 `json:"day_budget,omitempty" codec:"day_budget,omitempty"` //预算
+	CampaignId int    `json:"campaignId,omitempty" codec:"campaignId,omitempty"` // 计划id
+	DayBudget  uint64 `json:"day_budget,omitempty" codec:"day_budget,omitempty"` // 预算
 }
 
 type DaybudgetUpdateResponse struct {
@@ -62,7 +64,7 @@ func (r DaybudgetUpdateResult) Error() string {
 }
 
 // 修改计划日限额
-func DaybudgetUpdate(req *DaybudgetUpdateRequest) (bool, error) {
+func DaybudgetUpdate(ctx context.Context, req *DaybudgetUpdateRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := campaign.NewCampainDaybudgetUpdateRequest()
@@ -71,7 +73,7 @@ func DaybudgetUpdate(req *DaybudgetUpdateRequest) (bool, error) {
 	r.SetDayBudget(req.DayBudget)
 
 	var response DaybudgetUpdateResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return true, nil

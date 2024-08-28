@@ -1,6 +1,8 @@
 package crm
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type SetShopLevelRuleRequest struct {
 	Request *sdk.Request

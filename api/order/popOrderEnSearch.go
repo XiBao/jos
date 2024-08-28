@@ -1,6 +1,7 @@
 package order
 
 import (
+	"context"
 	"strconv"
 	"strings"
 
@@ -75,7 +76,7 @@ func (r SearchOrderInfo) Error() string {
 }
 
 // 根据条件检索订单信息 （仅适用于SOP、LBP，SOPL类型，FBP类型请调取FBP订单检索 ）
-func PopOrderEnSearch(req *PopOrderEnSearchRequest) ([]OrderInfo, int, error) {
+func PopOrderEnSearch(ctx context.Context, req *PopOrderEnSearchRequest) ([]OrderInfo, int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := order.NewPopOrderEnSearchRequest()
@@ -93,7 +94,7 @@ func PopOrderEnSearch(req *PopOrderEnSearchRequest) ([]OrderInfo, int, error) {
 	r.SetDateType(int(req.DateType))
 
 	var response PopOrderEnSearchResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, 0, err
 	}
 	return response.Data.SearchOrderInfo.OrderInfoList, response.Data.SearchOrderInfo.OrderTotal, nil

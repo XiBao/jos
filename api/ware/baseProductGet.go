@@ -1,6 +1,7 @@
 package ware
 
 import (
+	"context"
 	"strconv"
 	"strings"
 
@@ -37,7 +38,7 @@ type WareBaseProductGetData struct {
 }
 
 // 获取单个SKU
-func WareBaseProductGet(req *WareBaseProductGetRequest) ([]ProductsBase, error) {
+func WareBaseProductGet(ctx context.Context, req *WareBaseProductGetRequest) ([]ProductsBase, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := ware.NewWareBaseproductGetRequest()
@@ -49,7 +50,7 @@ func WareBaseProductGet(req *WareBaseProductGetRequest) ([]ProductsBase, error) 
 	r.SetBaseFields(req.BaseFields)
 
 	var response WareBaseProductGetResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result, nil

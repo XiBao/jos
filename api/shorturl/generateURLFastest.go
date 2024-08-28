@@ -1,6 +1,8 @@
 package shorturl
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/shorturl"
@@ -66,7 +68,7 @@ func (r GenerateURLFastestResult) Error() string {
 }
 
 // 生成短域新的api接口
-func GenerateURLFastest(req *GenerateURLFastestRequest) (*GenerateURLFastestResult, error) {
+func GenerateURLFastest(ctx context.Context, req *GenerateURLFastestRequest) (*GenerateURLFastestResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := shorturl.NewGenerateURLFastestRequest()
@@ -76,7 +78,7 @@ func GenerateURLFastest(req *GenerateURLFastestRequest) (*GenerateURLFastestResu
 	r.SetExpiredDays(req.ExpiredDays)
 
 	var response GenerateURLFastestResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result, nil

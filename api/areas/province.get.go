@@ -1,6 +1,8 @@
 package areas
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/areas"
@@ -42,13 +44,13 @@ func (r AreasProvinceGetResponse) Error() string {
 	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func ProvinceGet(req *ProvinceGetRequest) ([]Result, error) {
+func ProvinceGet(ctx context.Context, req *ProvinceGetRequest) ([]Result, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := areas.NewAreasProvinceGetRequest()
 
 	var response ProvinceGetResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.AreasProvinceGetResponse.AreasServiceResponse.Data, nil

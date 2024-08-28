@@ -1,6 +1,8 @@
 package campaign
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -55,7 +57,7 @@ type KuaicheCampaignUpdateDateV2ResponseData struct {
 	dsp.DataCommonResponse
 }
 
-func KuaicheCampaignUpdateDateV2(req *KuaicheCampaignUpdateDateV2Request) (bool, error) {
+func KuaicheCampaignUpdateDateV2(ctx context.Context, req *KuaicheCampaignUpdateDateV2Request) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := campaign.NewKuaicheCampaignUpdateDateV2Request()
@@ -65,7 +67,7 @@ func KuaicheCampaignUpdateDateV2(req *KuaicheCampaignUpdateDateV2Request) (bool,
 	}
 
 	var response KuaicheCampaignUpdateDateV2Response
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Responce.Data.Success, nil

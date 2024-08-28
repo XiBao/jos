@@ -1,6 +1,8 @@
 package campaign
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -55,7 +57,7 @@ type KuaicheCampaignGetV2ResponseData struct {
 	dsp.DataCommonResponse
 }
 
-func KuaicheCampaignGetV2(req *KuaicheCampaignGetV2Request) (*dsp.Campaign, error) {
+func KuaicheCampaignGetV2(ctx context.Context, req *KuaicheCampaignGetV2Request) (*dsp.Campaign, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := campaign.NewKuaicheCampaignGetV2Request()
@@ -65,7 +67,7 @@ func KuaicheCampaignGetV2(req *KuaicheCampaignGetV2Request) (*dsp.Campaign, erro
 	}
 
 	var response KuaicheCampaignGetV2Response
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Responce.Data.Data, nil

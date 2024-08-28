@@ -1,6 +1,8 @@
 package imgzone
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/imgzone"
@@ -48,7 +50,7 @@ func (c CategoryQueryData) Error() string {
 }
 
 // 根据分类id、分类名称、父分类等查询分类信息
-func CategoryQuery(req *CategoryQueryRequest) ([]Categroy, error) {
+func CategoryQuery(ctx context.Context, req *CategoryQueryRequest) ([]Categroy, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := imgzone.NewCategoryQueryRequest()
@@ -63,7 +65,7 @@ func CategoryQuery(req *CategoryQueryRequest) ([]Categroy, error) {
 	}
 
 	var response CategoryQueryResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.CateList, nil

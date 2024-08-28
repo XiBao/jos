@@ -1,6 +1,8 @@
 package sku
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ware"
 	"github.com/XiBao/jos/sdk"
@@ -70,7 +72,7 @@ type SearchSkuListPage struct {
 }
 
 // 根据条件检索订单信息 （仅适用于SOP、LBP，SOPL类型，FBP类型请调取FBP订单检索 ）
-func SearchSkuList(req *SearchSkuListRequest) (*SearchSkuListPage, error) {
+func SearchSkuList(ctx context.Context, req *SearchSkuListRequest) (*SearchSkuListPage, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := sku.NewSearchSkuListRequest()
@@ -103,7 +105,7 @@ func SearchSkuList(req *SearchSkuListRequest) (*SearchSkuListPage, error) {
 	}
 
 	var response SearchSkuListResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Page, nil

@@ -1,6 +1,8 @@
 package crm
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	crm "github.com/XiBao/jos/sdk/request/crm/shopGift"
@@ -62,14 +64,14 @@ func (r ShopGiftCloseResult) Error() string {
 	return sdk.ErrorString(r.Code, r.Desc)
 }
 
-func ShopGiftClose(req *ShopGiftCloseRequest) (bool, error) {
+func ShopGiftClose(ctx context.Context, req *ShopGiftCloseRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewShopGiftCloseRequest()
 	r.SetActivityId(req.ActivityId)
 
 	var response ShopGiftCloseResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Data.Result.Data, nil

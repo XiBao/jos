@@ -1,6 +1,8 @@
 package keyword
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -55,7 +57,7 @@ type KuaicheKeywordQueryV2ResponseData struct {
 	dsp.DataCommonResponse
 }
 
-func KuaicheKeywordQueryV2(req *KuaicheKeywordQueryV2Request) ([]dsp.KeywordQueryData, error) {
+func KuaicheKeywordQueryV2(ctx context.Context, req *KuaicheKeywordQueryV2Request) ([]dsp.KeywordQueryData, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := keyword.NewKuaicheKeywordQueryV2Request()
@@ -65,7 +67,7 @@ func KuaicheKeywordQueryV2(req *KuaicheKeywordQueryV2Request) ([]dsp.KeywordQuer
 	}
 
 	var response KuaicheKeywordQueryV2Response
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Responce.Data.Data, nil

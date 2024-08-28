@@ -1,6 +1,8 @@
 package adgroup
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -60,7 +62,7 @@ type KuaicheAdgroupListV2ResponseDataData struct {
 	Paginator *dsp.Paginator    `json:"paginator,omitempty" codec:"paginator,omitempty"`
 }
 
-func KuaicheAdgroupListV2(req *KuaicheAdgroupListV2Request) (*KuaicheAdgroupListV2ResponseDataData, error) {
+func KuaicheAdgroupListV2(ctx context.Context, req *KuaicheAdgroupListV2Request) (*KuaicheAdgroupListV2ResponseDataData, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := adgroup.NewKuaicheAdgroupListV2Request()
@@ -70,7 +72,7 @@ func KuaicheAdgroupListV2(req *KuaicheAdgroupListV2Request) (*KuaicheAdgroupList
 	}
 
 	var response KuaicheAdgroupListV2Response
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Responce.Data.Data, nil

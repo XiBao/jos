@@ -1,6 +1,8 @@
 package campaign
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/campaign"
@@ -76,16 +78,15 @@ type GetValue struct {
 }
 
 // 查询.快车.计划信息（指定计划ID）
-func Get(req *GetRequest) (*GetValue, error) {
+func Get(ctx context.Context, req *GetRequest) (*GetValue, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := campaign.NewCampainGetRequest()
 	r.SetCampaignId(req.CampaignId)
 
 	var response GetResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result.Value, nil
-
 }

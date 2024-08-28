@@ -1,6 +1,8 @@
 package center
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/interact/center"
@@ -91,7 +93,7 @@ func (r FindCollectInfoResult) Error() string {
 	return sdk.ErrorString(r.Code, r.Msg)
 }
 
-func FindCollectInfo(req *FindCollectInfoRequest) ([]FindCollectInfoDetails, error) {
+func FindCollectInfo(ctx context.Context, req *FindCollectInfoRequest) ([]FindCollectInfoDetails, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewFindCollectInfoRequest()
@@ -103,7 +105,7 @@ func FindCollectInfo(req *FindCollectInfoRequest) ([]FindCollectInfoDetails, err
 	r.SetType(req.Type)
 
 	var response FindCollectInfoResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 

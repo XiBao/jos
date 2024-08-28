@@ -1,6 +1,7 @@
 package promotion
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 
@@ -61,7 +62,7 @@ type PromotionCodeResp struct {
 }
 
 // 获取通用推广链接
-func UnionPromotionCodeGet(req *UnionPromotionCodeRequest) (string, error) {
+func UnionPromotionCodeGet(ctx context.Context, req *UnionPromotionCodeRequest) (string, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewUnionPromotionCodeRequest()
@@ -77,7 +78,7 @@ func UnionPromotionCodeGet(req *UnionPromotionCodeRequest) (string, error) {
 	r.SetPromotionCodeReq(codeReq)
 
 	var response UnionPromotionCodeResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return "", err
 	}
 

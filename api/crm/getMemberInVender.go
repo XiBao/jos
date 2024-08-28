@@ -1,6 +1,8 @@
 package crm
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
@@ -36,14 +38,14 @@ type GetMemberInVenderSubData struct {
 	CustomerInfoEs *CustomerInfoEs `json:"customerInfoEs,omitempty" codec:"customerInfoEs,omitempty"`
 }
 
-func GetMemberInVender(req *GetMemberInVenderRequest) (*CustomerInfoEs, error) {
+func GetMemberInVender(ctx context.Context, req *GetMemberInVenderRequest) (*CustomerInfoEs, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewGetMemberInVenderRequest()
 	r.SetCustomerPin(req.CustomerPin)
 
 	var response GetMemberInVenderResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result.CustomerInfoEs, nil

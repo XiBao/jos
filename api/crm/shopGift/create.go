@@ -1,6 +1,8 @@
 package crm
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	crm "github.com/XiBao/jos/sdk/request/crm/shopGift"
@@ -80,7 +82,7 @@ func (r ShopGiftCreateResult) Error() string {
 	return sdk.ErrorString(r.Code, r.Desc)
 }
 
-func ShopGiftCreate(req *ShopGiftCreateRequest) (uint64, error) {
+func ShopGiftCreate(ctx context.Context, req *ShopGiftCreateRequest) (uint64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewShopGiftCreateRequest()
@@ -113,7 +115,7 @@ func ShopGiftCreate(req *ShopGiftCreateRequest) (uint64, error) {
 	}
 
 	var response ShopGiftCreateResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
 	return response.Data.Result.Data, nil

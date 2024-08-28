@@ -1,6 +1,8 @@
 package center
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	center "github.com/XiBao/jos/sdk/request/interact/center/evaluate"
@@ -75,7 +77,7 @@ func (r CreateEvaluateActivityWithResultData) Error() string {
 	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func CreateEvaluateActivityWithResult(req *CreateEvaluateActivityWithResultRequest) (uint64, error) {
+func CreateEvaluateActivityWithResult(ctx context.Context, req *CreateEvaluateActivityWithResultRequest) (uint64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewCreateEvaluateActivityWithResultRequest()
@@ -179,7 +181,7 @@ func CreateEvaluateActivityWithResult(req *CreateEvaluateActivityWithResultReque
 	}
 
 	var response CreateEvaluateActivityWithResultResponse
-	if err := client.PostExecute(r.Request, req.Session, &response); err != nil {
+	if err := client.PostExecute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
 	return response.Data.Result, nil

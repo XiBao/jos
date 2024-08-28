@@ -1,6 +1,8 @@
 package adgroup
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -59,7 +61,7 @@ type KuaicheAdgroupGetV2ResponseDataAdgroup struct {
 	Adgroup *dsp.Adgroup `json:"adGroup,omitempty" codec:"adGroup,omitempty"`
 }
 
-func KuaicheAdgroupGetV2(req *KuaicheAdgroupGetV2Request) (*dsp.Adgroup, error) {
+func KuaicheAdgroupGetV2(ctx context.Context, req *KuaicheAdgroupGetV2Request) (*dsp.Adgroup, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := adgroup.NewKuaicheAdgroupGetV2Request()
@@ -69,7 +71,7 @@ func KuaicheAdgroupGetV2(req *KuaicheAdgroupGetV2Request) (*dsp.Adgroup, error) 
 	}
 
 	var response KuaicheAdgroupGetV2Response
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Responce.Data.Data.Adgroup, nil

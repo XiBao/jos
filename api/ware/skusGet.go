@@ -1,6 +1,7 @@
 package ware
 
 import (
+	"context"
 	"strings"
 
 	"github.com/XiBao/jos/api"
@@ -48,7 +49,7 @@ func (r SkusGetSubResponse) Error() string {
 }
 
 // 根据条件检索订单信息 （仅适用于SOP、LBP，SOPL类型，FBP类型请调取FBP订单检索 ）
-func SkusGet(req *SkusGetRequest) ([]Sku2, error) {
+func SkusGet(ctx context.Context, req *SkusGetRequest) ([]Sku2, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := ware.NewWareSkusGetRequest()
@@ -56,7 +57,7 @@ func SkusGet(req *SkusGetRequest) ([]Sku2, error) {
 	r.SetFields(strings.Join(req.Fields, ","))
 
 	var response SkusGetResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Skus, nil

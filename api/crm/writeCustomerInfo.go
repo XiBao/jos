@@ -1,6 +1,8 @@
 package crm
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
@@ -62,14 +64,14 @@ func (r WriteCustomerInfoResult) Error() string {
 }
 
 // 获取单个SKU
-func WriteCustomerInfo(req *WriteCustomerInfoRequest) (bool, error) {
+func WriteCustomerInfo(ctx context.Context, req *WriteCustomerInfoRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewWriteCustomerInfoRequest()
 	r.SetLinkUrl(req.LinkUrl)
 
 	var response WriteCustomerInfoResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Data.Result.Data, nil

@@ -1,6 +1,8 @@
 package follow
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/follow"
@@ -49,7 +51,7 @@ type IsFollowByPinAndVidResult struct {
 	Code string `json:"code,omitempty" codec:"code,omitempty"`
 }
 
-func IsFollowByPinAndVid(req *IsFollowByPinAndVidRequest) (bool, error) {
+func IsFollowByPinAndVid(ctx context.Context, req *IsFollowByPinAndVidRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := follow.NewIsFollowByPinAndVidRequest()
@@ -57,7 +59,7 @@ func IsFollowByPinAndVid(req *IsFollowByPinAndVidRequest) (bool, error) {
 	r.SetShopId(req.ShopId)
 
 	var response IsFollowByPinAndVidResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Data.Result.Data, nil

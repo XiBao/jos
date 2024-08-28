@@ -1,6 +1,8 @@
 package follow
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/follow"
@@ -8,8 +10,8 @@ import (
 
 type FollowProductRequest struct {
 	api.BaseRequest
-	Pin       string `json:"pin,omitempty" codec:"pin,omitempty"`             //加密pin
-	ProductId uint64 `json:"productId,omitempty" codec:"productId,omitempty"` //skuid
+	Pin       string `json:"pin,omitempty" codec:"pin,omitempty"`             // 加密pin
+	ProductId uint64 `json:"productId,omitempty" codec:"productId,omitempty"` // skuid
 }
 
 type FollowProductResponse struct {
@@ -49,8 +51,8 @@ func (r FollowProductData) Error() string {
 
 type FollowProductResult struct {
 	Msg  string `json:"msg,omitempty" codec:"msg,omitempty"`
-	Code string `json:"code,omitempty" codec:"code,omitempty"` //状态码
-	Data bool   `json:"data,omitempty" codec:"data,omitempty"` //是否成功
+	Code string `json:"code,omitempty" codec:"code,omitempty"` // 状态码
+	Data bool   `json:"data,omitempty" codec:"data,omitempty"` // 是否成功
 }
 
 func (r FollowProductResult) IsError() bool {
@@ -62,7 +64,7 @@ func (r FollowProductResult) Error() string {
 }
 
 // TODO  通过pin将商品加入用户关注栏
-func FollowProduct(req *FollowProductRequest) (bool, error) {
+func FollowProduct(ctx context.Context, req *FollowProductRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := follow.NewFollowProductComplexWriteFollow()
@@ -70,7 +72,7 @@ func FollowProduct(req *FollowProductRequest) (bool, error) {
 	r.SetProductId(req.ProductId)
 
 	var response FollowProductResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Data.Result.Data, nil

@@ -1,6 +1,8 @@
 package ware
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/ware"
@@ -44,14 +46,14 @@ func (r MobileBigFieldData) Error() string {
 	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func MobileBigField(req *MobileBigFieldRequest) (string, error) {
+func MobileBigField(ctx context.Context, req *MobileBigFieldRequest) (string, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := ware.NewMobileBigFieldRequest()
 	r.SetSkuId(req.SkuId)
 
 	var response MobileBigFieldResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return "", err
 	}
 	return response.Data.Result, nil
