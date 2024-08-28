@@ -83,7 +83,7 @@ func (o *Otel) WithSpan(ctx context.Context, methodName string, req *http.Reques
 		o.histogram.Record(ctx, time.Since(startTime).Milliseconds(), metric.WithAttributes(o.attrs...))
 	}
 	if o.counter != nil {
-		counterAttrs := append(o.attrs, semconv.URLPath(req.URL.Path))
+		counterAttrs := append(o.attrs, semconv10.HTTPTargetKey.String(methodName))
 		o.counter.Add(ctx, 1, metric.WithAttributes(counterAttrs...))
 	}
 	if !span.IsRecording() {
