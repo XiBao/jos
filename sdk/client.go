@@ -55,10 +55,12 @@ func GetOauthURL(appKey, rURI, state, scope string) string {
 
 // create new client
 func NewClient(appKey string, secretKey string) *Client {
-	return &Client{
+	clt := &Client{
 		AppKey:    appKey,
 		SecretKey: secretKey,
 	}
+	clt.WithTracer("")
+	return clt
 }
 
 func (c *Client) Logger() logger.Logger {
