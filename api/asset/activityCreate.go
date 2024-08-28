@@ -1,6 +1,8 @@
 package asset
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/asset"
@@ -70,7 +72,7 @@ type ActivityCreateToken struct {
 	Token string `json:"token" codec:"token"`
 }
 
-func ActivityCreate(req *ActivityCreateRequest) (string, error) {
+func ActivityCreate(ctx context.Context, req *ActivityCreateRequest) (string, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := asset.NewActivityCreateRequest()
@@ -82,7 +84,7 @@ func ActivityCreate(req *ActivityCreateRequest) (string, error) {
 	r.SetDetails(req.Details)
 
 	var response ActivityCreateResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return "", err
 	}
 	return response.Response.Res.Data.Token, nil

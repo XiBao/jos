@@ -1,6 +1,8 @@
 package keyword
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -55,7 +57,7 @@ type KuaicheKeywordBootRecommendListV2ResponseData struct {
 	dsp.DataCommonResponse
 }
 
-func KuaicheKeywordBootRecommendListV2(req *KuaicheKeywordBootRecommendListV2Request) ([]dsp.KeywordRecommend, error) {
+func KuaicheKeywordBootRecommendListV2(ctx context.Context, req *KuaicheKeywordBootRecommendListV2Request) ([]dsp.KeywordRecommend, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := keyword.NewKuaicheKeywordBootRecommendListV2Request()
@@ -65,7 +67,7 @@ func KuaicheKeywordBootRecommendListV2(req *KuaicheKeywordBootRecommendListV2Req
 	}
 
 	var response KuaicheKeywordBootRecommendListV2Response
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Responce.Data.Data, nil

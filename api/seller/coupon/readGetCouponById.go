@@ -1,6 +1,8 @@
 package coupon
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/coupon"
@@ -46,7 +48,7 @@ func (r ResponseData) Error() string {
 	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func CouponReadGetCouponById(req *CouponReadGetCouponByIdRequest) (*Coupon, error) {
+func CouponReadGetCouponById(ctx context.Context, req *CouponReadGetCouponByIdRequest) (*Coupon, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := coupon.NewSellerCouponReadGetCouponByIdRequest()
@@ -61,9 +63,8 @@ func CouponReadGetCouponById(req *CouponReadGetCouponByIdRequest) (*Coupon, erro
 	}
 
 	var response CouponReadGetCouponByIdResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.JosCoupon, nil
-
 }

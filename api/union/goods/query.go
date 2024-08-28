@@ -1,6 +1,8 @@
 package goods
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/goods"
@@ -140,7 +142,7 @@ type GoodsResp struct {
 }
 
 // 查询商品及优惠券信息，返回的结果可调用转链接口生成单品或二合一推广链接。支持按SKUID、关键词、优惠券基本属性、是否拼购、是否爆款等条件查询，建议不要同时传入SKUID和其他字段，以获得较多的结果。支持按价格、佣金比例、佣金、引单量等维度排序。用优惠券链接调用转链接口时，需传入搜索接口link字段返回的原始优惠券链接，切勿对链接进行任何encode、decode操作，否则将导致转链二合一推广链接时校验失败。
-func Query(req *QueryRequest) (*QueryResult, error) {
+func Query(ctx context.Context, req *QueryRequest) (*QueryResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := goods.NewQueryRequest()
@@ -197,7 +199,7 @@ func Query(req *QueryRequest) (*QueryResult, error) {
 	r.SetGoodsReqDTO(goodsReq)
 
 	var response QueryResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	var resp QueryResult

@@ -1,6 +1,8 @@
 package campaign
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/campaign"
@@ -8,8 +10,8 @@ import (
 
 type AddRequest struct {
 	api.BaseRequest
-	Name      string `json:"name,omitempty" codec:"name,omitempty"`             //计划名称
-	DayBudget int    `json:"day_budget,omitempty" codec:"day_budget,omitempty"` //预算
+	Name      string `json:"name,omitempty" codec:"name,omitempty"`             // 计划名称
+	DayBudget int    `json:"day_budget,omitempty" codec:"day_budget,omitempty"` // 预算
 }
 
 type AddResponse struct {
@@ -59,7 +61,7 @@ func (r AddResult) Error() string {
 }
 
 // 新建计划
-func Add(req *AddRequest) (bool, error) {
+func Add(ctx context.Context, req *AddRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := campaign.NewCampainShopAddRequest()
@@ -68,7 +70,7 @@ func Add(req *AddRequest) (bool, error) {
 	r.SetDayBudget(req.DayBudget)
 
 	var response AddResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return true, nil

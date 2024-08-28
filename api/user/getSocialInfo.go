@@ -1,6 +1,8 @@
 package user
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/user"
@@ -45,14 +47,14 @@ func (r GetSocialInfoData) Error() string {
 }
 
 // 店铺信息查询
-func GetSocialInfo(req *GetSocialInfoRequest) (*SocialInfo, error) {
+func GetSocialInfo(ctx context.Context, req *GetSocialInfoRequest) (*SocialInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := user.NewGetSocialInfoRequest()
 	r.SetPin(req.Pin)
 
 	var response GetSocialInfoResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	user := response.Data.Info

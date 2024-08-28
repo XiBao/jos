@@ -1,6 +1,8 @@
 package asc
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type ServiceAndRefundViewRequest struct {
 	Request *sdk.Request

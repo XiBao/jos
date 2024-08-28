@@ -1,6 +1,8 @@
 package coupon
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/coupon"
@@ -65,7 +67,7 @@ func (r PromoCouponCheckDiscountAuthResult) Error() string {
 	return sdk.ErrorString(r.Code, r.Msg)
 }
 
-func PromoCouponCheckDiscountAuth(req *PromoCouponCheckDiscountAuthRequest) (bool, error) {
+func PromoCouponCheckDiscountAuth(ctx context.Context, req *PromoCouponCheckDiscountAuthRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := coupon.NewPromoCouponCheckDiscountAuthRequest()
@@ -81,7 +83,7 @@ func PromoCouponCheckDiscountAuth(req *PromoCouponCheckDiscountAuthRequest) (boo
 	}
 
 	var response PromoCouponCheckDiscountAuthResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Data.Result.Data, nil

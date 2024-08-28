@@ -1,6 +1,7 @@
 package points
 
 import (
+	"context"
 	"time"
 
 	"github.com/XiBao/jos/api"
@@ -10,10 +11,10 @@ import (
 
 type JosSendPointsRequest struct {
 	api.BaseRequest
-	Pin        string `json:"pin,omitempty" codec:"pin,omitempty"`               //用户Pin
-	BusinessId string `json:"businessId,omitempty" codec:"businessId,omitempty"` //防重ID
-	SourceType uint8  `json:"sourceType,omitempty" codec:"sourceType,omitempty"` //渠道类型：26-消费积分 27-发放积分
-	Points     int64  `json:"points,omitempty" codec:"points,omitempty"`         //积分变更值
+	Pin        string `json:"pin,omitempty" codec:"pin,omitempty"`               // 用户Pin
+	BusinessId string `json:"businessId,omitempty" codec:"businessId,omitempty"` // 防重ID
+	SourceType uint8  `json:"sourceType,omitempty" codec:"sourceType,omitempty"` // 渠道类型：26-消费积分 27-发放积分
+	Points     int64  `json:"points,omitempty" codec:"points,omitempty"`         // 积分变更值
 }
 
 type JosSendPointsResponse struct {
@@ -51,8 +52,8 @@ func (r JosSendPointsData) Error() string {
 }
 
 type JosSendPointsJsfResult struct {
-	Code string `json:"code,omitempty" codec:"code,omitempty"` //返回码
-	Desc string `json:"desc,omitempty" codec:"desc,omitempty"` //返回描述
+	Code string `json:"code,omitempty" codec:"code,omitempty"` // 返回码
+	Desc string `json:"desc,omitempty" codec:"desc,omitempty"` // 返回描述
 }
 
 func (r JosSendPointsJsfResult) IsError() bool {
@@ -64,7 +65,7 @@ func (r JosSendPointsJsfResult) Error() string {
 }
 
 // TODO 积分变更开放接口 开放请求的渠道为：26-消费积分 27-发放积分
-func JosSendPoints(req *JosSendPointsRequest) (bool, error) {
+func JosSendPoints(ctx context.Context, req *JosSendPointsRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := points.NewSendPointsRequest()
@@ -85,9 +86,8 @@ func JosSendPoints(req *JosSendPointsRequest) (bool, error) {
 	r.SetBusinessId(req.BusinessId)
 
 	var response JosSendPointsResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return true, nil
-
 }

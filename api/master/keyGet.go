@@ -1,6 +1,7 @@
 package master
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -75,7 +76,7 @@ func (r MasterKeyResult) Error() string {
 }
 
 // 获取数据解密的密钥
-func MasterKeyGet(req *MasterKeyGetRequest) ([]crypto.KeyStore, error) {
+func MasterKeyGet(ctx context.Context, req *MasterKeyGetRequest) ([]crypto.KeyStore, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := master.NewMasterKeyGet()
@@ -96,7 +97,7 @@ func MasterKeyGet(req *MasterKeyGetRequest) ([]crypto.KeyStore, error) {
 	r.SetTid(req.Tid)
 
 	var response MasterKeyGetResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Response.Result.ServiceKeyList, nil

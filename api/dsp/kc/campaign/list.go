@@ -1,6 +1,8 @@
 package campaign
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -71,20 +73,20 @@ type ListValue struct {
 }
 
 type Query struct {
-	Id                 uint64  `json:"id,omitempty" codec:"id,omitempty"`                                 //计划ID
-	Name               string  `json:"name,omitempty" codec:"name,omitempty"`                             //计划名称
-	DayBudgetStr       string  `json:"dayBudgetStr,omitempty" codec:"dayBudgetStr,omitempty"`             //预算
-	DayBudgetResult    float64 `json:"dayBudgetResult,omitempty" codec:"dayBudgetResult,omitempty"`       //预算
-	StartTime          uint64  `json:"startTime,omitempty" codec:"startTime,omitempty"`                   //开始时间
-	EneTime            uint64  `json:"eneTime,omitempty" codec:"eneTime,omitempty"`                       //结束时间
-	TimeRangePriceCoef string  `json:"timeRangePriceCoef,omitempty" codec:"timeRangePriceCoef,omitempty"` //投放时间段
-	Status             int     `json:"status,omitempty" codec:"status,omitempty"`                         //状态
-	PutType            int     `json:"putType,omitempty" codec:"putType,omitempty"`                       //推广类型
-	BusinessType       int     `json:"businessType,omitempty" codec:"businessType,omitempty"`             //业务类型
+	Id                 uint64  `json:"id,omitempty" codec:"id,omitempty"`                                 // 计划ID
+	Name               string  `json:"name,omitempty" codec:"name,omitempty"`                             // 计划名称
+	DayBudgetStr       string  `json:"dayBudgetStr,omitempty" codec:"dayBudgetStr,omitempty"`             // 预算
+	DayBudgetResult    float64 `json:"dayBudgetResult,omitempty" codec:"dayBudgetResult,omitempty"`       // 预算
+	StartTime          uint64  `json:"startTime,omitempty" codec:"startTime,omitempty"`                   // 开始时间
+	EneTime            uint64  `json:"eneTime,omitempty" codec:"eneTime,omitempty"`                       // 结束时间
+	TimeRangePriceCoef string  `json:"timeRangePriceCoef,omitempty" codec:"timeRangePriceCoef,omitempty"` // 投放时间段
+	Status             int     `json:"status,omitempty" codec:"status,omitempty"`                         // 状态
+	PutType            int     `json:"putType,omitempty" codec:"putType,omitempty"`                       // 推广类型
+	BusinessType       int     `json:"businessType,omitempty" codec:"businessType,omitempty"`             // 业务类型
 }
 
 // 快车.计划信息（批量获取）
-func List(req *ListRequest) ([]Query, int, error) {
+func List(ctx context.Context, req *ListRequest) ([]Query, int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := campaign.NewCampainListRequest()
@@ -92,9 +94,8 @@ func List(req *ListRequest) ([]Query, int, error) {
 	r.SetPageSize(req.PageSize)
 
 	var response ListResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, 0, err
 	}
 	return response.Data.Result.Value.Datas, response.Data.Result.Value.Paginator.Items, nil
-
 }

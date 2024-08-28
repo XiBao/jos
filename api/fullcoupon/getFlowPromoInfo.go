@@ -1,6 +1,8 @@
 package fullcoupon
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/fullcoupon"
@@ -70,7 +72,7 @@ type FullCouponGetPromoListInfoResponseFlowList struct {
 	FlowList       []PromoFlow `json:"dataList" codec:"dataList"`
 }
 
-func GetFlowPromoInfo(req *FullCouponGetFlowPromoInfoRequest) ([]PromoFlow, error) {
+func GetFlowPromoInfo(ctx context.Context, req *FullCouponGetFlowPromoInfoRequest) ([]PromoFlow, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := fullcoupon.NewFullCouponGetFlowPromoInfoRequest()
@@ -78,7 +80,7 @@ func GetFlowPromoInfo(req *FullCouponGetFlowPromoInfoRequest) ([]PromoFlow, erro
 	r.SetPromoId(req.PromoId)
 
 	var response FullCouponGetFlowPromoInfoResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result.Data.FlowList, nil

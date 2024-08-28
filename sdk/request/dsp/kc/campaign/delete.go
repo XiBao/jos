@@ -1,6 +1,8 @@
 package campaign
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type CampainDeleteRequest struct {
 	Request *sdk.Request
@@ -12,7 +14,6 @@ func NewCampainDeleteRequest() (req *CampainDeleteRequest) {
 		Request: &request,
 	}
 	return
-
 }
 
 func (req *CampainDeleteRequest) SetCompaignId(compaignId string) {

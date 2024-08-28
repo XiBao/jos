@@ -1,6 +1,8 @@
 package crm
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
@@ -45,9 +47,9 @@ func (r GetShopRuleTypeData) Error() string {
 }
 
 type GetShopRuleTypeReturnResult struct {
-	Code string `json:"code,omitempty" codec:"code,omitempty"` //状态码
-	Desc string `json:"desc,omitempty" codec:"desc,omitempty"` //参数描述
-	Data uint8  `json:"data,omitempty" codec:"data,omitempty"` //会员类型 0-未开启会员规则 1-店铺已购即会员规则 2-店铺开卡规则 3- 品牌开卡规则
+	Code string `json:"code,omitempty" codec:"code,omitempty"` // 状态码
+	Desc string `json:"desc,omitempty" codec:"desc,omitempty"` // 参数描述
+	Data uint8  `json:"data,omitempty" codec:"data,omitempty"` // 会员类型 0-未开启会员规则 1-店铺已购即会员规则 2-店铺开卡规则 3- 品牌开卡规则
 }
 
 func (r GetShopRuleTypeReturnResult) IsError() bool {
@@ -59,13 +61,13 @@ func (r GetShopRuleTypeReturnResult) Error() string {
 }
 
 // TODO 查询商家是否开通会 员开卡功能/开卡类 型
-func GetShopRuleType(req *GetShopRuleTypeRequest) (uint8, error) {
+func GetShopRuleType(ctx context.Context, req *GetShopRuleTypeRequest) (uint8, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewGetShopRuleTypeRequest()
 
 	var response GetShopRuleTypeResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
 	return response.Data.ReturnResult.Data, nil

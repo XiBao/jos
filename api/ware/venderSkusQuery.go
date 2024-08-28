@@ -1,6 +1,8 @@
 package ware
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/ware"
@@ -50,14 +52,14 @@ type VenderSkusQueryResult struct {
 }
 
 // 获取单个SKU
-func VenderSkusQuery(req *VenderSkusQueryRequest) ([]uint64, int, error) {
+func VenderSkusQuery(ctx context.Context, req *VenderSkusQueryRequest) ([]uint64, int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := ware.NewWareVenderSkusQueryRequest()
 	r.SetIndex(req.Index)
 
 	var response VenderSkusQueryResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, 0, err
 	}
 	searchResult := response.Data.SearchResult

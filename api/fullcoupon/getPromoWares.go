@@ -1,6 +1,8 @@
 package fullcoupon
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/fullcoupon"
@@ -71,7 +73,7 @@ type FullCouponGetPromoWaresResponseDataList struct {
 	WareList       []PromoWare `json:"dataList,omitempty" codec:"dataList,omitempty"`
 }
 
-func GetPromoWares(req *FullCouponGetPromoWaresRequest) ([]PromoWare, int, error) {
+func GetPromoWares(ctx context.Context, req *FullCouponGetPromoWaresRequest) ([]PromoWare, int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := fullcoupon.NewFullCouponGetPromoWaresRequest()
@@ -80,7 +82,7 @@ func GetPromoWares(req *FullCouponGetPromoWaresRequest) ([]PromoWare, int, error
 	r.SetPageIndex(req.PageIndex)
 
 	var response FullCouponGetPromoWaresResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, 0, err
 	}
 	return response.Data.Result.Data.WareList, response.Data.Result.Data.TotalPageCount, nil

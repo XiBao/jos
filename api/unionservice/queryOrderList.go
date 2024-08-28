@@ -1,6 +1,8 @@
 package unionservice
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ware"
 	"github.com/XiBao/jos/sdk"
@@ -37,7 +39,7 @@ type QueryOrderListData struct {
 }
 
 // 获取单个SKU
-func QueryOrderList(req *QueryOrderListRequest) (*ware.Sku, error) {
+func QueryOrderList(ctx context.Context, req *QueryOrderListRequest) (*ware.Sku, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := unionservice.NewUnionQueryOrderListRequest()
@@ -47,7 +49,7 @@ func QueryOrderList(req *QueryOrderListRequest) (*ware.Sku, error) {
 	r.SetPageSize(req.PageSize)
 
 	var response QueryOrderListResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Sku, nil

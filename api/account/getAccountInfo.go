@@ -1,6 +1,8 @@
 package account
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/account"
@@ -53,7 +55,7 @@ func (r GetAccountInfoData) Error() string {
 	return "unexpected error"
 }
 
-func GetAccountInfo(req *GetAccountInfoRequest) (*AccountInfo, error) {
+func GetAccountInfo(ctx context.Context, req *GetAccountInfoRequest) (*AccountInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := account.NewGetAccountInfoRequest()
@@ -61,7 +63,7 @@ func GetAccountInfo(req *GetAccountInfoRequest) (*AccountInfo, error) {
 	r.SetAccountCode(req.AccountCode)
 
 	var response GetAccountInfoResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 

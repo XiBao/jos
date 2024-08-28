@@ -1,6 +1,8 @@
 package promotion
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -72,7 +74,7 @@ func (r FullCreateResponseData) Error() string {
 	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func FullCreate(req *FullCreateRequest) (uint64, error) {
+func FullCreate(ctx context.Context, req *FullCreateRequest) (uint64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionFullCreateRequest()
@@ -184,7 +186,7 @@ func FullCreate(req *FullCreateRequest) (uint64, error) {
 	}
 
 	var response FullCreateResponse
-	if err := client.PostExecute(r.Request, req.Session, &response); err != nil {
+	if err := client.PostExecute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
 	return response.Data.PromoId, nil

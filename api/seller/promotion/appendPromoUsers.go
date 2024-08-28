@@ -1,6 +1,8 @@
 package promotion
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -50,7 +52,7 @@ func (r AppendPromoUsersResponseData) Error() string {
 	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func AppendPromoUsers(req *AppendPromoUsersRequest) (interface{}, error) {
+func AppendPromoUsers(ctx context.Context, req *AppendPromoUsersRequest) (interface{}, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionAppendPromoUsersRequest()
@@ -75,7 +77,7 @@ func AppendPromoUsers(req *AppendPromoUsersRequest) (interface{}, error) {
 	}
 
 	var response AppendPromoUsersResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result, nil

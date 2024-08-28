@@ -1,6 +1,8 @@
 package center
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	center "github.com/XiBao/jos/sdk/request/interact/center/evaluate"
@@ -46,7 +48,7 @@ func (r CancelEvaluateActivityData) Error() string {
 	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func CancelEvaluateActivity(req *CancelEvaluateActivityRequest) (bool, error) {
+func CancelEvaluateActivity(ctx context.Context, req *CancelEvaluateActivityRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewCancelEvaluateActivityRequest()
@@ -55,7 +57,7 @@ func CancelEvaluateActivity(req *CancelEvaluateActivityRequest) (bool, error) {
 	r.SetId(req.Id)
 
 	var response CancelEvaluateActivityResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 

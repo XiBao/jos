@@ -1,6 +1,8 @@
 package promotion
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -55,7 +57,7 @@ type PromoLimit struct {
 	DiscountLimit float64 `json:"discount_limit,omitempty" codec:"discount_limit,omitempty"`
 }
 
-func Limit(req *LimitRequest) (*PromoLimit, error) {
+func Limit(ctx context.Context, req *LimitRequest) (*PromoLimit, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionLimitRequest()
@@ -66,7 +68,7 @@ func Limit(req *LimitRequest) (*PromoLimit, error) {
 	r.SetEndTime(req.EndTime)
 
 	var response LimitResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 

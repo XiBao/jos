@@ -1,6 +1,8 @@
 package promotion
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -83,7 +85,7 @@ func (r CreateResponseData) Error() string {
 	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func Create(req *CreateRequest) (interface{}, error) {
+func Create(ctx context.Context, req *CreateRequest) (interface{}, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionCreateRequest()
@@ -167,7 +169,7 @@ func Create(req *CreateRequest) (interface{}, error) {
 	}
 
 	var response CreateResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
 

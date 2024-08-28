@@ -1,6 +1,8 @@
 package campaign
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type CampainListRequest struct {
 	Request *sdk.Request
@@ -12,7 +14,6 @@ func NewCampainListRequest() (req *CampainListRequest) {
 		Request: &request,
 	}
 	return
-
 }
 
 func (req *CampainListRequest) SetPageNum(pageNum int) {

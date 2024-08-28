@@ -1,6 +1,8 @@
 package points
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/points"
@@ -45,9 +47,9 @@ func (r GetCouponInfoData) Error() string {
 }
 
 type GetCouponInfoJsfResult struct {
-	Code   string             `json:"code,omitempty" codec:"code,omitempty"`     //返回码
-	Desc   string             `json:"desc,omitempty" codec:"desc,omitempty"`     //返回描述
-	Result []PointsCouponInfo `json:"result,omitempty" codec:"result,omitempty"` //优惠券信息
+	Code   string             `json:"code,omitempty" codec:"code,omitempty"`     // 返回码
+	Desc   string             `json:"desc,omitempty" codec:"desc,omitempty"`     // 返回描述
+	Result []PointsCouponInfo `json:"result,omitempty" codec:"result,omitempty"` // 优惠券信息
 }
 
 func (r GetCouponInfoJsfResult) IsError() bool {
@@ -68,27 +70,26 @@ type PointsCouponInfo struct {
 	CouponType        uint8    `json:"couponType,omitempty" codec:"couponType,omitempty"`               // 优惠券类型 0:京券 1:东券
 	Points            uint64   `json:"points,omitempty" codec:"points,omitempty"`                       // 所需积分值
 	UsePlatList       []uint8  `json:"usePlatList,omitempty" codec:"usePlatList,omitempty"`             // 使用平台
-	PlatFormDesc      []string `json:"platFormDesc,omitempty" codec:"platFormDesc,omitempty"`           //使用平台描述
-	Period            uint64   `json:"period,omitempty" codec:"period,omitempty"`                       //优惠券有效期
-	SendCount         uint64   `json:"sendCount,omitempty" codec:"sendCount,omitempty"`                 //发行量
-	TradeCount        uint64   `json:"tradeCount,omitempty" codec:"tradeCount,omitempty"`               //已经领取量
+	PlatFormDesc      []string `json:"platFormDesc,omitempty" codec:"platFormDesc,omitempty"`           // 使用平台描述
+	Period            uint64   `json:"period,omitempty" codec:"period,omitempty"`                       // 优惠券有效期
+	SendCount         uint64   `json:"sendCount,omitempty" codec:"sendCount,omitempty"`                 // 发行量
+	TradeCount        uint64   `json:"tradeCount,omitempty" codec:"tradeCount,omitempty"`               // 已经领取量
 	RemainingCount    uint64   `json:"remainingCount,omitempty" codec:"remainingCount,omitempty"`       //	剩余量
-	FullPlat          uint8    `json:"fullPlat,omitempty" codec:"fullPlat,omitempty"`                   //是否全平台使用 1：全平台 3：限平台
-	ActivityStartTime string   `json:"activityStartTime,omitempty" codec:"activityStartTime,omitempty"` //活动开始时间
-	ActivityEndTime   string   `json:"activityEndTime,omitempty" codec:"activityEndTime,omitempty"`     //活动结束时间
-	RealCouponId      uint64   `json:"realCouponId,omitempty" codec:"realCouponId,omitempty"`           //卡券组ID
+	FullPlat          uint8    `json:"fullPlat,omitempty" codec:"fullPlat,omitempty"`                   // 是否全平台使用 1：全平台 3：限平台
+	ActivityStartTime string   `json:"activityStartTime,omitempty" codec:"activityStartTime,omitempty"` // 活动开始时间
+	ActivityEndTime   string   `json:"activityEndTime,omitempty" codec:"activityEndTime,omitempty"`     // 活动结束时间
+	RealCouponId      uint64   `json:"realCouponId,omitempty" codec:"realCouponId,omitempty"`           // 卡券组ID
 }
 
 // TODO 通过venderId查询商家设置的积分可兑换优惠券信息
-func GetCouponInfo(req *GetCouponInfoRequest) ([]PointsCouponInfo, error) {
+func GetCouponInfo(ctx context.Context, req *GetCouponInfoRequest) ([]PointsCouponInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := points.NewGetCouponInfoRequest()
 
 	var response GetCouponInfoResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.JsfResult.Result, nil
-
 }

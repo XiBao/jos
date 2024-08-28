@@ -1,6 +1,7 @@
 package sdk
 
 import (
+	"context"
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
@@ -15,8 +16,8 @@ import (
 )
 
 type Request struct {
-	MethodName string
 	Params     map[string]interface{}
+	MethodName string
 	IsLogGW    bool `json:"-"`
 	IsUnionGW  bool `json:"-"`
 }
@@ -27,11 +28,12 @@ type IResponse interface {
 }
 
 type Response struct {
-	MethodName string
 	Params     map[string]interface{}
+	MethodName string
 }
 
 type Client struct {
+	tracer    *Otel
 	AppKey    string
 	SecretKey string
 
@@ -64,6 +66,10 @@ func (c *Client) Logger() logger.Logger {
 		return logger.Debug
 	}
 	return logger.Default
+}
+
+func (c *Client) WithTracer(namespace string) {
+	c.tracer = NewOtel(namespace, c.AppKey)
 }
 
 func (c *Client) GetAccessTokenNew(code string) (string, error) {
@@ -126,7 +132,7 @@ func (c *Client) SetDev(dev bool) {
 	c.Dev = dev
 }
 
-func (c *Client) Execute(req *Request, token string, rep IResponse) error {
+func (c *Client) Execute(ctx context.Context, req *Request, token string, rep IResponse) error {
 	sysParams := make(map[string]string, 7)
 	if paramJson, err := json.Marshal(req.Params); err != nil {
 		return err
@@ -168,29 +174,16 @@ func (c *Client) Execute(req *Request, token string, rep IResponse) error {
 	gatewayUrl := StringsJoin(gwURL, "?", payload)
 	debug.DebugPrintGetRequest(gatewayUrl)
 
-	response, err := http.DefaultClient.Get(gatewayUrl)
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodGet, gatewayUrl, nil)
 	if err != nil {
 		debug.DebugPrintError(err)
 		return err
 	}
-	defer response.Body.Close()
-	if body, err := io.ReadAll(response.Body); err != nil {
-		debug.DebugPrintError(err)
-		return err
-	} else if rep != nil {
-		if err := debug.DecodeJSON(body, rep); err != nil {
-			return errors.Join(Error{Code: 0, Msg: string(body)}, err)
-		}
-		if rep.IsError() {
-			return rep
-		}
-	} else {
-		debug.DebugPrintStringResponse(string(body))
-	}
-	return nil
+	httpReq.Header.Set("content-type", "application/json")
+	return c.WithSpan(ctx, req.MethodName, httpReq, rep, nil, c.fetch)
 }
 
-func (c *Client) PostExecute(req *Request, token string, rep IResponse) error {
+func (c *Client) PostExecute(ctx context.Context, req *Request, token string, rep IResponse) error {
 	sysParams := make(map[string]string, 7)
 	if paramJson, err := json.Marshal(req.Params); err != nil {
 		return err
@@ -214,6 +207,7 @@ func (c *Client) PostExecute(req *Request, token string, rep IResponse) error {
 	rawSign := c.GenerateRawSign(sysParams)
 	sysParams["sign"] = c.GenerateSign(rawSign)
 	values := GetUrlValues()
+	defer PutUrlValues(values)
 	for k, v := range sysParams {
 		values.Set(k, v)
 	}
@@ -227,28 +221,38 @@ func (c *Client) PostExecute(req *Request, token string, rep IResponse) error {
 	}
 	debug := c.Logger()
 	debug.DebugPrintPostJSONRequest(gwURL, Json(sysParams))
-
-	response, err := http.PostForm(gwURL, values)
-	PutUrlValues(values)
+	payload := values.Encode()
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, gwURL, strings.NewReader(payload))
 	if err != nil {
 		debug.DebugPrintError(err)
 		return err
 	}
+	httpReq.Header.Set("content-type", "application/x-www-form-urlencoded")
+	return c.WithSpan(ctx, req.MethodName, httpReq, rep, []byte(payload), c.fetch)
+}
+
+func (c *Client) fetch(httpReq *http.Request, rep IResponse) (*http.Response, error) {
+	debug := c.Logger()
+	response, err := http.DefaultClient.Do(httpReq)
+	if err != nil {
+		debug.DebugPrintError(err)
+		return response, err
+	}
 	defer response.Body.Close()
 	if body, err := io.ReadAll(response.Body); err != nil {
 		debug.DebugPrintError(err)
-		return err
+		return response, err
 	} else if rep != nil {
 		if err := debug.DecodeJSON(body, rep); err != nil {
-			return errors.Join(Error{Code: 0, Msg: string(body)}, err)
+			return response, errors.Join(Error{Code: 0, Msg: string(body)}, err)
 		}
 		if rep.IsError() {
-			return rep
+			return response, rep
 		}
 	} else {
 		debug.DebugPrintStringResponse(string(body))
 	}
-	return nil
+	return response, nil
 }
 
 func (c *Client) GenerateRawSign(params map[string]string) string {
@@ -269,4 +273,12 @@ func (c *Client) GenerateSign(stringToBeSigned string) string {
 	h := md5.New()
 	io.WriteString(h, stringToBeSigned)
 	return strings.ToUpper(hex.EncodeToString(h.Sum(nil)))
+}
+
+func (c *Client) WithSpan(ctx context.Context, methodName string, req *http.Request, resp IResponse, payload []byte, fn func(*http.Request, IResponse) (*http.Response, error)) error {
+	if c.tracer == nil {
+		_, err := fn(req, resp)
+		return err
+	}
+	return c.tracer.WithSpan(ctx, methodName, req, resp, payload, fn)
 }

@@ -1,6 +1,8 @@
 package keyword
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -55,7 +57,7 @@ type KuaicheKeywordDeleteV2ResponseData struct {
 	dsp.DataCommonResponse
 }
 
-func KuaicheKeywordDeleteV2(req *KuaicheKeywordDeleteV2Request) (bool, error) {
+func KuaicheKeywordDeleteV2(ctx context.Context, req *KuaicheKeywordDeleteV2Request) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := keyword.NewKuaicheKeywordDeleteV2Request()
@@ -65,7 +67,7 @@ func KuaicheKeywordDeleteV2(req *KuaicheKeywordDeleteV2Request) (bool, error) {
 	}
 
 	var response KuaicheKeywordDeleteV2Response
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Responce.Data.Success, nil

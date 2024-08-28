@@ -1,6 +1,8 @@
 package isv
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/isv"
@@ -39,8 +41,8 @@ func (r UploadDBOperationLogResponse) Error() string {
 }
 
 type UploadDBOperationLogResult struct {
-	Code string `json:"code,omitempty" codec:"code,omitempty"`     //返回码
-	C    int    `json:"result,omitempty" codec:"result,omitempty"` //是否成功
+	Code string `json:"code,omitempty" codec:"code,omitempty"`     // 返回码
+	C    int    `json:"result,omitempty" codec:"result,omitempty"` // 是否成功
 }
 
 func (r UploadDBOperationLogResult) IsError() bool {
@@ -51,7 +53,7 @@ func (r UploadDBOperationLogResult) Error() string {
 	return r.Code
 }
 
-func UploadDBOperationLog(req *UploadDBOperationLogRequest) (int, error) {
+func UploadDBOperationLog(ctx context.Context, req *UploadDBOperationLogRequest) (int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := isv.NewIsvUploadDBOperationLogRequest()
@@ -68,7 +70,7 @@ func UploadDBOperationLog(req *UploadDBOperationLogRequest) (int, error) {
 	r.Request.IsLogGW = true
 
 	var response UploadDBOperationLogResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return -1, err
 	}
 	return response.Data.C, nil

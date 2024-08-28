@@ -1,6 +1,8 @@
 package points
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type BatchInsertOrUpdateRuleRequest struct {
 	Request *sdk.Request

@@ -1,6 +1,8 @@
 package vender
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/vender"
@@ -83,7 +85,7 @@ type CommonQueryResult struct {
 }
 
 // 通过组件化的方式，提供相关统一的查询方式
-func CommonQuery(req *CommonQueryRequest) (string, error) {
+func CommonQuery(ctx context.Context, req *CommonQueryRequest) (string, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := vender.NewVenderCommonQueryRequest()
@@ -95,7 +97,7 @@ func CommonQuery(req *CommonQueryRequest) (string, error) {
 	}
 
 	var response CommonQueryResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return "", err
 	}
 	return response.Data.Response.Result, nil

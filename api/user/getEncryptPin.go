@@ -1,6 +1,8 @@
 package user
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/user"
@@ -61,14 +63,14 @@ func (r GetEncryptPinResult) Error() string {
 }
 
 // 明文PIN转加密PIN
-func GetEncryptPin(req *GetEncryptPinRequest) (string, error) {
+func GetEncryptPin(ctx context.Context, req *GetEncryptPinRequest) (string, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := user.NewGetEncryptPinRequest()
 	r.SetPin(req.Pin)
 
 	var response GetEncryptPinResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return "", err
 	}
 	return response.Data.Result.Data, nil

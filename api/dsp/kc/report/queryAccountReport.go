@@ -1,6 +1,8 @@
 package report
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/report"
@@ -121,7 +123,7 @@ type AccountReport struct {
 	CouponCnt         uint64  `json:"couponCnt"`
 }
 
-func QueryAccountReport(req *QueryAccountReportRequest) ([]AccountReport, error) {
+func QueryAccountReport(ctx context.Context, req *QueryAccountReportRequest) ([]AccountReport, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := report.NewDspReportQueryAccountReportRequest()
@@ -138,7 +140,7 @@ func QueryAccountReport(req *QueryAccountReportRequest) ([]AccountReport, error)
 	}
 
 	var response QueryAccountReportResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result.Value.Datas, nil

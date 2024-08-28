@@ -1,6 +1,8 @@
 package ad
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -85,7 +87,7 @@ type AuditInfo struct {
 }
 
 // 查询.快车.指定单元下创意基本信息
-func AdQueryAdListByParam(req *AdQueryAdListByParamRequest) ([]DspADQuery, int, error) {
+func AdQueryAdListByParam(ctx context.Context, req *AdQueryAdListByParamRequest) ([]DspADQuery, int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := ad.NewAdQueryAdListByParamRequest()
@@ -95,9 +97,8 @@ func AdQueryAdListByParam(req *AdQueryAdListByParamRequest) ([]DspADQuery, int, 
 	r.SetPageNum(req.PageNum)
 
 	var response AdQueryAdListByParamResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, 0, err
 	}
 	return response.Data.Result.Value.Datas, response.Data.Result.Value.Paginator.Items, nil
-
 }

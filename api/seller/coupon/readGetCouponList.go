@@ -1,6 +1,8 @@
 package coupon
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/coupon"
@@ -43,7 +45,7 @@ type CouponReadGetCouponListResponseData struct {
 	List []Coupon `json:"couponList,omitempty" codec:"couponList,omitempty"`
 }
 
-func CouponReadGetCouponList(req *CouponReadGetCouponListRequest) ([]Coupon, error) {
+func CouponReadGetCouponList(ctx context.Context, req *CouponReadGetCouponListRequest) ([]Coupon, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := coupon.NewSellerCouponReadGetCouponListRequest()
@@ -89,7 +91,7 @@ func CouponReadGetCouponList(req *CouponReadGetCouponListRequest) ([]Coupon, err
 	r.SetPageSize(req.PageSize)
 
 	var response CouponReadGetCouponListResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.List, nil

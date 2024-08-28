@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 
@@ -28,7 +29,7 @@ type GetAccessTokenResponse struct {
 	OpenId       string `json:"open_id,omitempty" codec:"open_id,omitempty"`
 }
 
-func GetAccessToken(req *GetAccessTokenRequest) (*GetAccessTokenResponse, error) {
+func GetAccessToken(ctx context.Context, req *GetAccessTokenRequest) (*GetAccessTokenResponse, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 

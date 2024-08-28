@@ -1,6 +1,8 @@
 package order
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/order"
@@ -99,7 +101,7 @@ type SkuInfo struct {
 }
 
 // 订单查询接口
-func UnionOrderQuery(req *UnionOrderQueryRequest) (bool, []OrderResp, error) {
+func UnionOrderQuery(ctx context.Context, req *UnionOrderQueryRequest) (bool, []OrderResp, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := order.NewUnionOrderQueryRequest()
@@ -114,7 +116,7 @@ func UnionOrderQuery(req *UnionOrderQueryRequest) (bool, []OrderResp, error) {
 	r.SetOrderReq(orderReq)
 
 	var response UnionOrderQueryResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, nil, err
 	}
 	var ret UnionOrderQueryResult

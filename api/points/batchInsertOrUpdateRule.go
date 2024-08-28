@@ -1,6 +1,8 @@
 package points
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/points"
@@ -8,9 +10,9 @@ import (
 
 type BatchInsertOrUpdateRuleRequest struct {
 	api.BaseRequest
-	Multiple   float64 `json:"multiple"`   //兑换倍数
-	CreateTime string  `json:"createTime"` //创建记录时间  2006-01-02 15:04:05
-	ModifyTime string  `json:"modifyTime"` //记录修改时间  2006-01-02 15:04:05
+	Multiple   float64 `json:"multiple"`   // 兑换倍数
+	CreateTime string  `json:"createTime"` // 创建记录时间  2006-01-02 15:04:05
+	ModifyTime string  `json:"modifyTime"` // 记录修改时间  2006-01-02 15:04:05
 }
 
 type BatchInsertOrUpdateRuleResponse struct {
@@ -48,9 +50,9 @@ func (r BatchInsertOrUpdateRuleData) Error() string {
 }
 
 type BatchInsertOrUpdateRuleJsfResult struct {
-	Code   string `json:"code,omitempty" codec:"code,omitempty"`     //返回码
-	Desc   string `json:"desc,omitempty" codec:"desc,omitempty"`     //返回描述
-	Result bool   `json:"result,omitempty" codec:"result,omitempty"` //是否成功
+	Code   string `json:"code,omitempty" codec:"code,omitempty"`     // 返回码
+	Desc   string `json:"desc,omitempty" codec:"desc,omitempty"`     // 返回描述
+	Result bool   `json:"result,omitempty" codec:"result,omitempty"` // 是否成功
 }
 
 func (r BatchInsertOrUpdateRuleJsfResult) IsError() bool {
@@ -62,7 +64,7 @@ func (r BatchInsertOrUpdateRuleJsfResult) Error() string {
 }
 
 // TODO 设置积分规则   按商家后台规则进行设置
-func BatchInsertOrUpdateRule(req *BatchInsertOrUpdateRuleRequest) (bool, error) {
+func BatchInsertOrUpdateRule(ctx context.Context, req *BatchInsertOrUpdateRuleRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := points.NewBatchInsertOrUpdateRuleRequest()
@@ -80,10 +82,9 @@ func BatchInsertOrUpdateRule(req *BatchInsertOrUpdateRuleRequest) (bool, error) 
 	}
 
 	var response BatchInsertOrUpdateRuleResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 
 	return response.Data.JsfResult.Result, nil
-
 }

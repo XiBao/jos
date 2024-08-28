@@ -88,6 +88,7 @@ func (req *IsvUploadOrderLogRequest) GetUserId() string {
 	}
 	return ""
 }
+
 func (req *IsvUploadOrderLogRequest) SetFileMd5(fileMd5 string) {
 	req.Request.Params["file_md5"] = fileMd5
 }

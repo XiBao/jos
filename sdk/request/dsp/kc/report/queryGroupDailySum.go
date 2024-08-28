@@ -1,6 +1,8 @@
 package report
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type QueryGroupDailySumRequest struct {
 	Request *sdk.Request

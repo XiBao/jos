@@ -1,6 +1,7 @@
 package ware
 
 import (
+	"context"
 	"time"
 
 	"github.com/XiBao/jos/api"
@@ -91,7 +92,7 @@ type SearchWare4ValidPage struct {
 }
 
 // 根据条件检索订单信息 （仅适用于SOP、LBP，SOPL类型，FBP类型请调取FBP订单检索 ）
-func SearchWare4Valid(req *SearchWare4ValidRequest) (*SearchWare4ValidPage, error) {
+func SearchWare4Valid(ctx context.Context, req *SearchWare4ValidRequest) (*SearchWare4ValidPage, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := ware.NewSearchWare4ValidRequest()
@@ -125,7 +126,7 @@ func SearchWare4Valid(req *SearchWare4ValidRequest) (*SearchWare4ValidPage, erro
 	}
 
 	var response SearchWare4ValidResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 

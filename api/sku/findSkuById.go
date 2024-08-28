@@ -1,6 +1,8 @@
 package sku
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ware"
 	"github.com/XiBao/jos/sdk"
@@ -35,7 +37,7 @@ type FindSkuByIdData struct {
 }
 
 // 获取单个SKU
-func FindSkuById(req *FindSkuByIdRequest) (*ware.Sku, error) {
+func FindSkuById(ctx context.Context, req *FindSkuByIdRequest) (*ware.Sku, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := sku.NewFindSkuByIdRequest()
@@ -45,7 +47,7 @@ func FindSkuById(req *FindSkuByIdRequest) (*ware.Sku, error) {
 	r.SetSkuId(req.SkuId)
 
 	var response FindSkuByIdResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Sku, nil

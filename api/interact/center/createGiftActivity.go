@@ -1,6 +1,8 @@
 package center
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/interact/center"
@@ -70,7 +72,7 @@ type CreateGiftActivityResult struct {
 	Msg  string `json:"msg" codec:"msg"`
 }
 
-func CreateGiftActivity(req *CreateGiftActivityRequest) (*CreateGiftActivityResult, error) {
+func CreateGiftActivity(ctx context.Context, req *CreateGiftActivityRequest) (*CreateGiftActivityResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewCreateGiftActivityRequest()
@@ -108,7 +110,7 @@ func CreateGiftActivity(req *CreateGiftActivityRequest) (*CreateGiftActivityResu
 	}
 
 	var response CreateGiftActivityResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result, nil

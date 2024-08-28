@@ -1,6 +1,8 @@
 package center
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	center "github.com/XiBao/jos/sdk/request/interact/center/evaluate"
@@ -49,7 +51,7 @@ func (r GetEvaluateAnalysisListByParamsData) Error() string {
 	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func GetEvaluateAnalysisListByParams(req *GetEvaluateAnalysisListByParamsRequest) ([]EvaluateAnalysis, error) {
+func GetEvaluateAnalysisListByParams(ctx context.Context, req *GetEvaluateAnalysisListByParamsRequest) ([]EvaluateAnalysis, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewGetEvaluateAnalysisListByParamsRequest()
@@ -63,7 +65,7 @@ func GetEvaluateAnalysisListByParams(req *GetEvaluateAnalysisListByParamsRequest
 	}
 
 	var response GetEvaluateAnalysisListByParamsResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result, nil

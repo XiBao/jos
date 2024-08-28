@@ -1,6 +1,8 @@
 package campaign
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -60,7 +62,7 @@ type KuaicheCampaignListV2ResponseDataData struct {
 	Paginator *dsp.Paginator     `json:"paginator,omitempty" codec:"paginator,omitempty"`
 }
 
-func KuaicheCampaignListV2(req *KuaicheCampaignListV2Request) (*KuaicheCampaignListV2ResponseDataData, error) {
+func KuaicheCampaignListV2(ctx context.Context, req *KuaicheCampaignListV2Request) (*KuaicheCampaignListV2ResponseDataData, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := campaign.NewKuaicheCampaignListV2Request()
@@ -70,7 +72,7 @@ func KuaicheCampaignListV2(req *KuaicheCampaignListV2Request) (*KuaicheCampaignL
 	}
 
 	var response KuaicheCampaignListV2Response
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Responce.Data.Data, nil

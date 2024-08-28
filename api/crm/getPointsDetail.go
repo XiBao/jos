@@ -1,6 +1,7 @@
 package crm
 
 import (
+	"context"
 	"time"
 
 	"github.com/XiBao/jos/api"
@@ -13,11 +14,11 @@ type GetPointsDetailRequest struct {
 	CustomerPin string `json:"customer_pin,omitempty" codec:"customer_pin,omitempty"` // 客户唯一号
 	StartTime   string `json:"start_time,omitempty" codec:"start_time,omitempty"`     // 查询开始时间(yyyyMMddHHmmss)
 	EndTime     string `json:"end_time,omitempty" codec:"end_time,omitempty"`         // 查询结束时间(yyyyMMddHHmmss)
-	//StartPage   int    `json:"start_page,omitempty" codec:"start_page,omitempty"`       // 本次查询起始页码（大于等于1）
-	//EndPage     int    `json:"end_page,omitempty" codec:"end_page,omitempty"`           // 本次查询终止页码（大于等于startRowkey）
-	//Page        int    `json:"page,omitempty" codec:"page,omitempty"`                   // 本次查询页（要返回数据的页码，从1开始，必须在startPage和endPage之间（可以相等））
-	//PageSize    int    `json:"page_size,omitempty" codec:"page_size,omitempty"`         // 页长
-	//StartRowKey string `json:"start_row_key,omitempty" codec:"start_row_key,omitempty"` // 本次Hbase查询的endRowKey,做为下一查询的startRowKey（page对应页数的startRowkey，如果为空，需要page=1，从第一页开始查询）
+	// StartPage   int    `json:"start_page,omitempty" codec:"start_page,omitempty"`       // 本次查询起始页码（大于等于1）
+	// EndPage     int    `json:"end_page,omitempty" codec:"end_page,omitempty"`           // 本次查询终止页码（大于等于startRowkey）
+	// Page        int    `json:"page,omitempty" codec:"page,omitempty"`                   // 本次查询页（要返回数据的页码，从1开始，必须在startPage和endPage之间（可以相等））
+	// PageSize    int    `json:"page_size,omitempty" codec:"page_size,omitempty"`         // 页长
+	// StartRowKey string `json:"start_row_key,omitempty" codec:"start_row_key,omitempty"` // 本次Hbase查询的endRowKey,做为下一查询的startRowKey（page对应页数的startRowkey，如果为空，需要page=1，从第一页开始查询）
 }
 
 type GetPointsDetailResponse struct {
@@ -69,7 +70,7 @@ type PointsDetailView struct {
 	Msg        string `json:"msg,omitempty" codec:"msg,omitempty"`
 }
 
-func GetPointsDetail(req *GetPointsDetailRequest) ([]PointsDetailView, error) {
+func GetPointsDetail(ctx context.Context, req *GetPointsDetailRequest) ([]PointsDetailView, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewGetPointsDetailRequest()
@@ -90,10 +91,10 @@ func GetPointsDetail(req *GetPointsDetailRequest) ([]PointsDetailView, error) {
 	r.SetEndPage(10)
 	r.SetPage(1)
 	r.SetPageSize(50)
-	//r.SetStartRowKey(req.StartRowKey)
+	// r.SetStartRowKey(req.StartRowKey)
 
 	var response GetPointsDetailResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result.PointsDetailViews, nil

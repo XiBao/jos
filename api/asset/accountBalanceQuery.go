@@ -1,6 +1,8 @@
 package asset
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/asset"
@@ -73,14 +75,14 @@ type AccountBalance struct {
 	Signed          bool   `json:"signed" codec:"signed"`
 }
 
-func AccountBalanceQuery(req *AccountBalanceQueryRequest) ([]AccountBalance, error) {
+func AccountBalanceQuery(ctx context.Context, req *AccountBalanceQueryRequest) ([]AccountBalance, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := asset.NewAccountBalanceQueryRequest()
 	r.SetTypeId(req.TypeId)
 
 	var response AccountBalanceQueryResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Response.Res.Data, nil

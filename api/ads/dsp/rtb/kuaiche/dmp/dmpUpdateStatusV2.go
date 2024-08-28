@@ -1,6 +1,8 @@
 package dmp
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -55,7 +57,7 @@ type KuaicheDmpUpdateStatusV2ResponseData struct {
 	dsp.DataCommonResponse
 }
 
-func KuaicheDmpUpdateStatusV2(req *KuaicheDmpUpdateStatusV2Request) (bool, error) {
+func KuaicheDmpUpdateStatusV2(ctx context.Context, req *KuaicheDmpUpdateStatusV2Request) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := dmp.NewKuaicheDmpUpdateStatusV2Request()
@@ -65,7 +67,7 @@ func KuaicheDmpUpdateStatusV2(req *KuaicheDmpUpdateStatusV2Request) (bool, error
 	}
 
 	var response KuaicheDmpUpdateStatusV2Response
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Responce.Data.Success, nil

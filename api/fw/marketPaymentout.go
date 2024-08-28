@@ -1,6 +1,8 @@
 package fw
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/fw"
@@ -61,10 +63,10 @@ func (r MarketPaymentoutData) Error() string {
 }
 
 type MarketPaymentoutReturnType struct {
-	ErrorCode int64                           `json:"errorCode,omitempty" codec:"errorCode,omitempty"` //错误码
-	Success   bool                            `json:"success,omitempty" codec:"success,omitempty"`     //是否成功
+	ErrorCode int64                           `json:"errorCode,omitempty" codec:"errorCode,omitempty"` // 错误码
+	Success   bool                            `json:"success,omitempty" codec:"success,omitempty"`     // 是否成功
 	ErrorMsg  string                          `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`   // 错误信息
-	Body      *MarketPaymentoutReturnTypeBody `json:"body,omitempty" codec:"body,omitempty"`           //订单列表
+	Body      *MarketPaymentoutReturnTypeBody `json:"body,omitempty" codec:"body,omitempty"`           // 订单列表
 }
 
 func (r MarketPaymentoutReturnType) IsError() bool {
@@ -82,7 +84,7 @@ type MarketPaymentoutReturnTypeBody struct {
 	ResultPageType uint   `json:"resultPageType,omitempty" codec:"resultPageType,omitempty"`
 }
 
-func MarketPaymentout(req *MarketPaymentoutRequest) (*MarketPaymentoutReturnType, error) {
+func MarketPaymentout(ctx context.Context, req *MarketPaymentoutRequest) (*MarketPaymentoutReturnType, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := fw.NewMarketPaymentoutRequest()
@@ -127,7 +129,7 @@ func MarketPaymentout(req *MarketPaymentoutRequest) (*MarketPaymentoutReturnType
 	}
 
 	var response MarketPaymentoutResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.ReturnType, nil

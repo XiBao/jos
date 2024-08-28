@@ -1,6 +1,8 @@
 package ad
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/ad"
@@ -62,7 +64,7 @@ func (r DspKcAdUpdateResult) Error() string {
 }
 
 // 修改创意状态
-func AdUpdateStatus(req *AdUpdateStatusRequest) (bool, error) {
+func AdUpdateStatus(ctx context.Context, req *AdUpdateStatusRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := ad.NewAdUpdateStatusRequest()
@@ -71,9 +73,8 @@ func AdUpdateStatus(req *AdUpdateStatusRequest) (bool, error) {
 	r.SetStatus(req.Status)
 
 	var response AdUpdateStatusResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return true, nil
-
 }

@@ -1,6 +1,8 @@
 package campaign
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -55,7 +57,7 @@ type KuaicheCampaignDeleteV2ResponseData struct {
 	dsp.DataCommonResponse
 }
 
-func KuaicheCampaignDeleteV2(req *KuaicheCampaignDeleteV2Request) (bool, error) {
+func KuaicheCampaignDeleteV2(ctx context.Context, req *KuaicheCampaignDeleteV2Request) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := campaign.NewKuaicheCampaignDeleteV2Request()
@@ -65,7 +67,7 @@ func KuaicheCampaignDeleteV2(req *KuaicheCampaignDeleteV2Request) (bool, error) 
 	}
 
 	var response KuaicheCampaignDeleteV2Response
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 

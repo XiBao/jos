@@ -1,6 +1,8 @@
 package vender
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type GetVenderStatusRequest struct {
 	Request *sdk.Request

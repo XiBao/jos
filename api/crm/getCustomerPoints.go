@@ -1,6 +1,8 @@
 package crm
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
@@ -33,14 +35,14 @@ type GetCustomerPointsData struct {
 	Result int64  `json:"getcustomerpoints_result,omitempty" codec:"getcustomerpoints_result,omitempty"`
 }
 
-func GetCustomerPoints(req *GetCustomerPointsRequest) (int64, error) {
+func GetCustomerPoints(ctx context.Context, req *GetCustomerPointsRequest) (int64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewGetCustomerPointsRequest()
 	r.SetCustomerPin(req.CustomerPin)
 
 	var response GetCustomerPointsResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
 	return response.Data.Result, nil

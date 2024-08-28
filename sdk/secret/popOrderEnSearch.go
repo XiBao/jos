@@ -1,6 +1,8 @@
 package secret
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/order"
 )
@@ -16,7 +18,7 @@ type PopOrderEnSearchRequest struct {
 	DateType       uint8    `json:"date_type,omitempty" codec:"date_type,omitempty"`
 }
 
-func (this *Client) PopOrderEnSearch(searchReq *PopOrderEnSearchRequest, decrypt bool) ([]order.OrderInfo, int, error) {
+func (this *Client) PopOrderEnSearch(ctx context.Context, searchReq *PopOrderEnSearchRequest, decrypt bool) ([]order.OrderInfo, int, error) {
 	req := &order.PopOrderEnSearchRequest{
 		BaseRequest: api.BaseRequest{
 			AnApiKey: &api.ApiKey{
@@ -34,13 +36,13 @@ func (this *Client) PopOrderEnSearch(searchReq *PopOrderEnSearchRequest, decrypt
 		SortType:       searchReq.SortType,
 		DateType:       searchReq.DateType,
 	}
-	orders, total, err := order.PopOrderEnSearch(req)
+	orders, total, err := order.PopOrderEnSearch(ctx, req)
 	if err != nil {
 		return nil, 0, err
 	}
 	if decrypt {
 		for idx, orderInfo := range orders {
-			if err := this.DecryptOrderInfo(&orderInfo, false); err != nil {
+			if err := this.DecryptOrderInfo(ctx, &orderInfo, false); err != nil {
 				return nil, 0, err
 			}
 			orders[idx] = orderInfo

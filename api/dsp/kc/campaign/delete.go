@@ -1,6 +1,8 @@
 package campaign
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/kc/campaign"
@@ -8,7 +10,7 @@ import (
 
 type DeleteRequest struct {
 	api.BaseRequest
-	CompaignId string `json:"compaign_id,omitempty" codec:"compaign_id,omitempty"` //计划id
+	CompaignId string `json:"compaign_id,omitempty" codec:"compaign_id,omitempty"` // 计划id
 }
 
 type DeleteResponse struct {
@@ -60,16 +62,15 @@ func (r DeleteResult) Error() string {
 }
 
 // 删除计划
-func Delete(req *DeleteRequest) (bool, error) {
+func Delete(ctx context.Context, req *DeleteRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := campaign.NewCampainDeleteRequest()
 	r.SetCompaignId(req.CompaignId)
 
 	var response DeleteResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return true, nil
-
 }

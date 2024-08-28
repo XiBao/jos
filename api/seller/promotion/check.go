@@ -1,6 +1,8 @@
 package promotion
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -45,7 +47,7 @@ func (r CheckResponseData) Error() string {
 }
 
 // 促销审核,只能对人工审状态的促销进行审核
-func Check(req *CheckRequest) (uint, error) {
+func Check(ctx context.Context, req *CheckRequest) (uint, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionCheckRequest()
@@ -53,7 +55,7 @@ func Check(req *CheckRequest) (uint, error) {
 	r.SetStatus(req.Status)
 
 	var response CheckResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
 	return response.Data.Count, nil

@@ -1,6 +1,8 @@
 package center
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	center "github.com/XiBao/jos/sdk/request/interact/center/evaluate"
@@ -63,7 +65,7 @@ type EvaluateRule struct {
 	ExpireType   uint8   `json:"expire_type"`
 }
 
-func GetEvaluateRuleListById(req *GetEvaluateRuleListByIdRequest) ([]EvaluateRule, error) {
+func GetEvaluateRuleListById(ctx context.Context, req *GetEvaluateRuleListByIdRequest) ([]EvaluateRule, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewGetEvaluateRuleListByIdRequest()
@@ -72,7 +74,7 @@ func GetEvaluateRuleListById(req *GetEvaluateRuleListByIdRequest) ([]EvaluateRul
 	r.SetActivityId(req.ActivityId)
 
 	var response GetEvaluateRuleListByIdResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 

@@ -1,6 +1,8 @@
 package jzone
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type AddCartItemByPinRequest struct {
 	Request *sdk.Request

@@ -1,6 +1,8 @@
 package crm
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
@@ -8,8 +10,8 @@ import (
 
 type SetMemberGradeRequest struct {
 	api.BaseRequest
-	Pin   string `json:"pin"`   //用户Pin
-	Grade uint8  `json:"grade"` //等级
+	Pin   string `json:"pin"`   // 用户Pin
+	Grade uint8  `json:"grade"` // 等级
 }
 
 type SetMemberGradeResponse struct {
@@ -47,7 +49,7 @@ func (r SetMemberGradeData) Error() string {
 }
 
 // TODO 修改会员等级
-func SetMemberGrade(req *SetMemberGradeRequest) (bool, error) {
+func SetMemberGrade(ctx context.Context, req *SetMemberGradeRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewSetMemberGradeRequest()
@@ -61,9 +63,8 @@ func SetMemberGrade(req *SetMemberGradeRequest) (bool, error) {
 	}
 
 	var response SetMemberGradeResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Data.ReturnType.Data, nil
-
 }

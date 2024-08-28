@@ -1,6 +1,8 @@
 package follow
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/follow"
@@ -60,7 +62,7 @@ func (r QueryForCountByVidResult) Error() string {
 	return sdk.ErrorString(r.Code, r.Msg)
 }
 
-func QueryForCountByVid(req *QueryForCountByVidRequest) (uint64, error) {
+func QueryForCountByVid(ctx context.Context, req *QueryForCountByVidRequest) (uint64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := follow.NewQueryForCountByVidRequest()
@@ -68,7 +70,7 @@ func QueryForCountByVid(req *QueryForCountByVidRequest) (uint64, error) {
 	r.SetShopId(req.ShopId)
 
 	var response QueryForCountByVidResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
 	return response.Data.Result.Data, nil

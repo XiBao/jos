@@ -1,6 +1,8 @@
 package isv
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/isv"
@@ -62,7 +64,7 @@ func (r IsvTokenEncryptionData) Error() string {
 	return r.Msg
 }
 
-func IsvTokenEncryption(req *IsvTokenEncryptionRequest) (*IsvTokenEncryptionData, error) {
+func IsvTokenEncryption(ctx context.Context, req *IsvTokenEncryptionRequest) (*IsvTokenEncryptionData, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := isv.NewIsvTokenEncryptionRequest()
@@ -70,7 +72,7 @@ func IsvTokenEncryption(req *IsvTokenEncryptionRequest) (*IsvTokenEncryptionData
 	r.SetTokenStr(req.TokenStr)
 
 	var response IsvTokenEncryptionResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	if response.IsError() {

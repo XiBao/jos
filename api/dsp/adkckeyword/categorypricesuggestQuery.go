@@ -1,6 +1,8 @@
 package adkckeyword
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/adkckeyword"
@@ -77,7 +79,7 @@ type DspDayForeCast struct {
 }
 
 // 查询.快车.三级类目出价建议
-func CategorypricesuggestQuery(req *CategorypricesuggestQueryRequest) (*CategorypricesuggestQueryValue, error) {
+func CategorypricesuggestQuery(ctx context.Context, req *CategorypricesuggestQueryRequest) (*CategorypricesuggestQueryValue, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := adkckeyword.NewCategorypricesuggestQueryRequest()
@@ -85,7 +87,7 @@ func CategorypricesuggestQuery(req *CategorypricesuggestQueryRequest) (*Category
 	r.SetMobileType(req.MobileType)
 
 	var response CategorypricesuggestQueryResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result.Value, nil

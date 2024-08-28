@@ -1,6 +1,8 @@
 package fullcoupon
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/fullcoupon"
@@ -62,7 +64,7 @@ func (r FullCouponGetPromoDetailInfoResponseData) Error() string {
 	return sdk.ErrorString(r.Code, r.Msg)
 }
 
-func GetPromoDetailInfo(req *FullCouponGetPromoDetailInfoRequest) (*PromoDetailsInfo, error) {
+func GetPromoDetailInfo(ctx context.Context, req *FullCouponGetPromoDetailInfoRequest) (*PromoDetailsInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := fullcoupon.NewFullCouponGetPromoDetailInfoRequest()
@@ -70,7 +72,7 @@ func GetPromoDetailInfo(req *FullCouponGetPromoDetailInfoRequest) (*PromoDetails
 	r.SetPromoId(req.PromoId)
 
 	var response FullCouponGetPromoDetailInfoResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result.PromoDetails, nil

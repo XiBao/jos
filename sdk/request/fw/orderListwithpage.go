@@ -1,6 +1,8 @@
 package fw
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type OrderListwithpageRequest struct {
 	Request *sdk.Request

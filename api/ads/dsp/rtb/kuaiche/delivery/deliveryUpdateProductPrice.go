@@ -1,6 +1,8 @@
 package delivery
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -55,7 +57,7 @@ type KuaicheDeliveryUpdateProductPriceResponseReturnType struct {
 	dsp.DataCommonResponse
 }
 
-func KuaicheDeliveryUpdateProductPrice(req *KuaicheDeliveryUpdateProductPriceRequest) (bool, error) {
+func KuaicheDeliveryUpdateProductPrice(ctx context.Context, req *KuaicheDeliveryUpdateProductPriceRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := delivery.NewKuaicheDeliveryUpdateProductPriceRequest()
@@ -65,7 +67,7 @@ func KuaicheDeliveryUpdateProductPrice(req *KuaicheDeliveryUpdateProductPriceReq
 	}
 
 	var response KuaicheDeliveryUpdateProductPriceResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Responce.ReturnType.Data, nil

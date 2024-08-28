@@ -1,6 +1,8 @@
 package campaign
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type CampainGetRequest struct {
 	Request *sdk.Request
@@ -12,7 +14,6 @@ func NewCampainGetRequest() (req *CampainGetRequest) {
 		Request: &request,
 	}
 	return
-
 }
 
 func (req *CampainGetRequest) SetCampaignId(campaignId uint64) {

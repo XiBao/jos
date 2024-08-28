@@ -1,6 +1,8 @@
 package category
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/category"
@@ -54,7 +56,7 @@ type CategoryResp struct {
 }
 
 // 商品类目查询
-func GoodsGet(req *GoodsGetRequest) ([]CategoryResp, error) {
+func GoodsGet(ctx context.Context, req *GoodsGetRequest) ([]CategoryResp, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := category.NewGoodsGetRequest()
@@ -65,7 +67,7 @@ func GoodsGet(req *GoodsGetRequest) ([]CategoryResp, error) {
 	r.SetReq(goodsReq)
 
 	var response GoodsGetResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	var resp GoodsGetResult

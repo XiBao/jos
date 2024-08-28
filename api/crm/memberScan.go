@@ -1,6 +1,8 @@
 package crm
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
@@ -48,7 +50,7 @@ type MemberScanResult struct {
 	ScrollId    string   `json:"scroll_id,omitempty" codec:"scroll_id,omitempty"`
 }
 
-func MemberScan(req *MemberScanRequest) (*MemberScanResult, error) {
+func MemberScan(ctx context.Context, req *MemberScanRequest) (*MemberScanResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewMemberScanRequest()
@@ -84,7 +86,7 @@ func MemberScan(req *MemberScanRequest) (*MemberScanResult, error) {
 	}
 
 	var response MemberScanResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result, nil

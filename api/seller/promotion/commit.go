@@ -1,6 +1,8 @@
 package promotion
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
@@ -44,14 +46,14 @@ func (r CommitResponseData) Error() string {
 }
 
 // 促销创建完毕,提交保存促销命令
-func Commit(req *CommitRequest) (bool, error) {
+func Commit(ctx context.Context, req *CommitRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionCommitRequest()
 	r.SetPromoId(req.PromoId)
 
 	var response CommitResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 

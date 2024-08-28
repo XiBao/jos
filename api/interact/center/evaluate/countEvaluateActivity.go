@@ -1,6 +1,8 @@
 package center
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	center "github.com/XiBao/jos/sdk/request/interact/center/evaluate"
@@ -51,7 +53,7 @@ func (r CountEvaluateActivityData) Error() string {
 	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func CountEvaluateActivity(req *CountEvaluateActivityRequest) (uint, error) {
+func CountEvaluateActivity(ctx context.Context, req *CountEvaluateActivityRequest) (uint, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewCountEvaluateActivityRequest()
@@ -74,7 +76,7 @@ func CountEvaluateActivity(req *CountEvaluateActivityRequest) (uint, error) {
 	}
 
 	var response CountEvaluateActivityResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
 	return response.Data.Result, nil

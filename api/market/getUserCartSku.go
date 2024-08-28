@@ -1,6 +1,8 @@
 package market
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/market"
@@ -35,7 +37,7 @@ type GetUserCartSkuData struct {
 }
 
 // 获取用户加购的sku数据
-func GetUserCartSku(req *GetUserCartSkuRequest) ([]CartSku, error) {
+func GetUserCartSku(ctx context.Context, req *GetUserCartSkuRequest) ([]CartSku, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := market.NewGetUserCartSkuRequest()
@@ -44,7 +46,7 @@ func GetUserCartSku(req *GetUserCartSkuRequest) ([]CartSku, error) {
 	r.SetXidBuyer(req.XidBuyer)
 
 	var response GetUserCartSkuResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 

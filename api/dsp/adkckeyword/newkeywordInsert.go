@@ -1,6 +1,8 @@
 package adkckeyword
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/adkckeyword"
@@ -8,10 +10,10 @@ import (
 
 type KeywordInsertRequest struct {
 	api.BaseRequest
-	Name      string  `json:"name,omitempty" codec:"name,omitempty"`             //关键字
-	Price     float64 `json:"price,omitempty" codec:"price,omitempty"`           //出价
-	Type      uint8   `json:"type,omitempty" codec:"type,omitempty"`             //购买类型：1.精确匹配4.短语匹配8.切词匹配
-	AdGroupId uint64  `json:"ad_groupId,omitempty" codec:"ad_groupId,omitempty"` //单元id
+	Name      string  `json:"name,omitempty" codec:"name,omitempty"`             // 关键字
+	Price     float64 `json:"price,omitempty" codec:"price,omitempty"`           // 出价
+	Type      uint8   `json:"type,omitempty" codec:"type,omitempty"`             // 购买类型：1.精确匹配4.短语匹配8.切词匹配
+	AdGroupId uint64  `json:"ad_groupId,omitempty" codec:"ad_groupId,omitempty"` // 单元id
 }
 
 type KeywordInsertResponse struct {
@@ -60,7 +62,7 @@ func (r KeywordInsertResult) Error() string {
 }
 
 // 插入关键词
-func KeywordInsert(req *KeywordInsertRequest) (bool, error) {
+func KeywordInsert(ctx context.Context, req *KeywordInsertRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := adkckeyword.NewkeywordInsertRequest()
@@ -70,7 +72,7 @@ func KeywordInsert(req *KeywordInsertRequest) (bool, error) {
 	r.SetAdGroupId(req.AdGroupId)
 
 	var response KeywordInsertResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return true, nil

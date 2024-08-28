@@ -1,6 +1,8 @@
 package imgzone
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/imgzone"
@@ -53,7 +55,7 @@ func (c PictureQueryData) Error() string {
 }
 
 // 查询图片信息接口，帮助获取图片信息
-func PictureQuery(req *PictureQueryRequest) ([]Picture, error) {
+func PictureQuery(ctx context.Context, req *PictureQueryRequest) ([]Picture, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := imgzone.NewPictureQueryRequest()
@@ -80,7 +82,7 @@ func PictureQuery(req *PictureQueryRequest) ([]Picture, error) {
 	}
 
 	var response PictureQueryResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.ImgList, nil

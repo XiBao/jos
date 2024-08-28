@@ -1,6 +1,8 @@
 package points
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/points"
@@ -59,15 +61,14 @@ func (r JsfResult) Error() string {
 	return sdk.ErrorString(r.Code, r.Desc)
 }
 
-func GetPointsRule(req *GetPointsRuleRequest) ([]PointsRule, error) {
+func GetPointsRule(ctx context.Context, req *GetPointsRuleRequest) ([]PointsRule, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := points.NewGetPointsRuleRequest()
 
 	var response GetPointsRuleResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.JsfResult.Result, nil
-
 }

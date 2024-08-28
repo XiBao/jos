@@ -1,6 +1,8 @@
 package client
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	clt "github.com/XiBao/jos/sdk/request/brand/client"
@@ -35,15 +37,14 @@ type QueryBrandsIdByVenderIdResult struct {
 }
 
 // TODO 根据商家id 查询品牌id
-func QueryBrandsIdByVenderId(req *QueryBrandsIdByVenderIdRequest) (uint64, error) {
+func QueryBrandsIdByVenderId(ctx context.Context, req *QueryBrandsIdByVenderIdRequest) (uint64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := clt.NewQueryBrandsIdByVenderIdRequest()
 
 	var response QueryBrandsIdByVenderIdResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
 	return response.Data.Result.BrandsId, nil
-
 }

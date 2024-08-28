@@ -1,6 +1,8 @@
 package dmp
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -58,7 +60,7 @@ type KuaicheDmpNewTagDetailResponseData struct {
 	dsp.DataCommonResponse
 }
 
-func KuaicheDmpNewTagDetail(req *KuaicheDmpNewTagDetailRequest) (*dsp.TagDetail, error) {
+func KuaicheDmpNewTagDetail(ctx context.Context, req *KuaicheDmpNewTagDetailRequest) (*dsp.TagDetail, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := dmp.NewKuaicheDmpNewTagDetailRequest()
@@ -74,7 +76,7 @@ func KuaicheDmpNewTagDetail(req *KuaicheDmpNewTagDetailRequest) (*dsp.TagDetail,
 	r.SetCoverageRate(req.CoverageRate)
 
 	var response KuaicheDmpNewTagDetailResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Responce.Data.Data, nil

@@ -1,6 +1,7 @@
 package ware
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/XiBao/jos/api"
@@ -46,14 +47,14 @@ type PriceChange struct {
 }
 
 // 获取单个SKU
-func PriceGet(req *PriceGetRequest) (*PriceChange, error) {
+func PriceGet(ctx context.Context, req *PriceGetRequest) (*PriceChange, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := ware.NewWarePriceGetRequest()
 	r.SetSkuId(sdk.StringsJoin("J_", strconv.FormatUint(req.SkuId, 10)))
 
 	var response PriceGetResponse
-	err := client.Execute(r.Request, req.Session, &response)
+	err := client.Execute(ctx, r.Request, req.Session, &response)
 	if err != nil {
 		return nil, err
 	}

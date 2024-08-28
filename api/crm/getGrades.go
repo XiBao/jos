@@ -1,6 +1,8 @@
 package crm
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
@@ -40,13 +42,13 @@ type GetGradesResult struct {
 	NextGradeName     string `json:"next_grade_name,omitempty" codec:"next_grade_name,omitempty"`
 }
 
-func GetGrades(req *GetGradesRequest) ([]GetGradesResult, error) {
+func GetGrades(ctx context.Context, req *GetGradesRequest) ([]GetGradesResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewGetGradesRequest()
 
 	var response GetGradesResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result, nil

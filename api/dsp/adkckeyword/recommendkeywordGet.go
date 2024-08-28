@@ -1,6 +1,8 @@
 package adkckeyword
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp/adkckeyword"
@@ -9,7 +11,7 @@ import (
 type RecommendkeywordGetRequest struct {
 	api.BaseRequest
 	SkuId       uint64 `json:"sku_id,omitempty" codec:"sku_id,omitempty"`
-	SearchType  uint8  `json:"search_type,omitempty" codec:"search_type,omitempty"`     //查询范围 1.按整体查询/2.按无线端查询/3.按PC端查询
+	SearchType  uint8  `json:"search_type,omitempty" codec:"search_type,omitempty"`     // 查询范围 1.按整体查询/2.按无线端查询/3.按PC端查询
 	Order       uint8  `json:"order,omitempty" codec:"order,omitempty"`                 //	排序方式 0.正序/1.倒序
 	SortType    uint8  `json:"sort_type,omitempty" codec:"sort_type,omitempty"`         // 排序方式 1.按搜索量排序/2.按平均出价排序/3.按竞争激烈程度排序
 	KeyWordType uint8  `json:"key_word_type,omitempty" codec:"key_word_type,omitempty"` // 	关键词来源 1.商品关键词/2.相似商品关键词/3.行业热词
@@ -72,14 +74,14 @@ type RecommendkeywordGetValue struct {
 }
 
 type KeyWordRecommendQuery struct {
-	AvgBigPrice float64 `json:"avgBigPrice,omitempty" codec:"avgBigPrice,omitempty"` //平均出家
-	StarCount   uint8   `json:"starCount,omitempty" codec:"starCount,omitempty"`     //星星数量
-	Pv          uint64  `json:"pv,omitempty" codec:"pv,omitempty"`                   //三十访问量
-	KeyWord     string  `json:"keyWord,omitempty" codec:"keyWord,omitempty"`         //三十访问量
+	AvgBigPrice float64 `json:"avgBigPrice,omitempty" codec:"avgBigPrice,omitempty"` // 平均出家
+	StarCount   uint8   `json:"starCount,omitempty" codec:"starCount,omitempty"`     // 星星数量
+	Pv          uint64  `json:"pv,omitempty" codec:"pv,omitempty"`                   // 三十访问量
+	KeyWord     string  `json:"keyWord,omitempty" codec:"keyWord,omitempty"`         // 三十访问量
 }
 
 // 获取推荐关键词
-func RecommendkeywordGet(req *RecommendkeywordGetRequest) ([]KeyWordRecommendQuery, error) {
+func RecommendkeywordGet(ctx context.Context, req *RecommendkeywordGetRequest) ([]KeyWordRecommendQuery, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := adkckeyword.NewRecommendkeywordGetRequest()
@@ -90,7 +92,7 @@ func RecommendkeywordGet(req *RecommendkeywordGetRequest) ([]KeyWordRecommendQue
 	r.SetKeyWordType(req.KeyWordType)
 
 	var response RecommendkeywordGetResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 

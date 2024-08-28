@@ -1,6 +1,7 @@
 package secret
 
 import (
+	"context"
 	"sync"
 
 	"github.com/XiBao/jos/sdk"
@@ -25,7 +26,7 @@ func instanceKey(appKey string, accessToken string) string {
 	return sdk.StringsJoin(appKey, "-", accessToken)
 }
 
-func (this *Service) Instance(appKey string, secret string, accessToken string) *Client {
+func (this *Service) Instance(ctx context.Context, appKey string, secret string, accessToken string) *Client {
 	key := instanceKey(appKey, accessToken)
 	this.RLock()
 	if client, found := this.clients[key]; found {
@@ -34,7 +35,7 @@ func (this *Service) Instance(appKey string, secret string, accessToken string) 
 	}
 	this.RUnlock()
 	this.Lock()
-	client := NewClient(appKey, secret, accessToken)
+	client := NewClient(ctx, appKey, secret, accessToken)
 	client.SetHost(this.host)
 	client.SetEnv(this.env)
 	this.clients[key] = client

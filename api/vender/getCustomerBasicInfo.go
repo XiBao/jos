@@ -1,6 +1,8 @@
 package vender
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/vender"
@@ -76,7 +78,7 @@ type CardMemberInfo struct {
 	Channel       uint   `json:"channel,omitempty" codec:"channel,omitempty"`             // 601	渠道码（101-卡包；102-店铺首页；103-app支付完成页；。。。601-ISV服务；999-默认渠道；888-CRM-SHOP）
 }
 
-func GetCustomerBasicInfo(req *GetCustomerBasicInfoRequest) (*CardMemberInfo, error) {
+func GetCustomerBasicInfo(ctx context.Context, req *GetCustomerBasicInfoRequest) (*CardMemberInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := vender.NewGetCustomerBasicInfoRequest()
@@ -86,9 +88,8 @@ func GetCustomerBasicInfo(req *GetCustomerBasicInfoRequest) (*CardMemberInfo, er
 	}
 
 	var response GetCustomerBasicInfoResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result.Info, nil
-
 }

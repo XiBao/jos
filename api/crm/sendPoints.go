@@ -1,6 +1,7 @@
 package crm
 
 import (
+	"context"
 	"strconv"
 	"time"
 
@@ -52,7 +53,7 @@ type SendPointsData struct {
 	Result int64  `json:"sendpoints_result,omitempty" codec:"sendpoints_result,omitempty"`
 }
 
-func SendPoints(req *SendPointsRequest) (int64, error) {
+func SendPoints(ctx context.Context, req *SendPointsRequest) (int64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewSendPointsRequest()
@@ -71,7 +72,7 @@ func SendPoints(req *SendPointsRequest) (int64, error) {
 	r.SetPoints(req.Points)
 
 	var response SendPointsResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
 	return response.Data.Result, nil

@@ -1,6 +1,8 @@
 package imgzone
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type PictureQueryRequest struct {
 	Request *sdk.Request

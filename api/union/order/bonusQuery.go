@@ -1,6 +1,8 @@
 package order
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/union/order"
@@ -90,7 +92,7 @@ type OrderBonus struct {
 }
 
 // UnionOrderBonusQuery
-func UnionOrderBonusQuery(req *UnionOrderBonusQueryRequest) ([]OrderBonus, error) {
+func UnionOrderBonusQuery(ctx context.Context, req *UnionOrderBonusQueryRequest) ([]OrderBonus, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := order.NewUnionOrderBonusQueryRequest()
@@ -106,7 +108,7 @@ func UnionOrderBonusQuery(req *UnionOrderBonusQueryRequest) ([]OrderBonus, error
 	r.SetOrderReq(orderReq)
 
 	var response UnionOrderBonusQueryResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	var ret UnionOrderBonusQueryResult

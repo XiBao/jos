@@ -1,6 +1,8 @@
 package areas
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/areas"
@@ -43,14 +45,14 @@ func (r AreasCountyGetResponse) Error() string {
 	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
-func CountyGet(req *CountyGetRequest) ([]Result, error) {
+func CountyGet(ctx context.Context, req *CountyGetRequest) ([]Result, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := areas.NewAreasCountyGetRequest()
 	r.SetParentId(req.ParentId)
 
 	var response CountyGetResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.AreasCountyGetResponse.AreasServiceResponse.Data, nil

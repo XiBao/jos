@@ -1,6 +1,8 @@
 package creative
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -55,7 +57,7 @@ type KuaicheCreativeUpdateStatusV2ResponseData struct {
 	dsp.DataCommonResponse
 }
 
-func KuaicheCreativeUpdateStatusV2(req *KuaicheCreativeUpdateStatusV2Request) (bool, error) {
+func KuaicheCreativeUpdateStatusV2(ctx context.Context, req *KuaicheCreativeUpdateStatusV2Request) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := creative.NewKuaicheCreativeUpdateStatusV2Request()
@@ -65,7 +67,7 @@ func KuaicheCreativeUpdateStatusV2(req *KuaicheCreativeUpdateStatusV2Request) (b
 	}
 
 	var response KuaicheCreativeUpdateStatusV2Response
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Responce.Data.Success, nil

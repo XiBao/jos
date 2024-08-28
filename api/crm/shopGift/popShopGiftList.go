@@ -1,6 +1,8 @@
 package crm
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	crm "github.com/XiBao/jos/sdk/request/crm/shopGift"
@@ -74,7 +76,7 @@ type PopShopGiftListModel struct {
 	ModelNameList []string `json:"modelNameList"` // 人群列表
 }
 
-func PopShopGiftList(req *PopShopGiftListRequest) ([]PopShopGiftListModel, error) {
+func PopShopGiftList(ctx context.Context, req *PopShopGiftListRequest) ([]PopShopGiftListModel, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewPopShopGiftListRequest()
@@ -83,7 +85,7 @@ func PopShopGiftList(req *PopShopGiftListRequest) ([]PopShopGiftListModel, error
 	r.SetOpenIdBuyer(req.OpenIdBuyer)
 
 	var response PopShopGiftListResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result.Data, nil

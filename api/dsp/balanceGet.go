@@ -1,6 +1,8 @@
 package dsp
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/dsp"
@@ -73,13 +75,13 @@ type BalanceGetResultData struct {
 	FreezeAmount    float64 `json:"freezeAmount" codec:"freezeAmount"`
 }
 
-func BalanceGet(req *BalanceGetRequest) (*BalanceGetResultData, error) {
+func BalanceGet(ctx context.Context, req *BalanceGetRequest) (*BalanceGetResultData, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := dsp.NewBalanceGetRequest()
 
 	var response BalanceGetResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result.Data, nil

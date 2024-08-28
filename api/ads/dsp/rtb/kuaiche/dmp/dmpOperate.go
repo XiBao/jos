@@ -1,6 +1,8 @@
 package dmp
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -49,7 +51,7 @@ func (r KuaicheDmpOperateResponce) Error() string {
 	return "no result data"
 }
 
-func KuaicheDmpOperate(req *KuaicheDmpOperateRequest) (bool, error) {
+func KuaicheDmpOperate(ctx context.Context, req *KuaicheDmpOperateRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := dmp.NewKuaicheDmpOperateRequest()
@@ -59,7 +61,7 @@ func KuaicheDmpOperate(req *KuaicheDmpOperateRequest) (bool, error) {
 	}
 
 	var response KuaicheDmpOperateResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Responce.ReturnType.Success, nil

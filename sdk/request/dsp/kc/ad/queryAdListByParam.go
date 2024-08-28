@@ -1,6 +1,8 @@
 package ad
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type AdQueryAdListByParamRequest struct {
 	Request *sdk.Request

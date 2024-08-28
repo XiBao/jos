@@ -1,6 +1,8 @@
 package crm
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/crm"
@@ -60,13 +62,13 @@ func (r DeleteCustomerOpenInfoResult) Error() string {
 }
 
 // 获取单个SKU
-func DeleteCustomerOpenInfo(req *DeleteCustomerOpenInfoRequest) (bool, error) {
+func DeleteCustomerOpenInfo(ctx context.Context, req *DeleteCustomerOpenInfoRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewDeleteCustomerOpenInfoRequest()
 
 	var response DeleteCustomerOpenInfoResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Data.Result.Data, nil

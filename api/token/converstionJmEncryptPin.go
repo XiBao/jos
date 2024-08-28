@@ -1,6 +1,8 @@
 package token
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/token"
@@ -62,7 +64,7 @@ func (r ConverstionJmEncryptPinResult) Error() string {
 }
 
 // 输入单个订单id，得到所有相关订单信息
-func ConverstionJmEncryptPin(req *ConverstionJmEncryptPinRequest) (*ConverstionJmEncryptPinResult, error) {
+func ConverstionJmEncryptPin(ctx context.Context, req *ConverstionJmEncryptPinRequest) (*ConverstionJmEncryptPinResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := token.NewConverstionJmEncryptPinRequest()
@@ -70,7 +72,7 @@ func ConverstionJmEncryptPin(req *ConverstionJmEncryptPinRequest) (*ConverstionJ
 	r.SetEncryptPin(req.EncryptPin)
 
 	var response ConverstionJmEncryptPinResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.Result, nil

@@ -1,6 +1,7 @@
 package report
 
 import (
+	"context"
 	"strconv"
 	"time"
 
@@ -237,7 +238,7 @@ func (k JosKeywordTmp) ToJosKeyword() JosKeyword {
 }
 
 // 获取关键词报表
-func AdgroupkeywordQuery(req *AdgroupkeywordQueryRequest) ([]JosKeyword, error) {
+func AdgroupkeywordQuery(ctx context.Context, req *AdgroupkeywordQueryRequest) ([]JosKeyword, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := report.NewAdgroupkeywordQueryRequest()
@@ -263,7 +264,7 @@ func AdgroupkeywordQuery(req *AdgroupkeywordQueryRequest) ([]JosKeyword, error) 
 	}
 
 	var response AdgroupkeywordQueryResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	record := make([]JosKeyword, 0, len(response.Data.Result.Value.Datas))

@@ -1,6 +1,8 @@
 package jm
 
 import (
+	"context"
+
 	. "github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/jm"
@@ -53,13 +55,13 @@ func (r GetPurchaseInfoReturnType) Error() string {
 	return sdk.ErrorString(r.Code, r.Message)
 }
 
-func GetPurchaseInfo(req *GetPurchaseInfoRequest) ([]PurchaseInfo, error) {
+func GetPurchaseInfo(ctx context.Context, req *GetPurchaseInfoRequest) ([]PurchaseInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := jm.NewGetPurchaseInfoRequest()
 
 	var response GetPurchaseInfoResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.ReturnType.PurchaseInfoList, nil

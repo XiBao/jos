@@ -1,6 +1,7 @@
 package order
 
 import (
+	"context"
 	"strings"
 
 	"github.com/XiBao/jos/api"
@@ -67,7 +68,7 @@ func (r OrderDetailInfo) Error() string {
 }
 
 // 输入单个订单id，得到所有相关订单信息
-func PopOrderEnGet(req *PopOrderEnGetRequest) (*OrderInfo, error) {
+func PopOrderEnGet(ctx context.Context, req *PopOrderEnGetRequest) (*OrderInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := order.NewPopOrderEnGetRequest()
@@ -76,7 +77,7 @@ func PopOrderEnGet(req *PopOrderEnGetRequest) (*OrderInfo, error) {
 	r.SetOrderId(req.OrderId)
 
 	var response PopOrderEnGetResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Data.OrderDetailInfo.OrderInfo, nil

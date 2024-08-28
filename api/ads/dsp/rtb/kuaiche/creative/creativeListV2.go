@@ -1,6 +1,8 @@
 package creative
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -60,7 +62,7 @@ type KuaicheCreativeListV2ResponseDataData struct {
 	Paginator *dsp.Paginator     `json:"paginator,omitempty" codec:"paginator,omitempty"`
 }
 
-func KuaicheCreativeListV2(req *KuaicheCreativeListV2Request) (*KuaicheCreativeListV2ResponseDataData, error) {
+func KuaicheCreativeListV2(ctx context.Context, req *KuaicheCreativeListV2Request) (*KuaicheCreativeListV2ResponseDataData, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := creative.NewKuaicheCreativeListV2Request()
@@ -70,7 +72,7 @@ func KuaicheCreativeListV2(req *KuaicheCreativeListV2Request) (*KuaicheCreativeL
 	}
 
 	var response KuaicheCreativeListV2Response
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Responce.Data.Data, nil

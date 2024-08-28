@@ -1,6 +1,8 @@
 package adgroup
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -55,7 +57,7 @@ type KuaicheAdgroupUpdateNameV2ResponseData struct {
 	dsp.DataCommonResponse
 }
 
-func KuaicheAdgroupUpdateNameV2(req *KuaicheAdgroupUpdateNameV2Request) (bool, error) {
+func KuaicheAdgroupUpdateNameV2(ctx context.Context, req *KuaicheAdgroupUpdateNameV2Request) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := adgroup.NewKuaicheAdgroupUpdateNameV2Request()
@@ -65,7 +67,7 @@ func KuaicheAdgroupUpdateNameV2(req *KuaicheAdgroupUpdateNameV2Request) (bool, e
 	}
 
 	var response KuaicheAdgroupUpdateNameV2Response
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
 	return response.Responce.Data.Success, nil

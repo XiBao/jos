@@ -1,6 +1,8 @@
 package dmp
 
 import (
+	"context"
+
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
 	"github.com/XiBao/jos/sdk"
@@ -74,7 +76,7 @@ type KuaicheDmpCommonCrowdQueryResponseDataData struct {
 	Data      []dsp.DmpCommonCrowdQuery `json:"data"`
 }
 
-func KuaicheDmpCommonCrowdQuery(req *KuaicheDmpCommonCrowdQueryRequest) (*KuaicheDmpCommonCrowdQueryResponseDataData, error) {
+func KuaicheDmpCommonCrowdQuery(ctx context.Context, req *KuaicheDmpCommonCrowdQueryRequest) (*KuaicheDmpCommonCrowdQueryResponseDataData, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := dmp.NewKuaicheDmpCommonCrowdQueryRequest()
@@ -116,7 +118,7 @@ func KuaicheDmpCommonCrowdQuery(req *KuaicheDmpCommonCrowdQueryRequest) (*Kuaich
 	}
 
 	var response KuaicheDmpCommonCrowdQueryResponse
-	if err := client.Execute(r.Request, req.Session, &response); err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
 	return response.Responce.Data.Data, nil
