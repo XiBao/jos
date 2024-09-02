@@ -165,7 +165,7 @@ type CreativeData struct {
 	CustomTitle    string                  `json:"customTitle"`    // 创意标题
 	ImgUrl         string                  `json:"imgUrl"`         // 创意图片地址
 	SizeStr        string                  `json:"sizeStr"`        // 图片尺寸
-	SkuId          uint64                  `json:"skuId"`          // skuId
+	SkuId          string                  `json:"skuId"`          // skuId
 	Url            string                  `json:"url"`            // 落地页
 	AuditInfoList  []CreativeAuditInfoData `json:"auditInfoList"`  // 创意审核信息列表
 	SkuState       uint                    `json:"skuState"`       // 商品上架状态，非1为正常上架状态，1为不在架状态
@@ -196,7 +196,7 @@ type KeywordExtData struct {
 	CTR              string `json:"CTR"`
 	CPM              string `json:"CPM"`
 	KeywordName      string `json:"keywordName"`
-	Type             string `json:"type"`
+	Type             int    `json:"type"`
 	IndirectOrderCnt uint   `json:"indirectOrderCnt"`
 	DirectOrderCnt   uint   `json:"directOrderCnt"`
 	IndirectCartCnt  uint   `json:"indirectCartCnt"`
@@ -235,7 +235,7 @@ type KeywordData struct {
 	TotalOrderROI                string  `json:"totalOrderROI"`                // ROI
 	Id                           uint64  `json:"id"`                           // 关键词id
 	KeywordName                  string  `json:"keywordName"`                  // 关键词名称
-	KeywordPCPrice               float64 `json:"keywordPCPrice"`               // 关键词pc出价
+	KeywordPCPrice               string  `json:"keywordPCPrice"`               // 关键词pc出价
 	KeywordWlPrice               float64 `json:"keywordWlPrice"`               // 关键词无线出价
 	CampaignId                   uint64  `json:"campaignId"`                   // 计划id
 	CampaignName                 string  `json:"campaignName"`                 // 计划名称
@@ -247,8 +247,8 @@ type KeywordData struct {
 	AverageHistoryRankExpand     string  `json:"averageHistoryRankExpand"`     // 展现排名
 	Type                         uint    `json:"type"`                         // 关键词匹配类型,1:精确匹配 4:短语匹配 8:切词匹配
 	KeywordFlag                  string  `json:"keywordFlag"`                  // 标签
-	NewCurrentPcShowq            float64 `json:"newCurrentPcShowq"`            // pc竞争力指数
-	NewCurrentWlShowq            float64 `json:"newCurrentWlShowq"`            // 无线竞争力指数
+	NewCurrentPcShowq            string  `json:"newCurrentPcShowq"`            // pc竞争力指数
+	NewCurrentWlShowq            string  `json:"newCurrentWlShowq"`            // 无线竞争力指数
 	GroupId                      uint64  `json:"groupId"`                      // 单元id
 	GroupName                    string  `json:"groupName"`                    // 单元名称
 	KeyWordType                  uint    `json:"keyWordType"`                  // 词类型：1，关键词；2，意图词，注意：若是绑定了意图词，查询时返回的数据量会大于请求分页的数量，ex:查询10条，返回数据12条，其中2条是意图词信息
