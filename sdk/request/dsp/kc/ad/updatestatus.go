@@ -1,6 +1,8 @@
 package ad
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type AdUpdateStatusRequest struct {
 	Request *sdk.Request
@@ -12,7 +14,6 @@ func NewAdUpdateStatusRequest() (req *AdUpdateStatusRequest) {
 		Request: &request,
 	}
 	return
-
 }
 
 func (req *AdUpdateStatusRequest) SetStatus(status int) {

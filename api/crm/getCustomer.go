@@ -1,9 +1,7 @@
 package crm
 
 import (
-	"encoding/json"
-	"errors"
-	"fmt"
+	"context"
 
 	. "github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -20,8 +18,27 @@ type GetCustomerResponse struct {
 	Response  GetCustomerResponse1 `json:"jingdong_pop_crm_customer_getCustomer_responce,omitempty" codec:"jingdong_pop_crm_customer_getCustomer_responce,omitempty"`
 }
 
+func (r GetCustomerResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Response.IsError()
+}
+
+func (r GetCustomerResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return r.Response.Error()
+}
+
 type GetCustomerResponse1 struct {
 	Result GetCustomerResult `json:"returnResult,omitempty" codec:"returnResult,omitempty"`
+}
+
+func (r GetCustomerResponse1) IsError() bool {
+	return r.Result.IsError()
+}
+
+func (r GetCustomerResponse1) Error() string {
+	return r.Result.Error()
 }
 
 type GetCustomerResult struct {
@@ -30,31 +47,23 @@ type GetCustomerResult struct {
 	Data CardMember `json:"data,omitempty" codec:"data,omitempty"`
 }
 
-func GetCustomer(req GetCustomerRequest) (CardMember, error) {
+func (r GetCustomerResult) IsError() bool {
+	return r.Code != "200"
+}
 
+func (r GetCustomerResult) Error() string {
+	return sdk.ErrorString(r.Code, r.Desc)
+}
+
+func GetCustomer(ctx context.Context, req GetCustomerRequest) (CardMember, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.GetCustomerRequest()
 	r.SetCustomerPin(req.CustomerPin)
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return CardMember{}, err
-	}
-	if len(result) == 0 {
-		return CardMember{}, fmt.Errorf("no result info")
-	}
+
 	var response GetCustomerResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return CardMember{}, err
 	}
-	if response.ErrorResp != nil {
-		return CardMember{}, response.ErrorResp
-	}
-
-	if response.Response.Result.Code != "200" {
-		return CardMember{}, errors.New(response.Response.Result.Desc)
-	}
-
 	return response.Response.Result.Data, nil
 }

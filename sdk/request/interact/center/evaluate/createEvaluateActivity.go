@@ -41,17 +41,17 @@ type CreateEvaluateActivitySku struct {
 }
 
 type CreateEvaluateActivityBody struct {
-	SupplierCode       string                        `json:"supplierCode,omitempty" codec:"supplierCode,omitempty"`             // 供应商简码
-	EndTime            string                        `json:"endTime" codec:"endTime"`                                           // 活动结束时间
-	StartTime          string                        `json:"startTime" codec:"startTime"`                                       // 活动开始时间
-	PictureRequirement uint                          `json:"pictureRequirement,omitempty" codec:"pictureRequirement,omitempty"` // 晒单图片数量最低要求
-	ShopName           string                        `json:"shopName,omitempty" codec:"shopName,omitempty"`                     // 店铺名称
-	Name               string                        `json:"name" codec:"name"`                                                 // 活动名称
-	VedioRequirement   uint                          `json:"vedioRequirement,omitempty" codec:"vedioRequirement,omitempty"`     // 视频需要的数量
-	WordRequirement    uint                          `json:"wordRequirement,omitempty" codec:"wordRequirement,omitempty"`       // 字数需要的数量 页面上大于10
-	Modifier           string                        `json:"modifier,omitempty" codec:"modifier,omitempty"`                     // 活动修改者
-	EvaluateRuleList   []*CreateEvaluateActivityRule `json:"evaluateRuleList" codec:"evaluateRuleList"`                         // 活动规则集合
-	EvaluateSkuList    []*CreateEvaluateActivitySku  `json:"evaluateSkuList" codec:"evaluateSkuList"`                           // 活动商品集合
+	SupplierCode       string                       `json:"supplierCode,omitempty" codec:"supplierCode,omitempty"`             // 供应商简码
+	EndTime            string                       `json:"endTime" codec:"endTime"`                                           // 活动结束时间
+	StartTime          string                       `json:"startTime" codec:"startTime"`                                       // 活动开始时间
+	PictureRequirement uint                         `json:"pictureRequirement,omitempty" codec:"pictureRequirement,omitempty"` // 晒单图片数量最低要求
+	ShopName           string                       `json:"shopName,omitempty" codec:"shopName,omitempty"`                     // 店铺名称
+	Name               string                       `json:"name" codec:"name"`                                                 // 活动名称
+	VedioRequirement   uint                         `json:"vedioRequirement,omitempty" codec:"vedioRequirement,omitempty"`     // 视频需要的数量
+	WordRequirement    uint                         `json:"wordRequirement,omitempty" codec:"wordRequirement,omitempty"`       // 字数需要的数量 页面上大于10
+	Modifier           string                       `json:"modifier,omitempty" codec:"modifier,omitempty"`                     // 活动修改者
+	EvaluateRuleList   []CreateEvaluateActivityRule `json:"evaluateRuleList" codec:"evaluateRuleList"`                         // 活动规则集合
+	EvaluateSkuList    []CreateEvaluateActivitySku  `json:"evaluateSkuList" codec:"evaluateSkuList"`                           // 活动商品集合
 }
 
 // create new request

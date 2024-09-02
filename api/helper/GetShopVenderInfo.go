@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"context"
 	"time"
 
 	"github.com/XiBao/jos/api"
@@ -12,8 +13,8 @@ type GetShopVenderInfoRequest struct {
 	api.BaseRequest
 }
 
-func GetShopVenderInfo(req *GetShopVenderInfoRequest) (*vender.ShopInfo, error) {
-	shop, err := vender.ShopQuery(&vender.ShopQueryRequest{
+func GetShopVenderInfo(ctx context.Context, req *GetShopVenderInfoRequest) (*vender.ShopInfo, error) {
+	shop, err := vender.ShopQuery(ctx, &vender.ShopQueryRequest{
 		BaseRequest: api.BaseRequest{
 			Session:  req.Session,
 			AnApiKey: req.AnApiKey,
@@ -22,7 +23,7 @@ func GetShopVenderInfo(req *GetShopVenderInfoRequest) (*vender.ShopInfo, error) 
 	if err != nil {
 		return nil, err
 	}
-	venderInfo, err := sellerVender.InfoGet(&sellerVender.InfoGetRequest{
+	venderInfo, err := sellerVender.InfoGet(ctx, &sellerVender.InfoGetRequest{
 		BaseRequest: api.BaseRequest{
 			Session:  req.Session,
 			AnApiKey: req.AnApiKey,

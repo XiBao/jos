@@ -1,8 +1,7 @@
 package keyword
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
@@ -36,8 +35,33 @@ type KuaicheKeywordShopListResponse struct {
 	ErrorResp *api.ErrorResponnse             `json:"error_response,omitempty" codec:"error_response,omitempty"`
 }
 
+func (r KuaicheKeywordShopListResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Responce == nil || r.Responce.IsError()
+}
+
+func (r KuaicheKeywordShopListResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Responce != nil {
+		return r.Responce.Error()
+	}
+	return "no result data"
+}
+
 type KuaicheKeywordShopListResponce struct {
 	ReturnType *KuaicheKeywordShopListResponseData `json:"returnType,omitempty" codec:"returnType,omitempty"`
+}
+
+func (r KuaicheKeywordShopListResponce) IsError() bool {
+	return r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r KuaicheKeywordShopListResponce) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return "no result data"
 }
 
 type KuaicheKeywordShopListResponseData struct {
@@ -51,7 +75,7 @@ type KuaicheKeywordShopListResponseDataData struct {
 	Paginator *dsp.Paginator      `json:"paginator,omitempty" codec:"paginator,omitempty"`
 }
 
-func KuaicheKeywordShopList(req *KuaicheKeywordShopListRequest) (*KuaicheKeywordShopListResponseDataData, error) {
+func KuaicheKeywordShopList(ctx context.Context, req *KuaicheKeywordShopListRequest) (*KuaicheKeywordShopListResponseDataData, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := keyword.NewKuaicheKeywordShopListRequest()
@@ -88,28 +112,9 @@ func KuaicheKeywordShopList(req *KuaicheKeywordShopListRequest) (*KuaicheKeyword
 		r.SetPlatformBusinessType(req.PlatformBusinessType)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result.")
-	}
-
 	var response KuaicheKeywordShopListResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, errors.New(response.ErrorResp.ZhDesc)
-	}
-	if response.Responce == nil || response.Responce.ReturnType == nil {
-		return nil, errors.New("no result data.")
-	}
-	if !response.Responce.ReturnType.Success {
-		return nil, errors.New(response.Responce.ReturnType.Msg)
-	}
-
 	return response.Responce.ReturnType.Data, nil
 }

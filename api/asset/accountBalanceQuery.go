@@ -1,11 +1,9 @@
 package asset
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/asset"
 )
@@ -21,15 +19,48 @@ type AccountBalanceQueryResponse struct {
 	Response  *AccountBalanceQueryRes `json:"jingdong_asset_account_balance_query_responce,omitempty" codec:"jingdong_asset_account_balance_query_responce,omitempty"`
 }
 
+func (r AccountBalanceQueryResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Response == nil || r.Response.IsError()
+}
+
+func (r AccountBalanceQueryResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Response != nil {
+		return r.Response.Error()
+	}
+	return "no result data"
+}
+
 type AccountBalanceQueryRes struct {
 	Code string                   `json:"code,omitempty" codec:"code,omitempty"`
 	Res  *AccountBalanceQueryData `json:"response,omitempty" codec:"response,omitempty"`
 }
 
+func (r AccountBalanceQueryRes) IsError() bool {
+	return r.Res == nil || r.Res.IsError()
+}
+
+func (r AccountBalanceQueryRes) Error() string {
+	if r.Res != nil {
+		return r.Res.Error()
+	}
+	return "no result data"
+}
+
 type AccountBalanceQueryData struct {
-	Code      string            `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string            `json:"error_description,omitempty" codec:"error_description,omitempty"`
-	Data      []*AccountBalance `json:"data,omitempty" codec:"data,omitempty"`
+	Code      string           `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc string           `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	Data      []AccountBalance `json:"data,omitempty" codec:"data,omitempty"`
+}
+
+func (r AccountBalanceQueryData) IsError() bool {
+	return r.Code != "200"
+}
+
+func (r AccountBalanceQueryData) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type AccountBalance struct {
@@ -44,32 +75,15 @@ type AccountBalance struct {
 	Signed          bool   `json:"signed" codec:"signed"`
 }
 
-func AccountBalanceQuery(req *AccountBalanceQueryRequest) ([]*AccountBalance, error) {
+func AccountBalanceQuery(ctx context.Context, req *AccountBalanceQueryRequest) ([]AccountBalance, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := asset.NewAccountBalanceQueryRequest()
 	r.SetTypeId(req.TypeId)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response AccountBalanceQueryResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Response == nil || response.Response.Res == nil {
-		return nil, errors.New("No response.")
-	}
-	if response.Response.Res.Data == nil {
-		return nil, errors.New("No result.")
-	}
-
 	return response.Response.Res.Data, nil
 }

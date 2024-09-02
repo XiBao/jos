@@ -1,8 +1,7 @@
 package vender
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -19,14 +18,47 @@ type GetCustomerBasicInfoResponse struct {
 	Data      *GetCustomerBasicInfoData `json:"jingdong_pop_vender_getCustomerBasicInfo_responce,omitempty" codec:"jingdong_pop_vender_getCustomerBasicInfo_responce,omitempty"`
 }
 
+func (r GetCustomerBasicInfoResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r GetCustomerBasicInfoResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type GetCustomerBasicInfoData struct {
 	Result *GetCustomerResult `json:"returnResult,omitempty" codec:"returnResult,omitempty"`
+}
+
+func (r GetCustomerBasicInfoData) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r GetCustomerBasicInfoData) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type GetCustomerResult struct {
 	Desc string          `json:"desc,omitempty" codec:"desc,omitempty"`
 	Code string          `json:"code,omitempty" codec:"code,omitempty"`
 	Info *CardMemberInfo `json:"data,omitempty" codec:"data,omitempty"`
+}
+
+func (r GetCustomerResult) IsError() bool {
+	return r.Code != "200"
+}
+
+func (r GetCustomerResult) Error() string {
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 type CardMemberInfo struct {
@@ -46,7 +78,7 @@ type CardMemberInfo struct {
 	Channel       uint   `json:"channel,omitempty" codec:"channel,omitempty"`             // 601	渠道码（101-卡包；102-店铺首页；103-app支付完成页；。。。601-ISV服务；999-默认渠道；888-CRM-SHOP）
 }
 
-func GetCustomerBasicInfo(req *GetCustomerBasicInfoRequest) (*CardMemberInfo, error) {
+func GetCustomerBasicInfo(ctx context.Context, req *GetCustomerBasicInfoRequest) (*CardMemberInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := vender.NewGetCustomerBasicInfoRequest()
@@ -55,26 +87,9 @@ func GetCustomerBasicInfo(req *GetCustomerBasicInfoRequest) (*CardMemberInfo, er
 		r.SetCustomerPin(req.Pin)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result info")
-	}
 	var response GetCustomerBasicInfoResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if response.Data.Result.Code != "200" {
-		return nil, errors.New(response.Data.Result.Desc)
 	}
 	return response.Data.Result.Info, nil
-
 }

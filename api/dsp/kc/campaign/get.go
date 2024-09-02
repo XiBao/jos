@@ -1,8 +1,7 @@
 package campaign
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -19,8 +18,33 @@ type GetResponse struct {
 	Data      *GetData            `json:"jingdong_dsp_kc_campain_get_responce,omitempty" codec:"jingdong_dsp_kc_campain_get_responce,omitempty"`
 }
 
+func (r GetResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r GetResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type GetData struct {
 	Result *GetResult `json:"findcampaignbyid_result"`
+}
+
+func (r GetData) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r GetData) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type GetResult struct {
@@ -28,6 +52,17 @@ type GetResult struct {
 	ErrorMsg   string    `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
 	Success    bool      `json:"success,omitempty" codec:"success,omitempty"`
 	Value      *GetValue `json:"value,omitempty" codec:"value,omitempty"`
+}
+
+func (r GetResult) IsError() bool {
+	return !r.Success || r.Value == nil
+}
+
+func (r GetResult) Error() string {
+	if !r.Success {
+		return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
+	}
+	return "no result data"
 }
 
 type GetValue struct {
@@ -43,32 +78,15 @@ type GetValue struct {
 }
 
 // 查询.快车.计划信息（指定计划ID）
-func Get(req *GetRequest) (*GetValue, error) {
+func Get(ctx context.Context, req *GetRequest) (*GetValue, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := campaign.NewCampainGetRequest()
 	r.SetCampaignId(req.CampaignId)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result info")
-	}
 	var response GetResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if !response.Data.Result.Success {
-		return nil, errors.New(response.Data.Result.ErrorMsg)
-	}
-
 	return response.Data.Result.Value, nil
-
 }

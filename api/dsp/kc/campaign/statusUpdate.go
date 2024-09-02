@@ -1,8 +1,7 @@
 package campaign
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -20,8 +19,33 @@ type StatusUpdateResponse struct {
 	Data      *StatusUpdateData   `json:"jingdong_dsp_kc_campain_status_update_responce,omitempty" codec:"jingdong_dsp_kc_campain_status_update_response,omitempty"`
 }
 
+func (r StatusUpdateResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r StatusUpdateResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type StatusUpdateData struct {
 	Result *StatusUpdateResult `json:"updatestatus_result"`
+}
+
+func (r StatusUpdateData) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r StatusUpdateData) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type StatusUpdateResult struct {
@@ -31,8 +55,16 @@ type StatusUpdateResult struct {
 	Success    bool   `json:"success,omitempty" codec:"success,omitempty"`
 }
 
+func (r StatusUpdateResult) IsError() bool {
+	return !r.Success
+}
+
+func (r StatusUpdateResult) Error() string {
+	return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
+}
+
 // 修改计划状态
-func StatusUpdate(req *StatusUpdateRequest) (bool, error) {
+func StatusUpdate(ctx context.Context, req *StatusUpdateRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := campaign.NewCampainStatusUpdateRequest()
@@ -40,25 +72,9 @@ func StatusUpdate(req *StatusUpdateRequest) (bool, error) {
 	r.SetStatus(req.Status)
 	r.SetCompaignId(req.CompaignId)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("no result info")
-	}
 	var response StatusUpdateResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-
-	if !response.Data.Result.Success {
-		return false, errors.New(response.Data.Result.ErrorMsg)
-	}
-
 	return true, nil
 }

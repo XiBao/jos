@@ -1,11 +1,9 @@
 package coupon
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/coupon"
 )
@@ -52,14 +50,35 @@ type CouponWriteCreateResponse struct {
 	Data      *CouponWriteCreateData `json:"jingdong_seller_coupon_write_create_responce,omitempty" codec:"jingdong_seller_coupon_write_create_responce,omitempty"`
 }
 
+func (r CouponWriteCreateResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r CouponWriteCreateResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type CouponWriteCreateData struct {
 	Code      string `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
-
-	CouponId uint64 `json:"couponId,omitempty" codec:"couponId,omitempty"`
+	CouponId  uint64 `json:"couponId,omitempty" codec:"couponId,omitempty"`
 }
 
-func CouponWriteCreate(req *CouponWriteCreateRequest) (uint64, error) {
+func (r CouponWriteCreateData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r CouponWriteCreateData) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
+}
+
+func CouponWriteCreate(ctx context.Context, req *CouponWriteCreateRequest) (uint64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := coupon.NewSellerCouponWriteCreateRequest()
@@ -118,26 +137,9 @@ func CouponWriteCreate(req *CouponWriteCreateRequest) (uint64, error) {
 		r.SetNumPerSending(req.NumPerSending)
 	}
 
-	result, err := client.PostExecute(r.Request, req.Session)
-	if err != nil {
-		return 0, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response CouponWriteCreateResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.PostExecute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
-	if response.ErrorResp != nil {
-		return 0, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return 0, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.CouponId == 0 {
-		return 0, errors.New("No coupon id.")
-	}
-
 	return response.Data.CouponId, nil
 }

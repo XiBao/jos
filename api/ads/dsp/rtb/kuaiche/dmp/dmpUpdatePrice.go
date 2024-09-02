@@ -1,8 +1,7 @@
 package dmp
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
@@ -23,11 +22,36 @@ type KuaicheDmpUpdatePriceResponse struct {
 	ErrorResp *api.ErrorResponnse            `json:"error_response,omitempty" codec:"error_response,omitempty"`
 }
 
+func (r KuaicheDmpUpdatePriceResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Responce == nil || r.Responce.IsError()
+}
+
+func (r KuaicheDmpUpdatePriceResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Responce != nil {
+		return r.Responce.Error()
+	}
+	return "no result data"
+}
+
 type KuaicheDmpUpdatePriceResponce struct {
 	ReturnType *dsp.DataCommonResponse `json:"returnType,omitempty" codec:"returnType,omitempty"`
 }
 
-func KuaicheDmpUpdatePrice(req *KuaicheDmpUpdatePriceRequest) (bool, error) {
+func (r KuaicheDmpUpdatePriceResponce) IsError() bool {
+	return r.ReturnType != nil && !r.ReturnType.Success
+}
+
+func (r KuaicheDmpUpdatePriceResponce) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Msg
+	}
+	return "no result data"
+}
+
+func KuaicheDmpUpdatePrice(ctx context.Context, req *KuaicheDmpUpdatePriceRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := dmp.NewKuaicheDmpUpdatePriceRequest()
@@ -36,28 +60,9 @@ func KuaicheDmpUpdatePrice(req *KuaicheDmpUpdatePriceRequest) (bool, error) {
 		r.SetParamExt(req.ParamExt)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("no result.")
-	}
-
 	var response KuaicheDmpUpdatePriceResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-	if response.ErrorResp != nil {
-		return false, errors.New(response.ErrorResp.ZhDesc)
-	}
-	if response.Responce == nil || response.Responce.ReturnType == nil {
-		return false, errors.New("no result data.")
-	}
-	if !response.Responce.ReturnType.Success {
-		return false, errors.New(response.Responce.ReturnType.Msg)
-	}
-
 	return response.Responce.ReturnType.Success, nil
 }

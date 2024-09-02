@@ -1,11 +1,9 @@
 package center
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/interact/center"
 )
@@ -37,11 +35,35 @@ type CreateGiftActivityResponse struct {
 	Data      *CreateGiftActivityData `json:"jingdong_interact_center_api_service_write_createGiftActivity_responce,omitempty" codec:"jingdong_interact_center_api_service_write_createGiftActivity_responce,omitempty"`
 }
 
-type CreateGiftActivityData struct {
-	Code      string `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
+func (r CreateGiftActivityResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
 
-	Result *CreateGiftActivityResult `json:"giftActivityResults,omitempty" codec:"giftActivityResults,omitempty"`
+func (r CreateGiftActivityResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
+type CreateGiftActivityData struct {
+	Code      string                    `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc string                    `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	Result    *CreateGiftActivityResult `json:"giftActivityResults,omitempty" codec:"giftActivityResults,omitempty"`
+}
+
+func (r CreateGiftActivityData) IsError() bool {
+	return r.Code != "0" || r.Result == nil
+}
+
+func (r CreateGiftActivityData) Error() string {
+	if r.Code != "0" {
+		return sdk.ErrorString(r.Code, r.ErrorDesc)
+	}
+	return "no result data"
 }
 
 type CreateGiftActivityResult struct {
@@ -50,7 +72,7 @@ type CreateGiftActivityResult struct {
 	Msg  string `json:"msg" codec:"msg"`
 }
 
-func CreateGiftActivity(req *CreateGiftActivityRequest) (*CreateGiftActivityResult, error) {
+func CreateGiftActivity(ctx context.Context, req *CreateGiftActivityRequest) (*CreateGiftActivityResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewCreateGiftActivityRequest()
@@ -87,26 +109,9 @@ func CreateGiftActivity(req *CreateGiftActivityRequest) (*CreateGiftActivityResu
 		r.SetValidateDay(req.ValidateDay)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response CreateGiftActivityResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return nil, errors.New("No create gift activity result.")
-	}
-
 	return response.Data.Result, nil
 }

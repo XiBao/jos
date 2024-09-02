@@ -1,6 +1,8 @@
 package center
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type WritePersonInfoRequest struct {
 	Request *sdk.Request
@@ -87,7 +89,7 @@ func (req *WritePersonInfoRequest) GetProfileUrl() string {
 	return ""
 }
 
-func (req *WritePersonInfoRequest) SetActivityId(ActivityId string) {
+func (req *WritePersonInfoRequest) SetActivityId(ActivityId uint64) {
 	req.Request.Params["activityId"] = ActivityId
 }
 
@@ -147,7 +149,7 @@ func (req *WritePersonInfoRequest) GetId() uint64 {
 	return 0
 }
 
-func (req *WritePersonInfoRequest) SetType(Type string) {
+func (req *WritePersonInfoRequest) SetType(Type uint8) {
 	req.Request.Params["type"] = Type
 }
 

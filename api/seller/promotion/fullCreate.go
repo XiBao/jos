@@ -1,8 +1,7 @@
 package promotion
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -47,13 +46,35 @@ type FullCreateResponse struct {
 	Data      *FullCreateResponseData `json:"jingdong_seller_promotion_v2_unit_full_create_responce,omitempty" codec:"jingdong_seller_promotion_v2_unit_full_create_responce,omitempty"`
 }
 
+func (r FullCreateResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r FullCreateResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type FullCreateResponseData struct {
 	Code      string `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	PromoId   uint64 `json:"promo_id,omitempty" codec:"promo_id,omitempty"`
 }
 
-func FullCreate(req *FullCreateRequest) (uint64, error) {
+func (r FullCreateResponseData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r FullCreateResponseData) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
+}
+
+func FullCreate(ctx context.Context, req *FullCreateRequest) (uint64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionFullCreateRequest()
@@ -164,28 +185,9 @@ func FullCreate(req *FullCreateRequest) (uint64, error) {
 		r.SetLimitNum(req.LimitNum)
 	}
 
-	result, err := client.PostExecute(r.Request, req.Session)
-	if err != nil {
-		return 0, err
-	}
-	if len(result) == 0 {
-		return 0, errors.New("no result.")
-	}
-
 	var response FullCreateResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.PostExecute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
-	if response.ErrorResp != nil {
-		return 0, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return 0, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.PromoId == 0 {
-		return 0, errors.New("No promotion id.")
-	}
-
 	return response.Data.PromoId, nil
 }

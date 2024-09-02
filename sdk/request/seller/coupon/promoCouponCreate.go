@@ -69,11 +69,11 @@ type SellerPromoCouponCreateParam struct {
 	TakeBeginTime     string                                `json:"takeBeginTime"`               // 领券开始时间
 	Days              uint                                  `json:"days,omitempty"`              // 有效期(领券后N天)，validityType=1时必填
 	High              uint                                  `json:"high,omitempty"`              // 有效期类型 5、绝对时间，1、最高折扣 style=1时 high默认值等于discount；style=3时，high需要用法设置，并且大于最高折扣力度
-	Spus              []*SellerPromoCouponCreateParamSpu    `json:"spus,omitempty"`              // 参与活动spu集合
+	Spus              []SellerPromoCouponCreateParamSpu     `json:"spus,omitempty"`              // 参与活动spu集合
 	ShareType         uint8                                 `json:"shareType"`                   // 是否可赠送(分享)：1：可赠送；2：不可赠送
 	PromoteChannel    uint8                                 `json:"promoteChannel"`              // 全网渠道：1 ；官方渠道：2
-	Stairs            []*SellerPromoCouponCreateParamStair  `json:"stairs,omitempty"`            // 折扣阶梯，规则:style=3时 非空；并且满足折扣递减、满额递增
-	Skus              []*SellerPromoCouponCreateParamSku    `json:"skus,omitempty"`              // skuId集合
+	Stairs            []SellerPromoCouponCreateParamStair   `json:"stairs,omitempty"`            // 折扣阶梯，规则:style=3时 非空；并且满足折扣递减、满额递增
+	Skus              []SellerPromoCouponCreateParamSku     `json:"skus,omitempty"`              // skuId集合
 	BusiPlatformParam *SellerPromoCouponCreateParamPlatform `json:"busiPlatformParam,omitempty"` // 渠道
 	MemberParam       *SellerPromoCouponCreateParamMember   `json:"memberParam,omitempty"`       // 人群
 	BusiCode          string                                `json:"busiCode"`                    // 场景code

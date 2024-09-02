@@ -1,8 +1,7 @@
 package promotion
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -25,13 +24,35 @@ type RemovePromoUsersResponse struct {
 	Data      *RemovePromoUsersResponseData `json:"jingdong_seller_promotion_removePromoUsers_responce,omitempty" codec:"jingdong_seller_promotion_removePromoUsers_responce,omitempty"`
 }
 
+func (r RemovePromoUsersResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r RemovePromoUsersResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type RemovePromoUsersResponseData struct {
 	Code      string      `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string      `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    interface{} `json:"result,omitempty" codec:"result,omitempty"`
 }
 
-func RemovePromoUsers(req *RemovePromoUsersRequest) (interface{}, error) {
+func (r RemovePromoUsersResponseData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r RemovePromoUsersResponseData) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
+}
+
+func RemovePromoUsers(ctx context.Context, req *RemovePromoUsersRequest) (interface{}, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionRemovePromoUsersRequest()
@@ -55,26 +76,9 @@ func RemovePromoUsers(req *RemovePromoUsersRequest) (interface{}, error) {
 		r.SetEndTime(req.EndTime)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result.")
-	}
-
 	var response RemovePromoUsersResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-
 	return response.Data.Result, nil
 }

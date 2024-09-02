@@ -1,11 +1,9 @@
 package promotion
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
 )
@@ -24,18 +22,42 @@ type LimitResponse struct {
 	Data      *LimitData          `json:"jingdong_seller_promotion_v2_getPromoLimit_responce,omitempty" codec:"jingdong_seller_promotion_v2_getPromoLimit_responce,omitempty"`
 }
 
-type LimitData struct {
-	Code      string `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
+func (r LimitResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
 
-	PLimit *PromoLimit `json:"jos_promo_limit,omitempty" codec:"jos_promo_limit,omitempty"`
+func (r LimitResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
+type LimitData struct {
+	Code      string      `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc string      `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	PLimit    *PromoLimit `json:"jos_promo_limit,omitempty" codec:"jos_promo_limit,omitempty"`
+}
+
+func (r LimitData) IsError() bool {
+	return r.Code != "0" || r.PLimit == nil
+}
+
+func (r LimitData) Error() string {
+	if r.Code != "0" {
+		return sdk.ErrorString(r.Code, r.ErrorDesc)
+	}
+	return "no result data"
 }
 
 type PromoLimit struct {
 	DiscountLimit float64 `json:"discount_limit,omitempty" codec:"discount_limit,omitempty"`
 }
 
-func Limit(req *LimitRequest) (*PromoLimit, error) {
+func Limit(ctx context.Context, req *LimitRequest) (*PromoLimit, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionLimitRequest()
@@ -45,22 +67,9 @@ func Limit(req *LimitRequest) (*PromoLimit, error) {
 	r.SetStartTime(req.StartTime)
 	r.SetEndTime(req.EndTime)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response LimitResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
 	}
 
 	return response.Data.PLimit, nil

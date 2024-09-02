@@ -1,10 +1,7 @@
 package center
 
 import (
-	"encoding/json"
-	"errors"
-
-	"github.com/XiBao/jos/api/util"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -27,10 +24,32 @@ type GetEvaluateActivityListResponse struct {
 	Data      *GetEvaluateActivityListData `json:"jingdong_com_jd_interact_center_api_service_read_EvaluateActivityReadService_getActivityListByParams_responce,omitempty" codec:"jingdong_com_jd_interact_center_api_service_read_EvaluateActivityReadService_getActivityListByParams_responce,omitempty"`
 }
 
+func (r GetEvaluateActivityListResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r GetEvaluateActivityListResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data.IsError() {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type GetEvaluateActivityListData struct {
-	Code      string                           `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string                           `json:"error_description,omitempty" codec:"error_description,omitempty"`
-	Result    []*GetEvaluateActivityListResult `json:"GiftActivityResults,omitempty" codec:"GiftActivityResults,omitempty"`
+	Code      string                          `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc string                          `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	Result    []GetEvaluateActivityListResult `json:"GiftActivityResults,omitempty" codec:"GiftActivityResults,omitempty"`
+}
+
+func (r GetEvaluateActivityListData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r GetEvaluateActivityListData) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type GetEvaluateActivityListResult struct {
@@ -44,7 +63,7 @@ type GetEvaluateActivityListResult struct {
 	Status    uint8  `json:"status"`
 }
 
-func GetEvaluateActivityList(req *GetEvaluateActivityListRequest) ([]*GetEvaluateActivityListResult, error) {
+func GetEvaluateActivityList(ctx context.Context, req *GetEvaluateActivityListRequest) ([]GetEvaluateActivityListResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewGetEvaluateActivityListRequest()
@@ -61,26 +80,9 @@ func GetEvaluateActivityList(req *GetEvaluateActivityListRequest) ([]*GetEvaluat
 		r.SetEndTime(req.EndTime)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response GetEvaluateActivityListResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return nil, errors.New("No result.")
-	}
-
 	return response.Data.Result, nil
 }

@@ -1,8 +1,7 @@
 package jzone
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -11,9 +10,9 @@ import (
 
 type AddCartItemByPinRequest struct {
 	api.BaseRequest
-	Pin    string `json:"pin,omitempty" codec:"pin,omitempty"`       //加密pin
-	ItemId uint64 `json:"itemId,omitempty" codec:"itemId,omitempty"` //skuid
-	Num    uint64 `json:"num,omitempty" codec:"num,omitempty"`       //数量
+	Pin    string `json:"pin,omitempty" codec:"pin,omitempty"`       // 加密pin
+	ItemId uint64 `json:"itemId,omitempty" codec:"itemId,omitempty"` // skuid
+	Num    uint64 `json:"num,omitempty" codec:"num,omitempty"`       // 数量
 }
 
 type AddCartItemByPinResponse struct {
@@ -21,9 +20,34 @@ type AddCartItemByPinResponse struct {
 	Data      *AddCartItemByPinData `json:"jingdong_jzone_addCartItemByPin_responce,omitempty" codec:"jingdong_jzone_addCartItemByPin_responce,omitempty"`
 }
 
+func (r AddCartItemByPinResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r AddCartItemByPinResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type AddCartItemByPinData struct {
 	ReturnType *AddCartItemByPinReturnType `json:"returnType,omitempty" codec:"returnType,omitempty"`
 	Code       string                      `json:"code"`
+}
+
+func (r AddCartItemByPinData) IsError() bool {
+	return r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r AddCartItemByPinData) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return "no result data"
 }
 
 type AddCartItemByPinReturnType struct {
@@ -31,8 +55,16 @@ type AddCartItemByPinReturnType struct {
 	Code    string `json:"code,omitempty" codec:"code,omitempty"`
 }
 
+func (r AddCartItemByPinReturnType) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r AddCartItemByPinReturnType) Error() string {
+	return sdk.ErrorString(r.Code, r.Message)
+}
+
 // TODO  通过Pin将商品加入用户购物车
-func AddCartItemByPin(req *AddCartItemByPinRequest) (bool, error) {
+func AddCartItemByPin(ctx context.Context, req *AddCartItemByPinRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := jzone.NewAddCartItemByPinRequest()
@@ -43,26 +75,9 @@ func AddCartItemByPin(req *AddCartItemByPinRequest) (bool, error) {
 	}
 	r.SetNum(1)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("No result info.")
-	}
 	var response AddCartItemByPinResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-
-	if response.Data.ReturnType.Code != "0" {
-		return false, errors.New(response.Data.ReturnType.Message)
-	}
-
 	return true, nil
 }

@@ -1,6 +1,8 @@
 package adkcunit
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type AdkcunitStatusUpdateRequest struct {
 	Request *sdk.Request

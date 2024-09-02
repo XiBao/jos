@@ -3,7 +3,6 @@ package logger
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"log"
 )
 
@@ -36,18 +35,11 @@ func (l DebugLogger) DebugPrintPostMultipartRequest(url string, body []byte) {
 	log.Println("[JOS_DEBUG] [API] multipart/form-data POST", url)
 }
 
-func (l DebugLogger) DecodeJSONHttpResponse(r io.Reader, v interface{}) error {
-	body, err := io.ReadAll(r)
-	if err != nil {
-		return err
+func (l DebugLogger) DecodeJSON(body []byte, v interface{}) error {
+	bs := removeJsonSpace(body)
+	buf := bytes.NewBuffer(make([]byte, 0, len(bs)+1024))
+	if err := json.Indent(buf, bs, "", "\t"); err == nil {
+		log.Printf("[JOS_DEBUG] [API] http response body:\n%s\n", buf.Bytes())
 	}
-
-	body2 := body
-	buf := bytes.NewBuffer(make([]byte, 0, len(body2)+1024))
-	if err := json.Indent(buf, body2, "", "    "); err == nil {
-		body2 = buf.Bytes()
-	}
-	log.Printf("[JOS_DEBUG] [API] http response body:\n%s\n", body2)
-
-	return json.Unmarshal(body, v)
+	return json.Unmarshal(bs, v)
 }

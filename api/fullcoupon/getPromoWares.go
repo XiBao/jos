@@ -1,8 +1,7 @@
 package fullcoupon
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -22,8 +21,33 @@ type FullCouponGetPromoWaresResponse struct {
 	Data      *FullCouponGetPromoWaresResponseResult `json:"jingdong_fullCoupon_getPromoWares_responce,omitempty" codec:"jingdong_fullCoupon_getPromoWares_responce,omitempty"`
 }
 
+func (r FullCouponGetPromoWaresResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r FullCouponGetPromoWaresResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type FullCouponGetPromoWaresResponseResult struct {
 	Result *FullCouponGetPromoWaresResponseData `json:"returnType,omitempty" codec:"returnType,omitempty"`
+}
+
+func (r FullCouponGetPromoWaresResponseResult) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r FullCouponGetPromoWaresResponseResult) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type FullCouponGetPromoWaresResponseData struct {
@@ -31,6 +55,14 @@ type FullCouponGetPromoWaresResponseData struct {
 	Code    string                                   `json:"code,omitempty" codec:"code,omitempty"`       // 状态码
 	Success bool                                     `json:"success,omitempty" codec:"success,omitempty"` // 请求是否成功
 	Data    *FullCouponGetPromoWaresResponseDataList `json:"data,omitempty" codec:"data,omitempty"`
+}
+
+func (r FullCouponGetPromoWaresResponseData) IsError() bool {
+	return r.Data == nil
+}
+
+func (r FullCouponGetPromoWaresResponseData) Error() string {
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
 type FullCouponGetPromoWaresResponseDataList struct {
@@ -41,7 +73,7 @@ type FullCouponGetPromoWaresResponseDataList struct {
 	WareList       []PromoWare `json:"dataList,omitempty" codec:"dataList,omitempty"`
 }
 
-func GetPromoWares(req *FullCouponGetPromoWaresRequest) ([]PromoWare, int, error) {
+func GetPromoWares(ctx context.Context, req *FullCouponGetPromoWaresRequest) ([]PromoWare, int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := fullcoupon.NewFullCouponGetPromoWaresRequest()
@@ -49,26 +81,9 @@ func GetPromoWares(req *FullCouponGetPromoWaresRequest) ([]PromoWare, int, error
 	r.SetPromoId(req.PromoId)
 	r.SetPageIndex(req.PageIndex)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, 0, err
-	}
-	if len(result) == 0 {
-		return nil, 0, errors.New("no result.")
-	}
-
 	var response FullCouponGetPromoWaresResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, 0, err
 	}
-	if response.ErrorResp != nil {
-		return nil, 0, response.ErrorResp
-	}
-
-	if response.Data == nil || response.Data.Result == nil || response.Data.Result.Data == nil || response.Data.Result.Data.WareList == nil {
-		return nil, 0, errors.New("no ware list.")
-	}
-
 	return response.Data.Result.Data.WareList, response.Data.Result.Data.TotalPageCount, nil
 }

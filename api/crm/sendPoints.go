@@ -1,9 +1,7 @@
 package crm
 
 import (
-	"encoding/json"
-	"errors"
-	"fmt"
+	"context"
 	"strconv"
 	"time"
 
@@ -36,7 +34,18 @@ type SendPointsRequest struct {
 
 type SendPointsResponse struct {
 	ErrorResp *api.ErrorResponnse `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *SendPointsData     `json:"jingdong_pop_crm_sendPoints_responce",omitempty" codec:"jingdong_pop_crm_sendPoints_responce",omitempty"`
+	Data      *SendPointsData     `json:"jingdong_pop_crm_sendPoints_responce,omitempty" codec:"jingdong_pop_crm_sendPoints_responce,omitempty"`
+}
+
+func (r SendPointsResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil
+}
+
+func (r SendPointsResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
 }
 
 type SendPointsData struct {
@@ -44,7 +53,7 @@ type SendPointsData struct {
 	Result int64  `json:"sendpoints_result,omitempty" codec:"sendpoints_result,omitempty"`
 }
 
-func SendPoints(req *SendPointsRequest) (int64, error) {
+func SendPoints(ctx context.Context, req *SendPointsRequest) (int64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewSendPointsRequest()
@@ -57,27 +66,15 @@ func SendPoints(req *SendPointsRequest) (int64, error) {
 	if req.ResId != "" {
 		r.SetResId(req.ResId)
 	} else {
-		r.SetResId(fmt.Sprintf("jdvip%s", time.Now().Format("20060102150405")))
+		r.SetResId(sdk.StringsJoin("jdvip", time.Now().Format("20060102150405")))
 	}
 	r.SetSourceType(strconv.Itoa(req.SourceType))
 	r.SetPoints(req.Points)
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
+
+	var response SendPointsResponse
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
-	if len(result) == 0 {
-		return 0, errors.New("No result info.")
-	}
-	var response SendPointsResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
-		return 0, errors.New(fmt.Sprintf("%s result :%s", err.Error(), result))
-	}
-
-	if response.ErrorResp != nil {
-		return 0, response.ErrorResp
-	}
-
 	return response.Data.Result, nil
 }
 

@@ -1,8 +1,7 @@
 package areas
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -17,40 +16,42 @@ type ProvinceGetResponse struct {
 	AreasProvinceGetResponse *AreasProvinceGetResponse `json:"jingdong_areas_province_get_responce,omitempty" codec:"jingdong_areas_province_get_responce,omitempty"`
 }
 
+func (r ProvinceGetResponse) IsError() bool {
+	return r.ErrorResp != nil || r.AreasProvinceGetResponse == nil || r.AreasProvinceGetResponse.IsError()
+}
+
+func (r ProvinceGetResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.AreasProvinceGetResponse != nil {
+		return r.AreasProvinceGetResponse.Error()
+	}
+	return "no result data"
+}
+
 type AreasProvinceGetResponse struct {
 	Code                 string                    `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc            string                    `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	AreasServiceResponse *BaseAreasServiceResponse `json:"baseAreaServiceResponse,omitempty" codec:"baseAreaServiceResponse,omitempty"`
 }
 
-func ProvinceGet(req *ProvinceGetRequest) ([]*Result, error) {
+func (r AreasProvinceGetResponse) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r AreasProvinceGetResponse) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
+}
+
+func ProvinceGet(ctx context.Context, req *ProvinceGetRequest) ([]Result, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := areas.NewAreasProvinceGetRequest()
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no province result")
-	}
 
 	var response ProvinceGetResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if response.AreasProvinceGetResponse.Code != "0" {
-		return nil, errors.New(response.AreasProvinceGetResponse.ErrorDesc)
-	}
-
-	if response.AreasProvinceGetResponse.AreasServiceResponse == nil || response.AreasProvinceGetResponse.AreasServiceResponse.Data == nil {
-		return nil, errors.New("no province result")
-	}
-
 	return response.AreasProvinceGetResponse.AreasServiceResponse.Data, nil
 }

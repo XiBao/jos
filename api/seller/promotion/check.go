@@ -1,8 +1,7 @@
 package promotion
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -19,38 +18,45 @@ type CheckResponse struct {
 	Data      *CheckResponseData  `json:"jingdong_seller_promotion_check_responce,omitempty" codec:"jingdong_seller_promotion_check_responce,omitempty"`
 }
 
+func (r CheckResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r CheckResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type CheckResponseData struct {
 	Code      string `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Count     uint   `json:"count,omitempty" codec:"count,omitempty"`
 }
 
+func (r CheckResponseData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r CheckResponseData) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
+}
+
 // 促销审核,只能对人工审状态的促销进行审核
-func Check(req *CheckRequest) (uint, error) {
+func Check(ctx context.Context, req *CheckRequest) (uint, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionCheckRequest()
 	r.SetPromoId(req.PromoId)
 	r.SetStatus(req.Status)
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return 0, err
-	}
-	if len(result) == 0 {
-		return 0, errors.New("no result.")
-	}
 
 	var response CheckResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
-	if response.ErrorResp != nil {
-		return 0, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return 0, errors.New(response.Data.ErrorDesc)
-	}
-
 	return response.Data.Count, nil
 }

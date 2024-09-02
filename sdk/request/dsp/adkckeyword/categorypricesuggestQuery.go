@@ -1,6 +1,8 @@
 package adkckeyword
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type CategorypricesuggestQueryRequest struct {
 	Request *sdk.Request

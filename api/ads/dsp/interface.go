@@ -1,10 +1,20 @@
 package dsp
 
+import "github.com/XiBao/jos/sdk"
+
 type DataCommonResponse struct {
 	Msg     string                             `json:"msg,omitempty"`
 	Code    int                                `json:"code"`
 	Success bool                               `json:"success"`
 	System  *JdDspPlatformGatewayApiVoParamExt `json:"system,omitempty"`
+}
+
+func (r DataCommonResponse) IsError() bool {
+	return !r.Success
+}
+
+func (r DataCommonResponse) Error() string {
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
 type Paginator struct {

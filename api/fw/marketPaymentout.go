@@ -1,8 +1,7 @@
 package fw
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -33,16 +32,49 @@ type MarketPaymentoutResponse struct {
 	Data      *MarketPaymentoutData `json:"jingdong_fw_market_paymentout_responce,omitempty" codec:"jingdong_fw_market_paymentout_responce,omitempty"`
 }
 
+func (r MarketPaymentoutResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r MarketPaymentoutResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type MarketPaymentoutData struct {
 	ReturnType *MarketPaymentoutReturnType `json:"returnType,omitempty" codec:"returnType,omitempty"`
 	Code       string                      `json:"code"`
 }
 
+func (r MarketPaymentoutData) IsError() bool {
+	return r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r MarketPaymentoutData) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return "no result data"
+}
+
 type MarketPaymentoutReturnType struct {
-	ErrorCode uint64                          `json:"errorCode,omitempty" codec:"errorCode,omitempty"` //错误码
-	Success   bool                            `json:"success,omitempty" codec:"success,omitempty"`     //是否成功
+	ErrorCode int64                           `json:"errorCode,omitempty" codec:"errorCode,omitempty"` // 错误码
+	Success   bool                            `json:"success,omitempty" codec:"success,omitempty"`     // 是否成功
 	ErrorMsg  string                          `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`   // 错误信息
-	Body      *MarketPaymentoutReturnTypeBody `json:"body,omitempty" codec:"body,omitempty"`           //订单列表
+	Body      *MarketPaymentoutReturnTypeBody `json:"body,omitempty" codec:"body,omitempty"`           // 订单列表
+}
+
+func (r MarketPaymentoutReturnType) IsError() bool {
+	return r.ErrorCode != 0
+}
+
+func (r MarketPaymentoutReturnType) Error() string {
+	return sdk.ErrorString(r.ErrorCode, r.ErrorMsg)
 }
 
 type MarketPaymentoutReturnTypeBody struct {
@@ -52,7 +84,7 @@ type MarketPaymentoutReturnTypeBody struct {
 	ResultPageType uint   `json:"resultPageType,omitempty" codec:"resultPageType,omitempty"`
 }
 
-func MarketPaymentout(req *MarketPaymentoutRequest) (*MarketPaymentoutReturnType, error) {
+func MarketPaymentout(ctx context.Context, req *MarketPaymentoutRequest) (*MarketPaymentoutReturnType, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := fw.NewMarketPaymentoutRequest()
@@ -96,25 +128,9 @@ func MarketPaymentout(req *MarketPaymentoutRequest) (*MarketPaymentoutReturnType
 		r.SetSuccessUrl(req.SuccessUrl)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No result info.")
-	}
 	var response MarketPaymentoutResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if response.Data.ReturnType.ErrorCode != 0 {
-		return nil, errors.New(response.Data.ReturnType.ErrorMsg)
 	}
 	return response.Data.ReturnType, nil
 }

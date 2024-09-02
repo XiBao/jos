@@ -1,8 +1,7 @@
 package area
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
@@ -22,9 +21,34 @@ type AreaQueryV2Response struct {
 	ErrorResp *api.ErrorResponnse  `json:"error_response,omitempty" codec:"error_response,omitempty"`
 }
 
+func (r AreaQueryV2Response) IsError() bool {
+	return r.ErrorResp != nil || r.Responce == nil || r.Responce.IsError()
+}
+
+func (r AreaQueryV2Response) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Responce != nil {
+		return r.Responce.Error()
+	}
+	return "no responce"
+}
+
 type AreaQueryV2Responce struct {
 	Data *AreaQueryV2ResponseData `json:"data,omitempty" codec:"data,omitempty"`
 	Code string                   `json:"code,omitempty" codec:"code,omitempty"`
+}
+
+func (r AreaQueryV2Responce) IsError() bool {
+	return r.Data == nil || r.Data.IsError()
+}
+
+func (r AreaQueryV2Responce) Error() string {
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "unexpected error"
 }
 
 type AreaQueryV2ResponseData struct {
@@ -32,7 +56,7 @@ type AreaQueryV2ResponseData struct {
 	dsp.DataCommonResponse
 }
 
-func AreaQueryV2(req *AreaQueryV2Request) (string, error) {
+func AreaQueryV2(ctx context.Context, req *AreaQueryV2Request) (string, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := area.NewAreaQueryV2Request()
@@ -40,28 +64,9 @@ func AreaQueryV2(req *AreaQueryV2Request) (string, error) {
 		r.SetSystem(req.System)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return "", err
-	}
-	if len(result) == 0 {
-		return "", errors.New("no result.")
-	}
-
 	var response AreaQueryV2Response
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return "", err
 	}
-	if response.ErrorResp != nil {
-		return "", errors.New(response.ErrorResp.ZhDesc)
-	}
-	if response.Responce == nil || response.Responce.Data == nil {
-		return "", errors.New("no result data.")
-	}
-	if !response.Responce.Data.Success {
-		return "", errors.New(response.Responce.Data.Msg)
-	}
-
 	return response.Responce.Data.Data, nil
 }

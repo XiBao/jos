@@ -1,11 +1,9 @@
 package coupon
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/coupon"
 )
@@ -25,14 +23,35 @@ type CouponWritePushResponse struct {
 	Data      *CouponWritePushData `json:"jingdong_seller_coupon_write_pushCoupon_responce,omitempty" codec:"jingdong_seller_coupon_write_pushCoupon_responce,omitempty"`
 }
 
+func (r CouponWritePushResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r CouponWritePushResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type CouponWritePushData struct {
 	Code      string `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
-
 	// PushResult bool `json:"msg,omitempty" codec:"msg,omitempty"` // 调用成功无返回
 }
 
-func CouponWritePush(req *CouponWritePushRequest) (bool, error) {
+func (r CouponWritePushData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r CouponWritePushData) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
+}
+
+func CouponWritePush(ctx context.Context, req *CouponWritePushRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := coupon.NewSellerCouponWritePushRequest()
@@ -43,23 +62,9 @@ func CouponWritePush(req *CouponWritePushRequest) (bool, error) {
 	r.SetUuid(req.Uuid)
 	r.SetCouponId(req.CouponId)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response CouponWritePushResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return false, errors.New(response.Data.ErrorDesc)
-	}
-
 	return true, nil
 }

@@ -1,8 +1,7 @@
 package crm
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -26,7 +25,18 @@ type MemberSearchNewRequest struct {
 
 type MemberSearchNewResponse struct {
 	ErrorResp *api.ErrorResponnse  `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *MemberSearchNewData `json:"jingdong_crm_member_searchNew_responce",omitempty" codec:"jingdong_crm_member_searchNew_responce",omitempty"`
+	Data      *MemberSearchNewData `json:"jingdong_crm_member_searchNew_responce,omitempty" codec:"jingdong_crm_member_searchNew_responce,omitempty"`
+}
+
+func (r MemberSearchNewResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.Result == nil
+}
+
+func (r MemberSearchNewResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
 }
 
 type MemberSearchNewData struct {
@@ -35,11 +45,11 @@ type MemberSearchNewData struct {
 }
 
 type MemberSearchNewResult struct {
-	TotalResult int       `json:"total_result,omitempty" codec:"total_result,omitempty"`
-	Members     []*Member `json:"crm_members,omitempty" codec:"crm_members,omitempty"`
+	TotalResult int      `json:"total_result,omitempty" codec:"total_result,omitempty"`
+	Members     []Member `json:"crm_members,omitempty" codec:"crm_members,omitempty"`
 }
 
-func MemberSearchNew(req *MemberSearchNewRequest) (*MemberSearchNewResult, error) {
+func MemberSearchNew(ctx context.Context, req *MemberSearchNewRequest) (*MemberSearchNewResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewMemberSearchNewRequest()
@@ -79,26 +89,9 @@ func MemberSearchNew(req *MemberSearchNewRequest) (*MemberSearchNewResult, error
 		r.SetMinTradeAmount(req.MinTradeAmount)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No result info.")
-	}
 	var response MemberSearchNewResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if response.Data.Result == nil {
-		return nil, nil
-	}
-
 	return response.Data.Result, nil
 }

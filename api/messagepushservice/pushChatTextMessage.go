@@ -1,8 +1,7 @@
 package messagepushservice
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -30,6 +29,20 @@ type PushChatTextMessageResponse struct {
 	ReturnType *PushChatTextMessageReturnType `json:"jingdong_MessagePushService_pushChatTextMessage_responce,omitempty" codec:"jingdong_MessagePushService_pushChatTextMessage_responce,omitempty"`
 }
 
+func (r PushChatTextMessageResponse) IsError() bool {
+	return r.ErrorResp != nil || r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r PushChatTextMessageResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return "no result data"
+}
+
 type PushChatTextMessageReturnType struct {
 	Code          string `json:"code,omitempty" codec:"code,omitempty"`
 	ErrMsg        string `json:"errmsg,omitempty" codec:"errmsg,omitempty"`
@@ -38,8 +51,16 @@ type PushChatTextMessageReturnType struct {
 	SendTimestamp string `json:"sendTimestamp,omitempty" codec:"sendTimestamp,omitempty"`
 }
 
+func (r PushChatTextMessageReturnType) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r PushChatTextMessageReturnType) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrMsg)
+}
+
 // 新提供发送咚咚消息接口，方便打标pin
-func PushChatTextMessage(req *PushChatTextMessageRequest) (*PushChatTextMessageReturnType, error) {
+func PushChatTextMessage(ctx context.Context, req *PushChatTextMessageRequest) (*PushChatTextMessageReturnType, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := messagepushservice.NewPushChatTextMessageRequest()
@@ -60,22 +81,9 @@ func PushChatTextMessage(req *PushChatTextMessageRequest) (*PushChatTextMessageR
 		r.SetToClientType(req.ToClientType)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No return type.")
-	}
 	var response PushChatTextMessageResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
 	return response.ReturnType, nil
 }

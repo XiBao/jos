@@ -1,8 +1,7 @@
 package secret
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -24,8 +23,30 @@ type SecretApiReportGetResponse struct {
 	Response  *SecretApiReportResponse `json:"jingdong_jos_secret_api_report_get_responce,omitempty" codec:"jingdong_jos_secret_api_report_get_responce,omitempty"`
 }
 
+func (r SecretApiReportGetResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Response == nil || r.Response.IsError()
+}
+
+func (r SecretApiReportGetResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Response != nil {
+		return r.Response.Error()
+	}
+	return "no result data"
+}
+
 type SecretApiReportResponse struct {
 	Result SecretApiReportResult `json:"response,omitempty" codec:"response,omitempty"`
+}
+
+func (r SecretApiReportResponse) IsError() bool {
+	return r.Result.IsError()
+}
+
+func (r SecretApiReportResponse) Error() string {
+	return r.Result.Error()
 }
 
 type SecretApiReportResult struct {
@@ -33,8 +54,16 @@ type SecretApiReportResult struct {
 	ErrorDesc string `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
 }
 
+func (r SecretApiReportResult) IsError() bool {
+	return r.Code != 0
+}
+
+func (r SecretApiReportResult) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
+}
+
 // 对加解密等调用信息上报，不包含敏感信息，只负责统计系统性能
-func SecretApiReportGet(req *SecretApiReportGetRequest) error {
+func SecretApiReportGet(ctx context.Context, req *SecretApiReportGetRequest) error {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := secret.NewSecretApiReportGetRequest()
@@ -44,23 +73,9 @@ func SecretApiReportGet(req *SecretApiReportGetRequest) error {
 	r.SetAttribute(req.Attribute)
 	r.SetServerUrl(req.ServerUrl)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return err
-	}
-	if len(result) == 0 {
-		return errors.New("No result.")
-	}
 	var response SecretApiReportGetResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return err
-	}
-	if response.ErrorResp != nil {
-		return response.ErrorResp
-	}
-	if response.Response.Result.Code != 0 {
-		return errors.New(response.Response.Result.ErrorDesc)
 	}
 	return nil
 }

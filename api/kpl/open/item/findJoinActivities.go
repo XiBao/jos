@@ -1,8 +1,7 @@
 package item
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -20,13 +19,43 @@ type FindJoinActivitiesResponse struct {
 	Data      *FindJoinActivitiesData `json:"jd_kpl_open_item_findjoinactives_response,omitempty" codec:"jd_kpl_open_item_findjoinactives_responseomitempty"`
 }
 
+func (r FindJoinActivitiesResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r FindJoinActivitiesResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type FindJoinActivitiesData struct {
 	Result FindJoinActivitiesResult `json:"findjoinactivesResult" codec:"findjoinactivesResult"`
 }
 
+func (r FindJoinActivitiesData) IsError() bool {
+	return r.Result.IsError()
+}
+
+func (r FindJoinActivitiesData) Error() string {
+	return r.Result.Error()
+}
+
 type FindJoinActivitiesResult struct {
-	Error   string      `json:"error,omitempty" codec:"error,omitempty"`
-	Coupons []*CouponVo `json:"coupons,omitempty" codec:"coupons,omitempty"`
+	Err     string     `json:"error,omitempty" codec:"error,omitempty"`
+	Coupons []CouponVo `json:"coupons,omitempty" codec:"coupons,omitempty"`
+}
+
+func (r FindJoinActivitiesResult) IsError() bool {
+	return r.Err != ""
+}
+
+func (r FindJoinActivitiesResult) Error() string {
+	return r.Err
 }
 
 type CouponVo struct {
@@ -63,31 +92,16 @@ type Coupon struct {
 }
 
 // 输入单个订单id，得到所有相关订单信息
-func FindJoinActivities(req *FindJoinActivitiesRequest) ([]Coupon, error) {
+func FindJoinActivities(ctx context.Context, req *FindJoinActivitiesRequest) ([]Coupon, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := item.NewFindJoinActivitiesRequest()
 	r.SetUid(req.Uid)
 	r.SetSku(req.Sku)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No result.")
-	}
-
 	var response FindJoinActivitiesResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Result.Error != "" {
-		return nil, errors.New(response.Data.Result.Error)
 	}
 	var coupons []Coupon
 	for _, i := range response.Data.Result.Coupons {

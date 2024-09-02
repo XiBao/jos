@@ -1,8 +1,7 @@
 package vender
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -31,10 +30,35 @@ type SyncBindResponse struct {
 	Data      *SyncBindData       `json:"jingdong_pop_vender_syncBind_responce,omitempty" codec:"jingdong_pop_vender_syncBind_responce,omitempty"`
 }
 
+func (r SyncBindResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r SyncBindResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type SyncBindData struct {
 	Code      string      `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string      `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    *SyncResult `json:"returnResult,omitempty" codec:"returnResult,omitempty"`
+}
+
+func (r SyncBindData) IsError() bool {
+	return r.Code != "0" || r.Result == nil || r.Result.IsError()
+}
+
+func (r SyncBindData) Error() string {
+	if r.Result != nil && r.Result.IsError() {
+		return r.Result.Error()
+	}
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type SyncResult struct {
@@ -43,7 +67,15 @@ type SyncResult struct {
 	Code string `json:"code,omitempty" codec:"code,omitempty"`
 }
 
-func SyncBind(req *SyncBindRequest) (bool, error) {
+func (r SyncResult) IsError() bool {
+	return r.Code != "200" && r.Code != "0"
+}
+
+func (r SyncResult) Error() string {
+	return sdk.ErrorString(r.Code, r.Desc)
+}
+
+func SyncBind(ctx context.Context, req *SyncBindRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := vender.NewVenderSyncBindRequest()
@@ -80,27 +112,10 @@ func SyncBind(req *SyncBindRequest) (bool, error) {
 	if req.Street != "" {
 		r.SetStreet(req.Street)
 	}
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("no result.")
-	}
-	var response SyncBindResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
-		return false, err
-	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return false, errors.New(response.Data.ErrorDesc)
-	}
 
-	if response.Data.Result.Code != "200" && response.Data.Result.Code != "0" {
-		return false, errors.New(response.Data.Result.Desc)
+	var response SyncBindResponse
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
+		return false, err
 	}
 
 	return response.Data.Result.Data, nil

@@ -1,8 +1,7 @@
 package keyword
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
@@ -23,9 +22,34 @@ type KuaicheKeywordAddV2Response struct {
 	ErrorResp *api.ErrorResponnse          `json:"error_response,omitempty" codec:"error_response,omitempty"`
 }
 
+func (r KuaicheKeywordAddV2Response) IsError() bool {
+	return r.ErrorResp != nil || r.Responce == nil || r.Responce.IsError()
+}
+
+func (r KuaicheKeywordAddV2Response) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Responce != nil {
+		return r.Responce.Error()
+	}
+	return "no result data"
+}
+
 type KuaicheKeywordAddV2Responce struct {
 	Data *KuaicheKeywordAddV2ResponseData `json:"data,omitempty" codec:"data,omitempty"`
 	Code string                           `json:"code,omitempty" codec:"code,omitempty"`
+}
+
+func (r KuaicheKeywordAddV2Responce) IsError() bool {
+	return r.Data != nil || r.Data.IsError()
+}
+
+func (r KuaicheKeywordAddV2Responce) Error() string {
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
 }
 
 type KuaicheKeywordAddV2ResponseData struct {
@@ -33,7 +57,7 @@ type KuaicheKeywordAddV2ResponseData struct {
 	dsp.DataCommonResponse
 }
 
-func KuaicheKeywordAddV2(req *KuaicheKeywordAddV2Request) (bool, error) {
+func KuaicheKeywordAddV2(ctx context.Context, req *KuaicheKeywordAddV2Request) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := keyword.NewKuaicheKeywordAddV2Request()
@@ -42,28 +66,9 @@ func KuaicheKeywordAddV2(req *KuaicheKeywordAddV2Request) (bool, error) {
 		r.SetSystem(req.System)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("no result.")
-	}
-
 	var response KuaicheKeywordAddV2Response
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-	if response.ErrorResp != nil {
-		return false, errors.New(response.ErrorResp.ZhDesc)
-	}
-	if response.Responce == nil || response.Responce.Data == nil {
-		return false, errors.New("no result data.")
-	}
-	if !response.Responce.Data.Success {
-		return false, errors.New(response.Responce.Data.Msg)
-	}
-
 	return response.Responce.Data.Success, nil
 }

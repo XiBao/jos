@@ -1,8 +1,7 @@
 package fullcoupon
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -21,8 +20,33 @@ type FullCouponGetFlowPromoInfoResponse struct {
 	Data      *FullCouponGetFlowPromoInfoResponseResult `json:"jingdong_fullCoupon_getFlowPromoInfo_responce,omitempty" codec:"jingdong_fullCoupon_getFlowPromoInfo_responce,omitempty"`
 }
 
+func (r FullCouponGetFlowPromoInfoResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r FullCouponGetFlowPromoInfoResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type FullCouponGetFlowPromoInfoResponseResult struct {
 	Result *FullCouponGetFlowPromoInfoResponseData `json:"result,omitempty" codec:"result,omitempty"`
+}
+
+func (r FullCouponGetFlowPromoInfoResponseResult) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r FullCouponGetFlowPromoInfoResponseResult) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type FullCouponGetFlowPromoInfoResponseData struct {
@@ -30,6 +54,14 @@ type FullCouponGetFlowPromoInfoResponseData struct {
 	Code    string                                      `json:"code,omitempty" codec:"code,omitempty"`       // 状态码
 	Success bool                                        `json:"success,omitempty" codec:"success,omitempty"` // 请求是否成功
 	Data    *FullCouponGetPromoListInfoResponseFlowList `json:"data,omitempty" codec:"data,omitempty"`
+}
+
+func (r FullCouponGetFlowPromoInfoResponseData) IsError() bool {
+	return r.Data == nil
+}
+
+func (r FullCouponGetFlowPromoInfoResponseData) Error() string {
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
 type FullCouponGetPromoListInfoResponseFlowList struct {
@@ -40,32 +72,16 @@ type FullCouponGetPromoListInfoResponseFlowList struct {
 	FlowList       []PromoFlow `json:"dataList" codec:"dataList"`
 }
 
-func GetFlowPromoInfo(req *FullCouponGetFlowPromoInfoRequest) ([]PromoFlow, error) {
+func GetFlowPromoInfo(ctx context.Context, req *FullCouponGetFlowPromoInfoRequest) ([]PromoFlow, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := fullcoupon.NewFullCouponGetFlowPromoInfoRequest()
 	r.SetAppKey(req.AppKey)
 	r.SetPromoId(req.PromoId)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result.")
-	}
-
 	var response FullCouponGetFlowPromoInfoResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data == nil || response.Data.Result == nil || response.Data.Result.Data == nil || response.Data.Result.Data.FlowList == nil {
-		return nil, errors.New("no flow list.")
-	}
-
 	return response.Data.Result.Data.FlowList, nil
 }

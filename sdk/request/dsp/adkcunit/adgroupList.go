@@ -1,6 +1,8 @@
 package adkcunit
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type AdkcunitAdgroupListRequest struct {
 	Request *sdk.Request

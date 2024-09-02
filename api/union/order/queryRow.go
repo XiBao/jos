@@ -1,8 +1,7 @@
 package order
 
 import (
-	"encoding/json"
-	"strconv"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -19,11 +18,23 @@ type UnionOrderQueryRowRequest struct {
 	ChildUnionId string `json:"childUnionId,omitempty"` // 子推客unionID，传入该值可查询子推客的订单，注意不可和key同时传入。（需联系运营开通PID权限才能拿到数据）
 	Key          string `json:"key,omitempty"`          // 工具商传入推客的授权key，可帮助该推客查询订单，注意不可和childUnionid同时传入。（需联系运营开通工具商权限才能拿到数据）
 	Fields       string `json:"fields,omitempty"`       // 支持出参数据筛选，逗号','分隔，目前可用：goodsInfo（商品信息）,categoryInfo(类目信息）
+	OrderId      uint64 `json:"orderId,omitempty"`      // 订单号，当orderId不为空时，其他参数非必填
 }
 
 type UnionOrderQueryRowResponse struct {
 	ErrorResp *api.ErrorResponnse             `json:"error_response,omitempty"`
 	Data      *UnionOrderQueryRowResponseData `json:"jd_union_open_order_row_query_responce,omitempty"`
+}
+
+func (r UnionOrderQueryRowResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.Result == ""
+}
+
+func (r UnionOrderQueryRowResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
 }
 
 type UnionOrderQueryRowResponseData struct {
@@ -35,6 +46,14 @@ type UnionOrderQueryRowResult struct {
 	Message string         `json:"message,omitempty"`
 	Data    []OrderRowResp `json:"data,omitempty"`
 	HasMore bool           `json:"hasMore,omitempty"`
+}
+
+func (r UnionOrderQueryRowResult) IsError() bool {
+	return r.Code != 200
+}
+
+func (r UnionOrderQueryRowResult) Error() string {
+	return sdk.ErrorString(r.Code, r.Message)
 }
 
 type OrderRowResp struct {
@@ -108,7 +127,7 @@ type GoodInfo struct {
 }
 
 // 订单查询接口
-func UnionOrderQueryRow(req *UnionOrderQueryRowRequest) (bool, []OrderRowResp, error) {
+func UnionOrderQueryRow(ctx context.Context, req *UnionOrderQueryRowRequest) (bool, []OrderRowResp, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := order.NewUnionOrderQueryRowRequest()
@@ -122,28 +141,22 @@ func UnionOrderQueryRow(req *UnionOrderQueryRowRequest) (bool, []OrderRowResp, e
 		Key:          req.Key,
 		Fields:       req.Fields,
 	}
+	if req.OrderId > 0 {
+		orderReq.OrderId = req.OrderId
+	}
 	r.SetOrderRowReq(orderReq)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, nil, err
-	}
 	var response UnionOrderQueryRowResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, nil, err
-	}
-	if response.Data == nil {
-		return false, nil, nil
 	}
 	var ret UnionOrderQueryRowResult
-	err = json.Unmarshal([]byte(response.Data.Result), &ret)
-	if err != nil {
+	if err := client.Logger().DecodeJSON([]byte(response.Data.Result), &ret); err != nil {
 		return false, nil, err
 	}
 
-	if ret.Code != 200 {
-		return false, nil, &api.ErrorResponnse{Code: strconv.FormatInt(int64(ret.Code), 10), ZhDesc: ret.Message}
+	if ret.IsError() {
+		return false, nil, ret
 	}
 
 	return ret.HasMore, ret.Data, nil

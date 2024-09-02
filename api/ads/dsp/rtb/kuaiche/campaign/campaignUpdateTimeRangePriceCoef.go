@@ -1,8 +1,7 @@
 package campaign
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
@@ -25,8 +24,33 @@ type KuaicheCampaignUpdateTimeRangePriceCoefResponse struct {
 	ErrorResp *api.ErrorResponnse                              `json:"error_response,omitempty" codec:"error_response,omitempty"`
 }
 
+func (r KuaicheCampaignUpdateTimeRangePriceCoefResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Responce == nil || r.Responce.IsError()
+}
+
+func (r KuaicheCampaignUpdateTimeRangePriceCoefResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Responce != nil {
+		return r.Responce.Error()
+	}
+	return "no result data"
+}
+
 type KuaicheCampaignUpdateTimeRangePriceCoefResponce struct {
 	ReturnType *KuaicheCampaignUpdateTimeRangePriceCoefResponseReturnType `json:"returnType,omitempty" codec:"returnType,omitempty"`
+}
+
+func (r KuaicheCampaignUpdateTimeRangePriceCoefResponce) IsError() bool {
+	return r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r KuaicheCampaignUpdateTimeRangePriceCoefResponce) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return "no result data"
 }
 
 type KuaicheCampaignUpdateTimeRangePriceCoefResponseReturnType struct {
@@ -34,7 +58,7 @@ type KuaicheCampaignUpdateTimeRangePriceCoefResponseReturnType struct {
 	dsp.DataCommonResponse
 }
 
-func KuaicheCampaignUpdateTimeRangePriceCoef(req *KuaicheCampaignUpdateTimeRangePriceCoefRequest) (uint64, error) {
+func KuaicheCampaignUpdateTimeRangePriceCoef(ctx context.Context, req *KuaicheCampaignUpdateTimeRangePriceCoefRequest) (uint64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := campaign.NewKuaicheCampaignUpdateTimeRangePriceCoefRequest()
@@ -50,28 +74,9 @@ func KuaicheCampaignUpdateTimeRangePriceCoef(req *KuaicheCampaignUpdateTimeRange
 		r.SetPlatformBusinessType(req.PlatformBusinessType)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return 0, err
-	}
-	if len(result) == 0 {
-		return 0, errors.New("no result.")
-	}
-
 	var response KuaicheCampaignUpdateTimeRangePriceCoefResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
-	if response.ErrorResp != nil {
-		return 0, errors.New(response.ErrorResp.ZhDesc)
-	}
-	if response.Responce == nil || response.Responce.ReturnType == nil {
-		return 0, errors.New("no result data.")
-	}
-	if !response.Responce.ReturnType.Success {
-		return 0, errors.New(response.Responce.ReturnType.Msg)
-	}
-
 	return response.Responce.ReturnType.Data, nil
 }

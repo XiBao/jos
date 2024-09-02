@@ -1,8 +1,7 @@
 package shorturl
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -22,8 +21,33 @@ type GenerateURLFastestResponse struct {
 	Data      *GenerateURLFastestData `json:"jingdong_shorturl_generateURLFastest_responce,omitempty"`
 }
 
+func (r GenerateURLFastestResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r GenerateURLFastestResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type GenerateURLFastestData struct {
 	Result *GenerateURLFastestResult `json:"generatejdurl_result,omitempty"`
+}
+
+func (r GenerateURLFastestData) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r GenerateURLFastestData) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type GenerateURLFastestResult struct {
@@ -35,8 +59,16 @@ type GenerateURLFastestResult struct {
 	Ts       int64  `json:"ts,omitempty"`
 }
 
+func (r GenerateURLFastestResult) IsError() bool {
+	return r.Code != "200"
+}
+
+func (r GenerateURLFastestResult) Error() string {
+	return sdk.ErrorString(r.Code, r.Message)
+}
+
 // 生成短域新的api接口
-func GenerateURLFastest(req *GenerateURLFastestRequest) (*GenerateURLFastestResult, error) {
+func GenerateURLFastest(ctx context.Context, req *GenerateURLFastestRequest) (*GenerateURLFastestResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := shorturl.NewGenerateURLFastestRequest()
@@ -45,22 +77,9 @@ func GenerateURLFastest(req *GenerateURLFastestRequest) (*GenerateURLFastestResu
 	r.SetRealUrl(req.RealUrl)
 	r.SetExpiredDays(req.ExpiredDays)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
 	var response GenerateURLFastestResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-
-	if response.Data == nil {
-		return nil, errors.New("no data")
-	}
-
-	if response.Data.Result.Code != "200" {
-		return nil, &api.ErrorResponnse{Code: response.Data.Result.Code, ZhDesc: response.Data.Result.Message}
 	}
 	return response.Data.Result, nil
 }

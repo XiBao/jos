@@ -1,11 +1,9 @@
 package asset
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/asset"
 )
@@ -26,9 +24,34 @@ type ActivityCreateResponse struct {
 	Response  *ActivityCreateRes  `json:"jingdong_asset_activity_create_responce,omitempty" codec:"jingdong_asset_activity_create_responce,omitempty"`
 }
 
+func (r ActivityCreateResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Response == nil || r.Response.IsError()
+}
+
+func (r ActivityCreateResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Response != nil {
+		return r.Response.Error()
+	}
+	return "no result data"
+}
+
 type ActivityCreateRes struct {
 	Code string              `json:"code,omitempty" codec:"code,omitempty"`
 	Res  *ActivityCreateData `json:"response,omitempty" codec:"response,omitempty"`
+}
+
+func (r ActivityCreateRes) IsError() bool {
+	return r.Res == nil || r.Res.IsError()
+}
+
+func (r ActivityCreateRes) Error() string {
+	if r.Res != nil {
+		return r.Res.Error()
+	}
+	return "no result data"
 }
 
 type ActivityCreateData struct {
@@ -37,11 +60,19 @@ type ActivityCreateData struct {
 	Data    *ActivityCreateToken `json:"data,omitempty" codec:"data,omitempty"`
 }
 
+func (r ActivityCreateData) IsError() bool {
+	return r.Code != "200"
+}
+
+func (r ActivityCreateData) Error() string {
+	return sdk.ErrorString(r.Code, r.Message)
+}
+
 type ActivityCreateToken struct {
 	Token string `json:"token" codec:"token"`
 }
 
-func ActivityCreate(req *ActivityCreateRequest) (string, error) {
+func ActivityCreate(ctx context.Context, req *ActivityCreateRequest) (string, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := asset.NewActivityCreateRequest()
@@ -52,29 +83,9 @@ func ActivityCreate(req *ActivityCreateRequest) (string, error) {
 	r.SetTool(req.Tool)
 	r.SetDetails(req.Details)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return "", err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response ActivityCreateResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return "", err
 	}
-	if response.ErrorResp != nil {
-		return "", response.ErrorResp
-	}
-	if response.Response == nil || response.Response.Res == nil {
-		return "", errors.New("No response.")
-	}
-	if response.Response.Res.Code != "200" && response.Response.Res.Message != "" {
-		return "", errors.New(response.Response.Res.Message)
-	}
-	if response.Response.Res.Data == nil {
-		return "", errors.New("No result.")
-	}
-
 	return response.Response.Res.Data.Token, nil
 }

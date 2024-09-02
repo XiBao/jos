@@ -1,8 +1,7 @@
 package follow
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -20,9 +19,31 @@ type FollowByPinAndVidResponse struct {
 	Data      *FollowByPinAndVidData `json:"jingdong_follow_vender_write_followByPinAndVid_responce,omitempty" codec:"jingdong_follow_vender_write_followByPinAndVid_responce,omitempty"`
 }
 
+func (r FollowByPinAndVidResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r FollowByPinAndVidResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type FollowByPinAndVidData struct {
 	Code   string                   `json:"code,omitempty" codec:"code,omitempty"`
 	Result *FollowByPinAndVidResult `json:"followbypinandvid_result,omitempty" codec:"followbypinandvid_result,omitempty"`
+}
+
+func (r FollowByPinAndVidData) IsError() bool {
+	return r.Result == nil
+}
+
+func (r FollowByPinAndVidData) Error() string {
+	return "no result data"
 }
 
 type FollowByPinAndVidResult struct {
@@ -30,29 +51,16 @@ type FollowByPinAndVidResult struct {
 	Code string `json:"code,omitempty" codec:"code,omitempty"`
 }
 
-func FollowByPinAndVid(req *FollowByPinAndVidRequest) (bool, error) {
+func FollowByPinAndVid(ctx context.Context, req *FollowByPinAndVidRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := follow.NewFollowByPinAndVidRequest()
 	r.SetPin(req.Pin)
 	r.SetShopId(req.ShopId)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("No result info.")
-	}
 	var response FollowByPinAndVidResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-
 	return response.Data.Result.Data, nil
 }

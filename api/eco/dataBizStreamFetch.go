@@ -1,8 +1,7 @@
 package eco
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -29,9 +28,34 @@ type BizStreamFetchResponse struct {
 	Res       *Response           `json:"jingdong_eco_data_biz_stream_fetch_responce,omitempty" codec:"jingdong_eco_data_biz_stream_fetch_responce,omitempty"`
 }
 
+func (r BizStreamFetchResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Res == nil || r.Res.IsError()
+}
+
+func (r BizStreamFetchResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Res != nil {
+		return r.Res.Error()
+	}
+	return "no result data"
+}
+
 type Response struct {
 	Code string      `json:"code,omitempty" codec:"code,omitempty"`
 	RT   *ReturnType `json:"returnType,omitempty" codec:"returnType,omitempty"`
+}
+
+func (r Response) IsError() bool {
+	return r.RT == nil || r.RT.IsError()
+}
+
+func (r Response) Error() string {
+	if r.RT != nil {
+		return r.RT.Error()
+	}
+	return "no result data"
 }
 
 type ReturnType struct {
@@ -40,9 +64,34 @@ type ReturnType struct {
 	Data string `json:"data,omitempty" codec:"data,omitempty"`
 }
 
+func (r ReturnType) IsError() bool {
+	return r.Code != "200" || r.Data == ""
+}
+
+func (r ReturnType) Error() string {
+	if r.Code != "200" {
+		return sdk.ErrorString(r.Code, r.Desc)
+	}
+	return "no result data"
+}
+
 type ReturnTypeData struct {
 	Header *ReturnTypeDataHeader `json:"header,omitempty" codec:"header,omitempty"`
 	Body   *ReturnTypeDataBody   `json:"body,omitempty" codec:"body,omitempty"`
+}
+
+func (r ReturnTypeData) IsError() bool {
+	return r.Header == nil || r.Header.IsError() || r.Body == nil || r.Body.IsError()
+}
+
+func (r ReturnTypeData) Error() string {
+	if r.Header != nil {
+		return r.Header.Error()
+	}
+	if r.Body != nil {
+		return r.Body.Error()
+	}
+	return "missing header/body"
 }
 
 type ReturnTypeDataHeader struct {
@@ -51,10 +100,26 @@ type ReturnTypeDataHeader struct {
 	Desc       string `json:"desc,omitempty" codec:"desc,omitempty"`
 }
 
+func (r ReturnTypeDataHeader) IsError() bool {
+	return r.Code != "200"
+}
+
+func (r ReturnTypeDataHeader) Error() string {
+	return sdk.ErrorString(r.Code, r.Desc)
+}
+
 type ReturnTypeDataBody struct {
 	Data [][]string `json:"data,omitempty" codec:"code,omitempty"`
 	Size uint       `json:"size,omitempty" codec:"code,omitempty"`
 	Meta *Meta      `json:"meta,omitempty" codec:"code,omitempty"`
+}
+
+func (r ReturnTypeDataBody) IsError() bool {
+	return r.Meta == nil
+}
+
+func (r ReturnTypeDataBody) Error() string {
+	return "no return type data body meta"
 }
 
 type Meta struct {
@@ -62,7 +127,7 @@ type Meta struct {
 }
 
 // 数据数据开放接口
-func BizStreamFetch(req *BizStreamFetchRequest) ([]map[string]interface{}, error) {
+func BizStreamFetch(ctx context.Context, req *BizStreamFetchRequest) ([]map[string]interface{}, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := eco.NewBizStreamFetchRequest()
@@ -97,55 +162,24 @@ func BizStreamFetch(req *BizStreamFetchRequest) ([]map[string]interface{}, error
 	if req.TicketType != "" {
 		r.SetTicketType(req.TicketType)
 	}
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No data.")
-	}
-
 	var response BizStreamFetchResponse
-	err = json.Unmarshal([]byte(result), &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Res == nil || response.Res.Code != "0" {
-		return nil, errors.New("unknow error")
-	}
-	if response.Res.RT == nil || response.Res.RT.Code != "200" {
-		return nil, errors.New(response.Res.RT.Desc)
-	}
-
-	if response.Res.RT.Data == "" {
-		return nil, errors.New("no return type data")
-	}
-
 	var returnTypeData ReturnTypeData
-	err = json.Unmarshal([]byte(response.Res.RT.Data), &returnTypeData)
-	if err != nil {
+	if err := client.Logger().DecodeJSON([]byte(response.Res.RT.Data), &returnTypeData); err != nil {
 		return nil, err
 	}
-	if returnTypeData.Header == nil {
-		return nil, errors.New("no return type data header")
+	if returnTypeData.IsError() {
+		return nil, returnTypeData
 	}
-	if returnTypeData.Header.Code != "200" {
-		return nil, errors.New(returnTypeData.Header.Desc)
-	}
-
-	if returnTypeData.Body.Meta == nil {
-		return nil, errors.New("no return type data body meta")
-	}
-	metaIndex := make(map[int]string)
+	metaIndex := make(map[int]string, len(returnTypeData.Body.Meta.MetaIndex))
 	for key, index := range returnTypeData.Body.Meta.MetaIndex {
 		metaIndex[index] = key
 	}
 	metaSize := len(metaIndex)
 
-	rs := []map[string]interface{}{}
+	rs := make([]map[string]interface{}, len(returnTypeData.Body.Data))
 	for _, data := range returnTypeData.Body.Data {
 		dataMap := make(map[string]interface{})
 		for i := 0; i < metaSize; i++ {

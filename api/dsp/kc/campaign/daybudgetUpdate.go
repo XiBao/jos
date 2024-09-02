@@ -1,8 +1,7 @@
 package campaign
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -11,8 +10,8 @@ import (
 
 type DaybudgetUpdateRequest struct {
 	api.BaseRequest
-	CampaignId int    `json:"campaignId,omitempty" codec:"campaignId,omitempty"` //计划id
-	DayBudget  uint64 `json:"day_budget,omitempty" codec:"day_budget,omitempty"` //预算
+	CampaignId int    `json:"campaignId,omitempty" codec:"campaignId,omitempty"` // 计划id
+	DayBudget  uint64 `json:"day_budget,omitempty" codec:"day_budget,omitempty"` // 预算
 }
 
 type DaybudgetUpdateResponse struct {
@@ -20,8 +19,33 @@ type DaybudgetUpdateResponse struct {
 	Data      *DaybudgetUpdateData `json:"jingdong_dsp_kc_campain_daybudget_update_responce,omitempty" codec:"jingdong_dsp_kc_campain_daybudget_update_responce,omitempty"`
 }
 
+func (r DaybudgetUpdateResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r DaybudgetUpdateResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type DaybudgetUpdateData struct {
 	Result *DaybudgetUpdateResult `json:"updatecampaigndaybudget_result"`
+}
+
+func (r DaybudgetUpdateData) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r DaybudgetUpdateData) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type DaybudgetUpdateResult struct {
@@ -31,8 +55,16 @@ type DaybudgetUpdateResult struct {
 	Success    bool   `json:"success,omitempty" codec:"success,omitempty"`
 }
 
+func (r DaybudgetUpdateResult) IsError() bool {
+	return !r.Success
+}
+
+func (r DaybudgetUpdateResult) Error() string {
+	return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
+}
+
 // 修改计划日限额
-func DaybudgetUpdate(req *DaybudgetUpdateRequest) (bool, error) {
+func DaybudgetUpdate(ctx context.Context, req *DaybudgetUpdateRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := campaign.NewCampainDaybudgetUpdateRequest()
@@ -40,25 +72,9 @@ func DaybudgetUpdate(req *DaybudgetUpdateRequest) (bool, error) {
 	r.SetCampaignId(req.CampaignId)
 	r.SetDayBudget(req.DayBudget)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("no result info")
-	}
 	var response DaybudgetUpdateResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-
-	if !response.Data.Result.Success {
-		return false, errors.New(response.Data.Result.ErrorMsg)
-	}
-
 	return true, nil
 }

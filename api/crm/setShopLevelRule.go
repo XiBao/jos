@@ -1,8 +1,7 @@
 package crm
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -11,7 +10,7 @@ import (
 
 type SetShopLevelRuleRequest struct {
 	api.BaseRequest
-	CustomerLevelName []string `json:"customerLevelName,omitempty"` //按顺序填写店铺会员等级名称
+	CustomerLevelName []string `json:"customerLevelName,omitempty"` // 按顺序填写店铺会员等级名称
 }
 
 type SetShopLevelRuleResponse struct {
@@ -19,12 +18,37 @@ type SetShopLevelRuleResponse struct {
 	Data      *SetShopLevelRuleData `json:"jingdong_pop_crm_setShopLevelRule_responce,omitempty" codec:"jingdong_pop_crm_setShopLevelRule_responce,omitempty"`
 }
 
+func (r SetShopLevelRuleResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r SetShopLevelRuleResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type SetShopLevelRuleData struct {
 	ReturnType *ReturnType `json:"returnType,omitempty" codec:"returnType,omitempty"`
 }
 
+func (r SetShopLevelRuleData) IsError() bool {
+	return r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r SetShopLevelRuleData) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return "no result data"
+}
+
 // TODO 修改会员体系规则
-func SetShopLevelRule(req *SetShopLevelRuleRequest) (bool, error) {
+func SetShopLevelRule(ctx context.Context, req *SetShopLevelRuleRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewSetShopLevelRuleRequest()
@@ -32,27 +56,10 @@ func SetShopLevelRule(req *SetShopLevelRuleRequest) (bool, error) {
 	if len(req.CustomerLevelName) > 0 {
 		r.SetCustomerLevelName(req.CustomerLevelName)
 	}
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("no result info")
-	}
+
 	var response SetShopLevelRuleResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-
-	if response.Data.ReturnType.Code != "200" {
-		return false, errors.New(response.Data.ReturnType.Desc)
-	}
-
 	return response.Data.ReturnType.Data, nil
-
 }

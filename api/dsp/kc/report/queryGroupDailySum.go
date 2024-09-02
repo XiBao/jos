@@ -1,8 +1,7 @@
 package report
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 	"sort"
 	"strconv"
 	"time"
@@ -31,18 +30,52 @@ type QueryGroupDailySumResponse struct {
 	Data      *QueryGroupDailySumData `json:"jingdong_dsp_report_queryGroupDailySum_responce,omitempty" codec:"jingdong_dsp_report_queryGroupDailySum_responce,omitempty"`
 }
 
+func (r QueryGroupDailySumResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r QueryGroupDailySumResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type QueryGroupDailySumData struct {
 	Result *QueryGroupDailySumResult `json:"querycampdailysum_result,omitempty" codec:"querycampdailysum_result,omitempty"`
 }
 
-type QueryGroupDailySumResult struct {
-	Success    bool          `json:"success,omitempty" codec:"success,omitempty"`
-	ResultCode string        `json:"resultCode,omitempty" codec:"resultCode,omitempty"`
-	ErrorMsg   string        `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
-	Total      int           `json:"total,omitempty" codec:"total,omitempty"`
-	Page       int           `json:"page,omitempty" codec:"page,omitempty"`
-	Value      []*ReportInfo `json:"value,omitempty" codec:"value,omitempty"`
+func (r QueryGroupDailySumData) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
 }
+
+func (r QueryGroupDailySumData) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
+}
+
+type QueryGroupDailySumResult struct {
+	Success    bool         `json:"success,omitempty" codec:"success,omitempty"`
+	ResultCode string       `json:"resultCode,omitempty" codec:"resultCode,omitempty"`
+	ErrorMsg   string       `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
+	Total      int          `json:"total,omitempty" codec:"total,omitempty"`
+	Page       int          `json:"page,omitempty" codec:"page,omitempty"`
+	Value      []ReportInfo `json:"value,omitempty" codec:"value,omitempty"`
+}
+
+func (r QueryGroupDailySumResult) IsError() bool {
+	return !r.Success
+}
+
+func (r QueryGroupDailySumResult) Error() string {
+	return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
+}
+
 type GroupDailyRpt struct {
 	Date                              time.Time `json:"date,omitempty" codec:"date,omitempty"`
 	GroupId                           uint64    `json:"group_id,omitempty" codec:"group_id,omitempty"`
@@ -92,7 +125,7 @@ type GroupDailyRpt struct {
 }
 
 // 查询.快车.单元报表数据
-func QueryGroupDailySum(req *QueryGroupDailySumRequest) ([]*GroupDailyRpt, int, error) {
+func QueryGroupDailySum(ctx context.Context, req *QueryGroupDailySumRequest) ([]GroupDailyRpt, int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := report.NewQueryGroupDailySumRequest()
@@ -117,33 +150,15 @@ func QueryGroupDailySum(req *QueryGroupDailySumRequest) ([]*GroupDailyRpt, int, 
 	r.SetPageIndex(req.PageIndex)
 	r.SetPageSize(req.PageSize)
 
-	result, err := client.Execute(r.Request, req.Session)
-
-	if err != nil {
-		return nil, 0, err
-	}
-	if len(result) == 0 {
-		return nil, 0, errors.New("no result info")
-	}
-
 	var response QueryGroupDailySumResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, 0, err
 	}
-	if response.ErrorResp != nil {
-		return nil, 0, response.ErrorResp
-	}
 
-	if !response.Data.Result.Success {
-		return nil, 0, errors.New(response.Data.Result.ErrorMsg)
-	}
-
-	var rpts []*GroupDailyRpt
-
+	rpts := make([]GroupDailyRpt, 0, len(response.Data.Result.Value))
 	loc := time.Now().Location()
 	for _, data := range response.Data.Result.Value {
-		rpt := &GroupDailyRpt{
+		rpt := GroupDailyRpt{
 			GroupId: uint64(data.Id),
 		}
 		for k, v := range data.FigureData {
@@ -247,8 +262,6 @@ func QueryGroupDailySum(req *QueryGroupDailySumRequest) ([]*GroupDailyRpt, int, 
 		sort.Slice(rpts, func(i, j int) bool {
 			return rpts[i].Date.Before(rpts[j].Date)
 		})
-
 	}
 	return rpts, response.Data.Result.Total, nil
-
 }

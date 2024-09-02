@@ -1,8 +1,7 @@
 package adkckeyword
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -23,8 +22,30 @@ type UpdateKeyWordsResponse struct {
 	Data      *UpdateKeyWordsData `json:"jingdong_dsp_adkckeyword_updateKeyWords_responce,omitempty" codec:"jingdong_dsp_adkckeyword_updateKeyWords_responce,omitempty"`
 }
 
+func (r UpdateKeyWordsResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r UpdateKeyWordsResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type UpdateKeyWordsData struct {
 	Result UpdateKeyWordsResult `json:"updatekeywords_result,omitempty" codec:"updatekeywords_result,omitempty"`
+}
+
+func (r UpdateKeyWordsData) IsError() bool {
+	return r.Result.IsError()
+}
+
+func (r UpdateKeyWordsData) Error() string {
+	return r.Result.Error()
 }
 
 type UpdateKeyWordsResult struct {
@@ -33,8 +54,16 @@ type UpdateKeyWordsResult struct {
 	ErrorMsg   string `json:"errorMsg,omitempty" codec:"errorMsg,omitempty"`
 }
 
+func (r UpdateKeyWordsResult) IsError() bool {
+	return !r.Success
+}
+
+func (r UpdateKeyWordsResult) Error() string {
+	return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
+}
+
 // 更新关键词状态
-func UpdateKeyWords(req *UpdateKeyWordsRequest) (bool, error) {
+func UpdateKeyWords(ctx context.Context, req *UpdateKeyWordsRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := adkckeyword.NewUpdateKeyWordsRequest()
@@ -46,26 +75,9 @@ func UpdateKeyWords(req *UpdateKeyWordsRequest) (bool, error) {
 	}
 	r.SetAdGroupId(req.AdGroupId)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("no result info")
-	}
 	var response UpdateKeyWordsResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-
-	if !response.Data.Result.Success {
-		return false, errors.New(response.Data.Result.ErrorMsg)
-	}
-
 	return true, nil
-
 }

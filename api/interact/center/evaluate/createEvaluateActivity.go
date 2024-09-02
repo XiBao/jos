@@ -1,12 +1,7 @@
 package center
 
 import (
-	"encoding/json"
-	"errors"
-
-	"github.com/davecgh/go-spew/spew"
-
-	"github.com/XiBao/jos/api/util"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -24,37 +19,44 @@ type CreateEvaluateActivityResponse struct {
 	Data      *CreateEvaluateActivityData `json:"jingdong_com_jd_interact_center_api_service_write_EvaluateActivityWriteService_createActivity_responce,omitempty" codec:"jingdong_com_jd_interact_center_api_service_write_EvaluateActivityWriteService_createActivity_responce,omitempty"`
 }
 
+func (r CreateEvaluateActivityResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r CreateEvaluateActivityResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type CreateEvaluateActivityData struct {
 	Code      string `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    uint64 `json:"result,omitempty" codec:"result,omitempty"`
 }
 
-func CreateEvaluateActivity(req *CreateEvaluateActivityRequest) (uint64, error) {
-	spew.Dump(req)
+func (r CreateEvaluateActivityData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r CreateEvaluateActivityData) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
+}
+
+func CreateEvaluateActivity(ctx context.Context, req *CreateEvaluateActivityRequest) (uint64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewCreateEvaluateActivityRequest()
 	r.SetClientSource(req.ClientSource)
 	r.SetEvaluateActivity(req.EvaluateActivity)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return 0, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response CreateEvaluateActivityResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
-	if response.ErrorResp != nil {
-		return 0, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return 0, errors.New(response.Data.ErrorDesc)
-	}
-
 	return response.Data.Result, nil
 }

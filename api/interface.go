@@ -1,22 +1,23 @@
 package api
 
 import (
-	"fmt"
+	"strconv"
+
+	"github.com/XiBao/jos/sdk"
 )
 
 // ApiKey jd APP key/secret
 type ApiKey struct {
 	Key    string
 	Secret string
-    Id     uint8  `json:"id,omitempty" codec:"id,omitempty"`
-    Name   string `json:"name,omitempty" codec:"name,omitempty"`
+	Name   string `json:"name,omitempty" codec:"name,omitempty"`
+	Id     uint8  `json:"id,omitempty" codec:"id,omitempty"`
 }
 
 type BaseRequest struct {
-	Session  string
 	AnApiKey *ApiKey `json:",omitempty" codec:",omitempty"`
-
-	Debug bool `json:"-"`
+	Session  string
+	Debug    bool `json:"-"`
 }
 
 type ErrorResponnse struct {
@@ -26,16 +27,20 @@ type ErrorResponnse struct {
 }
 
 func (e ErrorResponnse) Error() string {
-	return fmt.Sprintf("Code:%v, ZhDesc:%v, EnDesc:%v", e.Code, e.ZhDesc, e.EnDesc)
+	return sdk.StringsJoin("Code:", e.Code, ", ZhDesc:", e.ZhDesc, ", EnDesc:", e.EnDesc)
 }
 
 type ApiResult struct {
-	Success        bool   `json:"success,omitempty" codec:"success,omitempty"`
 	EnglishErrCode string `json:"englishErrCode,omitempty" codec:"englishErrCode,omitempty"`
 	ChineseErrCode string `json:"chineseErrCode,omitempty" codec:"chineseErrCode,omitempty"`
 	NumberCode     int    `json:"numberCode,omitempty" codec:"numberCode,omitempty"`
+	Success        bool   `json:"success,omitempty" codec:"success,omitempty"`
+}
+
+func (e ApiResult) IsError() bool {
+	return !e.Success
 }
 
 func (e ApiResult) Error() string {
-	return fmt.Sprintf("Success:%v, EnglishErrCode:%v, ChineseErrCode:%v, NumberCode:%v", e.Success, e.EnglishErrCode, e.ChineseErrCode, e.NumberCode)
+	return sdk.StringsJoin("EnglishErrCode:", e.EnglishErrCode, ", ChineseErrCode:", e.ChineseErrCode, ", NumberCode:", strconv.Itoa(e.NumberCode))
 }

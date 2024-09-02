@@ -1,8 +1,7 @@
 package dmp
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
@@ -19,7 +18,7 @@ type KuaicheDmpTagListRequest struct {
 	PageIndex       int    `json:"pageIndex"`                 // 页码
 	PageSize        int    `json:"pageSize,omitempty"`        // 每页条数
 	TagName         string `json:"tagName,omitempty"`         // 标签名称关键字：界面上输入搜索框内的文本
-	SortType        uint   `json:"sortType,omitempty"`        //8行业热度降序(点击页面图标);9行业热度升序(点击页面图标);10覆盖度降序(点击页面图标);11覆盖度升序(点击页面图标),12相关性降序（点击搜索按钮），1标签创建时间降序（点击维度分类按此顺序）
+	SortType        uint   `json:"sortType,omitempty"`        // 8行业热度降序(点击页面图标);9行业热度升序(点击页面图标);10覆盖度降序(点击页面图标);11覆盖度升序(点击页面图标),12相关性降序（点击搜索按钮），1标签创建时间降序（点击维度分类按此顺序）
 	IsFavorite      int    `json:"isFavorite,omitempty"`      // -1 查询全部，1查询收藏列表。收藏列表时排序默认为1
 	Level           uint   `json:"level,omitempty"`           // 类目级别
 	TagCategoryType uint   `json:"tagCategoryType,omitempty"` // 1、类目对应列表（含新上标签类目） 2收藏列表 3、最近使用 4、同行常用 5、可能感兴趣 6、标签组合 ，收藏和最近使用列表排序默认为1，不支持其他类型排序
@@ -30,9 +29,34 @@ type KuaicheDmpTagListResponse struct {
 	ErrorResp *api.ErrorResponnse        `json:"error_response,omitempty" codec:"error_response,omitempty"`
 }
 
+func (r KuaicheDmpTagListResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Responce == nil || r.Responce.IsError()
+}
+
+func (r KuaicheDmpTagListResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Responce != nil {
+		return r.Responce.Error()
+	}
+	return "no result data"
+}
+
 type KuaicheDmpTagListResponce struct {
 	Data *KuaicheDmpTagListResponseData `json:"data,omitempty" codec:"data,omitempty"`
 	Code string                         `json:"code,omitempty" codec:"code,omitempty"`
+}
+
+func (r KuaicheDmpTagListResponce) IsError() bool {
+	return r.Data == nil || r.Data.IsError()
+}
+
+func (r KuaicheDmpTagListResponce) Error() string {
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
 }
 
 type KuaicheDmpTagListResponseData struct {
@@ -52,7 +76,7 @@ type KuaicheDmpTagListResponseDataTagPageInfo struct {
 	TagVOList []dsp.TagVO `json:"data,omitempty" codec:"data,omitempty"`
 }
 
-func KuaicheDmpTagList(req *KuaicheDmpTagListRequest) (*KuaicheDmpTagListResponseDataTagPageInfo, error) {
+func KuaicheDmpTagList(ctx context.Context, req *KuaicheDmpTagListRequest) (*KuaicheDmpTagListResponseDataTagPageInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := dmp.NewKuaicheDmpTagListRequest()
@@ -87,28 +111,9 @@ func KuaicheDmpTagList(req *KuaicheDmpTagListRequest) (*KuaicheDmpTagListRespons
 		r.SetTagCategoryType(req.TagCategoryType)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result.")
-	}
-
 	var response KuaicheDmpTagListResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, errors.New(response.ErrorResp.ZhDesc)
-	}
-	if response.Responce == nil || response.Responce.Data == nil {
-		return nil, errors.New("no result data.")
-	}
-	if !response.Responce.Data.Success {
-		return nil, errors.New(response.Responce.Data.Msg)
-	}
-
 	return response.Responce.Data.Data.TagPageInfo, nil
 }

@@ -1,10 +1,7 @@
 package center
 
 import (
-	"encoding/json"
-	"errors"
-
-	"github.com/XiBao/jos/api/util"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -30,10 +27,35 @@ type WriteCollectCouponResponse struct {
 	Data      *WriteCollectCouponData `json:"jingdong_interact_center_api_service_write_collectCoupon_responce,omitempty" codec:"jingdong_interact_center_api_service_write_collectCoupon_responce,omitempty"`
 }
 
+func (r WriteCollectCouponResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r WriteCollectCouponResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type WriteCollectCouponData struct {
 	Code      string                    `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string                    `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    *WriteCollectCouponResult `json:"GiftActivityResults,omitempty" codec:"GiftActivityResults,omitempty"`
+}
+
+func (r WriteCollectCouponData) IsError() bool {
+	return r.Code != "0" || r.Result == nil
+}
+
+func (r WriteCollectCouponData) Error() string {
+	if r.Code != "0" {
+		return sdk.ErrorString(r.Code, r.ErrorDesc)
+	}
+	return "no result data"
 }
 
 type WriteCollectCouponResult struct {
@@ -42,7 +64,7 @@ type WriteCollectCouponResult struct {
 	Msg  string `json:"msg" codec:"msg"`
 }
 
-func WriteCollectCoupon(req *WriteCollectCouponRequest) (bool, error) {
+func WriteCollectCoupon(ctx context.Context, req *WriteCollectCouponRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewWriteCollectCouponRequest()
@@ -57,26 +79,9 @@ func WriteCollectCoupon(req *WriteCollectCouponRequest) (bool, error) {
 	r.SetSource(req.Source)
 	r.SetType(req.Type)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response WriteCollectCouponResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return false, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return false, errors.New("No writer collect coupon result.")
-	}
-
 	return response.Data.Result.Data, nil
 }

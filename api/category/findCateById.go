@@ -1,8 +1,7 @@
 package category
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -18,7 +17,18 @@ type FindCateByIdRequest struct {
 
 type FindCateByIdResponse struct {
 	ErrorResp *api.ErrorResponnse `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *FindCateByIdData   `json:"jingdong_category_read_findById_response,omitempty" codec:"jingdong_category_read_findById_response,omitempty"`
+	Data      *FindCateByIdData   `json:"jingdong_category_read_findById_responce,omitempty" codec:"jingdong_category_read_findById_responce,omitempty"`
+}
+
+func (r FindCateByIdResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil
+}
+
+func (r FindCateByIdResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
 }
 
 type FindCateByIdData struct {
@@ -27,7 +37,7 @@ type FindCateByIdData struct {
 }
 
 // 获取单个SKU
-func FindCateById(req *FindCateByIdRequest) (*Category, error) {
+func FindCateById(ctx context.Context, req *FindCateByIdRequest) (*Category, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := category.NewFindCateByIdRequest()
@@ -36,22 +46,9 @@ func FindCateById(req *FindCateByIdRequest) (*Category, error) {
 	}
 	r.SetCid(req.Cid)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No sku info.")
-	}
 	var response FindCateByIdResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
 	return response.Data.Category, nil
 }

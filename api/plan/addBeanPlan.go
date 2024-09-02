@@ -1,11 +1,9 @@
 package plan
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/plan"
 )
@@ -36,14 +34,35 @@ type AddBeanPlanResponse struct {
 	Data      *AddBeanPlanData    `json:"jingdong_pop_plan_addBeanPlan_responce,omitempty" codec:"jingdong_pop_plan_addBeanPlan_responce,omitempty"`
 }
 
+func (r AddBeanPlanResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r AddBeanPlanResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type AddBeanPlanData struct {
 	Code      string `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
-
-	PlanId uint64 `json:"planId,omitempty" codec:"planId,omitempty"`
+	PlanId    uint64 `json:"planId,omitempty" codec:"planId,omitempty"`
 }
 
-func AddBeanPlan(req *AddBeanPlanRequest) (uint64, error) {
+func (r AddBeanPlanData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r AddBeanPlanData) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
+}
+
+func AddBeanPlan(ctx context.Context, req *AddBeanPlanRequest) (uint64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := plan.NewAddBeanPlanRequest()
@@ -71,25 +90,9 @@ func AddBeanPlan(req *AddBeanPlanRequest) (uint64, error) {
 		r.SetRfld(req.Rfld)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return 0, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response AddBeanPlanResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
-	}
-	if response.ErrorResp != nil {
-		return 0, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return 0, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.PlanId == 0 {
-		return 0, errors.New("No plan id.")
 	}
 
 	return response.Data.PlanId, nil

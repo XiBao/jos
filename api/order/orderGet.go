@@ -1,8 +1,7 @@
 package order
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 	"strings"
 
 	"github.com/XiBao/jos/api"
@@ -21,10 +20,34 @@ type OrderGetResponse struct {
 	Data      *OrderGetData       `json:"jingdong_shop_order_get_responce,omitempty" codec:"jingdong_shop_order_get_responce,omitempty"`
 }
 
-type OrderGetData struct {
-	Code string `json:"code,omitempty" codec:"code,omitempty"`
+func (r OrderGetResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
 
+func (r OrderGetResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
+type OrderGetData struct {
+	Code              string             `json:"code,omitempty" codec:"code,omitempty"`
 	OrderDetailResult *OrderDetailResult `json:"orderDetailResult,omitempty" codec:"orderDetailResult,omitempty"`
+}
+
+func (r OrderGetData) IsError() bool {
+	return r.OrderDetailResult == nil || r.OrderDetailResult.IsError()
+}
+
+func (r OrderGetData) Error() string {
+	if r.OrderDetailResult != nil {
+		return r.OrderDetailResult.Error()
+	}
+	return "no result data"
 }
 
 type OrderDetailResult struct {
@@ -35,33 +58,25 @@ type OrderDetailResult struct {
 	Orders  []JdOrderInfo     `json:"orders,omitempty" codec:"orders,omitempty"`
 }
 
+func (r OrderDetailResult) IsError() bool {
+	return !r.Success
+}
+
+func (r OrderDetailResult) Error() string {
+	return sdk.ErrorString(r.Code, r.Message)
+}
+
 // 输入单个自营订单id，得到所有相关订单信息
-func OrderGet(req *OrderGetRequest) ([]JdOrderInfo, error) {
+func OrderGet(ctx context.Context, req *OrderGetRequest) ([]JdOrderInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := order.NewOrderGetRequest()
 	r.SetOrders(req.Orders)
 	r.SetOptionalFields(strings.Join(req.OptionalFields, ","))
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No order info.")
-	}
-
 	var response OrderGetResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if !response.Data.OrderDetailResult.Success {
-		return nil, errors.New(response.Data.OrderDetailResult.Message)
-	}
-
 	return response.Data.OrderDetailResult.Orders, nil
 }

@@ -1,11 +1,9 @@
 package coupon
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/coupon"
 )
@@ -22,14 +20,35 @@ type CouponWriteCloseResponse struct {
 	Data      *CouponWriteCloseData `json:"jingdong_seller_coupon_write_close_responce,omitempty" codec:"jingdong_seller_coupon_write_close_responce,omitempty"`
 }
 
-type CouponWriteCloseData struct {
-	Code      string `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
-
-	CloseResult bool `json:"close_result,omitempty" codec:"close_result,omitempty"`
+func (r CouponWriteCloseResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
 }
 
-func CouponWriteClose(req *CouponWriteCloseRequest) (bool, error) {
+func (r CouponWriteCloseResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
+type CouponWriteCloseData struct {
+	Code        string `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc   string `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	CloseResult bool   `json:"close_result,omitempty" codec:"close_result,omitempty"`
+}
+
+func (r CouponWriteCloseData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r CouponWriteCloseData) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
+}
+
+func CouponWriteClose(ctx context.Context, req *CouponWriteCloseRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := coupon.NewSellerCouponWriteCloseRequest()
@@ -37,22 +56,9 @@ func CouponWriteClose(req *CouponWriteCloseRequest) (bool, error) {
 	r.SetPort(req.Port)
 	r.SetCouponId(req.CouponId)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response CouponWriteCloseResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
-	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return false, errors.New(response.Data.ErrorDesc)
 	}
 
 	return response.Data.CloseResult, nil

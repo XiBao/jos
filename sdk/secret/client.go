@@ -2,6 +2,7 @@ package secret
 
 import (
 	"bytes"
+	"context"
 	"crypto/aes"
 	"encoding/base64"
 	"encoding/hex"
@@ -33,14 +34,14 @@ type Client struct {
 	sync.RWMutex
 }
 
-func NewClient(appKey string, appSecret, accessToken string) *Client {
+func NewClient(ctx context.Context, appKey string, appSecret, accessToken string) *Client {
 	client := &Client{
 		AppKey:      appKey,
 		AppSecret:   appSecret,
 		AccessToken: accessToken,
 		SdkVer:      2,
 	}
-	go client.StartReport()
+	go client.StartReport(ctx)
 	return client
 }
 
@@ -52,17 +53,17 @@ func (this *Client) SetEnv(env string) {
 	this.Env = env
 }
 
-func (this *Client) StartReport() {
+func (this *Client) StartReport(ctx context.Context) {
 	hourlyTicker := time.NewTicker(1 * time.Hour)
 	for {
 		select {
 		case <-hourlyTicker.C:
-			this.ReportStatitics()
+			this.ReportStatitics(ctx)
 		}
 	}
 }
 
-func (this *Client) GetVoucher() (voucherData voucher.VoucherData, err error) {
+func (this *Client) GetVoucher(ctx context.Context) (voucherData voucher.VoucherData, err error) {
 	req := &voucher.VoucherInfoGetRequest{
 		BaseRequest: api.BaseRequest{
 			AnApiKey: &api.ApiKey{
@@ -72,10 +73,10 @@ func (this *Client) GetVoucher() (voucherData voucher.VoucherData, err error) {
 			Session: this.AccessToken,
 		},
 	}
-	return voucher.VoucherInfoGet(req)
+	return voucher.VoucherInfoGet(ctx, req)
 }
 
-func (this *Client) GetMasterKey(tid string, voucherKey string) (keyStore *crypto.KeyStore, err error) {
+func (this *Client) GetMasterKey(ctx context.Context, tid string, voucherKey string) (keyStore *crypto.KeyStore, err error) {
 	req := &master.MasterKeyGetRequest{
 		BaseRequest: api.BaseRequest{
 			AnApiKey: &api.ApiKey{
@@ -87,9 +88,12 @@ func (this *Client) GetMasterKey(tid string, voucherKey string) (keyStore *crypt
 		Tid: tid,
 		Key: voucherKey,
 	}
-	keyStore, err = master.MasterKeyGet(req)
-	if err != nil {
+	if keyStores, err := master.MasterKeyGet(ctx, req); err != nil {
 		return nil, err
+	} else if len(keyStores) == 0 {
+		return nil, errors.New("empty keystore")
+	} else {
+		keyStore = &keyStores[0]
 	}
 	this.Lock()
 	this.KeyStore = keyStore
@@ -97,20 +101,20 @@ func (this *Client) GetMasterKey(tid string, voucherKey string) (keyStore *crypt
 	return
 }
 
-func (this *Client) RefreshKeyStore() (*crypto.KeyStore, error) {
-	voucher, err := this.GetVoucher()
+func (this *Client) RefreshKeyStore(ctx context.Context) (*crypto.KeyStore, error) {
+	voucher, err := this.GetVoucher(ctx)
 	if err != nil {
 		return nil, err
 	}
-	keyStore, err := this.GetMasterKey(voucher.Id, voucher.Key)
+	keyStore, err := this.GetMasterKey(ctx, voucher.Id, voucher.Key)
 	if err != nil {
 		return nil, err
 	}
-	this.Report(voucher.Service, INIT, INIT_TYPE, "0", "", "")
+	this.Report(ctx, voucher.Service, INIT, INIT_TYPE, "0", "", "")
 	return keyStore, nil
 }
 
-func (this *Client) GetKey(keyId string) (key crypto.Key, err error) {
+func (this *Client) GetKey(ctx context.Context, keyId string) (key crypto.Key, err error) {
 	var found bool
 	this.RLock()
 	if this.KeyStore == nil {
@@ -122,7 +126,7 @@ func (this *Client) GetKey(keyId string) (key crypto.Key, err error) {
 	if found {
 		return key, nil
 	}
-	keyStore, err := this.RefreshKeyStore()
+	keyStore, err := this.RefreshKeyStore(ctx)
 	if err != nil {
 		return key, err
 	}
@@ -133,7 +137,7 @@ func (this *Client) GetKey(keyId string) (key crypto.Key, err error) {
 	return key, nil
 }
 
-func (this *Client) GetCurrentKey() (key crypto.Key, err error) {
+func (this *Client) GetCurrentKey(ctx context.Context) (key crypto.Key, err error) {
 	var found bool
 	this.RLock()
 	if this.KeyStore == nil {
@@ -145,7 +149,7 @@ func (this *Client) GetCurrentKey() (key crypto.Key, err error) {
 	if found {
 		return key, nil
 	}
-	keyStore, err := this.RefreshKeyStore()
+	keyStore, err := this.RefreshKeyStore(ctx)
 	if err != nil {
 		return key, err
 	}
@@ -156,7 +160,7 @@ func (this *Client) GetCurrentKey() (key crypto.Key, err error) {
 	return key, nil
 }
 
-func (this *Client) GetFirstKey() (key crypto.Key, err error) {
+func (this *Client) GetFirstKey(ctx context.Context) (key crypto.Key, err error) {
 	var found bool
 	this.RLock()
 	if this.KeyStore == nil {
@@ -168,7 +172,7 @@ func (this *Client) GetFirstKey() (key crypto.Key, err error) {
 	if found {
 		return key, nil
 	}
-	keyStore, err := this.RefreshKeyStore()
+	keyStore, err := this.RefreshKeyStore(ctx)
 	if err != nil {
 		return key, err
 	}
@@ -179,12 +183,12 @@ func (this *Client) GetFirstKey() (key crypto.Key, err error) {
 	return key, nil
 }
 
-func (this *Client) Salt(usePrivateEncrypt bool) ([]byte, error) {
+func (this *Client) Salt(ctx context.Context, usePrivateEncrypt bool) ([]byte, error) {
 	var keyData []byte
 	if usePrivateEncrypt {
 		keyData = crypto.Sha256([]byte(this.AppKey))
 	} else {
-		key, err := this.GetFirstKey()
+		key, err := this.GetFirstKey(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -193,8 +197,8 @@ func (this *Client) Salt(usePrivateEncrypt bool) ([]byte, error) {
 	return crypto.AESCBCEncryptZeroIV(keyData)
 }
 
-func (this *Client) Hash(oriData string, usePrivateEncrypt bool) (string, error) {
-	salt, err := this.Salt(usePrivateEncrypt)
+func (this *Client) Hash(ctx context.Context, oriData string, usePrivateEncrypt bool) (string, error) {
+	salt, err := this.Salt(ctx, usePrivateEncrypt)
 	if err != nil {
 		return "", err
 	}
@@ -206,7 +210,7 @@ func (this *Client) Hash(oriData string, usePrivateEncrypt bool) (string, error)
 	return hex.EncodeToString(crypto.Sha256(buf.Bytes())), nil
 }
 
-func (this *Client) Decrypt(encryptedStr string, usePrivateEncrypt bool) (string, error) {
+func (this *Client) Decrypt(ctx context.Context, encryptedStr string, usePrivateEncrypt bool) (string, error) {
 	if encryptedStr == "" {
 		return "", nil
 	}
@@ -220,12 +224,12 @@ func (this *Client) Decrypt(encryptedStr string, usePrivateEncrypt bool) (string
 		return "", err
 	}
 
-	data := encryptedData[ivStart:len(encryptedData)]
+	data := encryptedData[ivStart:]
 	if usePrivateEncrypt {
 		keyData = crypto.Sha256([]byte(this.AppKey))
 	} else {
 		keyId := base64.StdEncoding.EncodeToString(encryptedData[CIPHER_LEN:ivStart])
-		key, err := this.GetKey(keyId)
+		key, err := this.GetKey(ctx, keyId)
 		if err != nil {
 			this.Lock()
 			this.Decerrcnt += 1
@@ -253,7 +257,7 @@ func (this *Client) Decrypt(encryptedStr string, usePrivateEncrypt bool) (string
 	return origData, nil
 }
 
-func (this *Client) Encrypt(str string, usePrivateEncrypt bool) (string, error) {
+func (this *Client) Encrypt(ctx context.Context, str string, usePrivateEncrypt bool) (string, error) {
 	if str == "" {
 		return "", nil
 	}
@@ -265,7 +269,7 @@ func (this *Client) Encrypt(str string, usePrivateEncrypt bool) (string, error) 
 		keyData = crypto.Sha256([]byte(this.AppKey))
 		keyIdData = crypto.Sha256([]byte(this.AppSecret))[:aes.BlockSize]
 	} else {
-		key, err := this.GetCurrentKey()
+		key, err := this.GetCurrentKey(ctx)
 		if err != nil {
 			this.Lock()
 			this.Encerrcnt += 1
@@ -305,7 +309,7 @@ func (this *Client) Encrypt(str string, usePrivateEncrypt bool) (string, error) 
 	return base64.StdEncoding.EncodeToString(buf.Bytes()), nil
 }
 
-func (this *Client) Report(service string, reportText ReportText, reportType ReportType, code string, msg string, heap string) error {
+func (this *Client) Report(ctx context.Context, service string, reportText ReportText, reportType ReportType, code string, msg string, heap string) error {
 	level := INFO_LEVEL
 	if reportType == EXCEPTION_TYPE {
 		level = ERROR_LEVEL
@@ -336,10 +340,10 @@ func (this *Client) Report(service string, reportText ReportText, reportType Rep
 		Attribute:  string(buf),
 		ServerUrl:  DefaultServerUrl,
 	}
-	return secret.SecretApiReportGet(req)
+	return secret.SecretApiReportGet(ctx, req)
 }
 
-func (this *Client) ReportStatitics() error {
+func (this *Client) ReportStatitics(ctx context.Context) error {
 	this.Lock()
 	if this.KeyStore == nil {
 		this.Unlock()
@@ -377,5 +381,5 @@ func (this *Client) ReportStatitics() error {
 		Attribute:  string(buf),
 		ServerUrl:  DefaultServerUrl,
 	}
-	return secret.SecretApiReportGet(req)
+	return secret.SecretApiReportGet(ctx, req)
 }

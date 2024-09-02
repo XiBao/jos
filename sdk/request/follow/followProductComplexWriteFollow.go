@@ -1,6 +1,8 @@
 package follow
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type FollowProductComplexWriteFollow struct {
 	Request *sdk.Request

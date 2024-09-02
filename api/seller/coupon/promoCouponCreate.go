@@ -1,8 +1,7 @@
 package coupon
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -20,10 +19,35 @@ type PromoCouponCreateResponse struct {
 	Data      *PromoCouponCreateData `json:"jingdong_pop_promo_coupon_createCoupon_responce,omitempty" codec:"jingdong_pop_promo_coupon_createCoupon_responce,omitempty"`
 }
 
+func (r PromoCouponCreateResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r PromoCouponCreateResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type PromoCouponCreateData struct {
 	Code      string                   `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string                   `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    *PromoCouponCreateResult `json:"returnType,omitempty" codec:"returnType,omitempty"`
+}
+
+func (r PromoCouponCreateData) IsError() bool {
+	return r.Code != "0" || r.Result == nil || r.Result.IsError()
+}
+
+func (r PromoCouponCreateData) Error() string {
+	if r.Result != nil && r.Result.IsError() {
+		return r.Result.Error()
+	}
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type PromoCouponCreateResult struct {
@@ -33,7 +57,15 @@ type PromoCouponCreateResult struct {
 	Msg     string `json:"msg,omitempty" codec:"msg,omitempty"`
 }
 
-func PromoCouponCreate(req *PromoCouponCreateRequest) (uint64, error) {
+func (r PromoCouponCreateResult) IsError() bool {
+	return r.Code != "200" || !r.Success
+}
+
+func (r PromoCouponCreateResult) Error() string {
+	return sdk.ErrorString(r.Code, r.Msg)
+}
+
+func PromoCouponCreate(ctx context.Context, req *PromoCouponCreateRequest) (uint64, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := coupon.NewSellerPromoCouponCreateRequest()
@@ -41,35 +73,9 @@ func PromoCouponCreate(req *PromoCouponCreateRequest) (uint64, error) {
 	r.SetClientInfo(req.ClientInfo)
 	r.SetParam(req.CouponOuterParam)
 
-	result, err := client.PostExecute(r.Request, req.Session)
-	if err != nil {
-		return 0, err
-	}
-	if len(result) == 0 {
-		return 0, errors.New("no result.")
-	}
-
 	var response PromoCouponCreateResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.PostExecute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
-	if response.ErrorResp != nil {
-		return 0, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return 0, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return 0, errors.New("No create promotion result.")
-	}
-	if response.Data.Result.Code != "200" || !response.Data.Result.Success {
-		if response.Data.Result.Msg == "" {
-			return 0, errors.New("未知错误")
-		} else {
-			return 0, errors.New(response.Data.Result.Msg)
-		}
-	}
-
 	return response.Data.Result.Data, nil
 }

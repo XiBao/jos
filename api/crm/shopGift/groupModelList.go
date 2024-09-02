@@ -1,8 +1,7 @@
 package crm
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -20,16 +19,49 @@ type ShopGiftGroupModelListResponse struct {
 	Data      *ShopGiftGroupModelListData `json:"jingdong_pop_crm_shopGift_getGroupModelList_responce,omitempty" codec:"jingdong_pop_crm_shopGift_getGroupModelList_responce,omitempty"`
 }
 
+func (r ShopGiftGroupModelListResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r ShopGiftGroupModelListResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type ShopGiftGroupModelListData struct {
 	Code      string                        `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string                        `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    *ShopGiftGroupModelListResult `json:"commonResult,omitempty" codec:"commonResult,omitempty"`
 }
 
+func (r ShopGiftGroupModelListData) IsError() bool {
+	return r.Code != "0" || r.Result == nil || r.Result.IsError()
+}
+
+func (r ShopGiftGroupModelListData) Error() string {
+	if r.Result != nil && r.Result.IsError() {
+		return r.Result.Error()
+	}
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
+}
+
 type ShopGiftGroupModelListResult struct {
-	Code string                `json:"code,omitempty" codec:"code,omitempty"`
-	Desc string                `json:"desc,omitempty" codec:"desc,omitempty"`
-	Data []*ShopGiftGroupModel `json:"data,omitempty" codec:"data,omitempty"`
+	Code string               `json:"code,omitempty" codec:"code,omitempty"`
+	Desc string               `json:"desc,omitempty" codec:"desc,omitempty"`
+	Data []ShopGiftGroupModel `json:"data,omitempty" codec:"data,omitempty"`
+}
+
+func (r ShopGiftGroupModelListResult) IsError() bool {
+	return r.Code != "200"
+}
+
+func (r ShopGiftGroupModelListResult) Error() string {
+	return sdk.ErrorString(r.Code, r.Desc)
 }
 
 type ShopGiftGroupModel struct {
@@ -50,38 +82,15 @@ type ShopGiftGroupModel struct {
 	ModelDescList []string `json:"modelDescList"`    // 人群信息描述
 }
 
-func ShopGiftGroupModelList(req *ShopGiftGroupModelListRequest) ([]*ShopGiftGroupModel, error) {
+func ShopGiftGroupModelList(ctx context.Context, req *ShopGiftGroupModelListRequest) ([]ShopGiftGroupModel, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewShopGiftGroupModelListRequest()
 	r.SetChannel(req.Channel)
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No result info.")
-	}
+
 	var response ShopGiftGroupModelListResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
-	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return nil, errors.New("No result.")
-	}
-	if response.Data.Result.Code != "200" {
-		if response.Data.Result.Desc == "" {
-			return nil, errors.New("未知错误")
-		} else {
-			return nil, errors.New(response.Data.Result.Desc)
-		}
 	}
 	return response.Data.Result.Data, nil
 }

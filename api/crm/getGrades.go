@@ -1,8 +1,7 @@
 package crm
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -18,9 +17,20 @@ type GetGradesResponse struct {
 	Data      *GetGradesData      `json:"jingdong_crm_grade_get_responce,omitempty" codec:"jingdong_crm_grade_get_responce,omitempty"`
 }
 
+func (r GetGradesResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil
+}
+
+func (r GetGradesResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
+}
+
 type GetGradesData struct {
-	Code   string             `json:"code,omitempty" codec:"code,omitempty"`
-	Result []*GetGradesResult `json:"grade_promotions,omitempty" codec:"grade_promotions,omitempty"`
+	Code   string            `json:"code,omitempty" codec:"code,omitempty"`
+	Result []GetGradesResult `json:"grade_promotions,omitempty" codec:"grade_promotions,omitempty"`
 }
 
 type GetGradesResult struct {
@@ -32,27 +42,14 @@ type GetGradesResult struct {
 	NextGradeName     string `json:"next_grade_name,omitempty" codec:"next_grade_name,omitempty"`
 }
 
-func GetGrades(req *GetGradesRequest) ([]*GetGradesResult, error) {
+func GetGrades(ctx context.Context, req *GetGradesRequest) ([]GetGradesResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewGetGradesRequest()
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No result info.")
-	}
 	var response GetGradesResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
 	return response.Data.Result, nil
 }

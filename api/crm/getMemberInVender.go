@@ -1,8 +1,7 @@
 package crm
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -16,7 +15,18 @@ type GetMemberInVenderRequest struct {
 
 type GetMemberInVenderResponse struct {
 	ErrorResp *api.ErrorResponnse    `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *GetMemberInVenderData `json:"jingdong_pop_crm_getMemberInVender_responce",omitempty" codec:"jingdong_pop_crm_getMemberInVender_responce",omitempty"`
+	Data      *GetMemberInVenderData `json:"jingdong_pop_crm_getMemberInVender_responce,omitempty" codec:"jingdong_pop_crm_getMemberInVender_responce,omitempty"`
+}
+
+func (r GetMemberInVenderResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil
+}
+
+func (r GetMemberInVenderResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
 }
 
 type GetMemberInVenderData struct {
@@ -28,32 +38,15 @@ type GetMemberInVenderSubData struct {
 	CustomerInfoEs *CustomerInfoEs `json:"customerInfoEs,omitempty" codec:"customerInfoEs,omitempty"`
 }
 
-func GetMemberInVender(req *GetMemberInVenderRequest) (*CustomerInfoEs, error) {
+func GetMemberInVender(ctx context.Context, req *GetMemberInVenderRequest) (*CustomerInfoEs, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewGetMemberInVenderRequest()
 	r.SetCustomerPin(req.CustomerPin)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No result info.")
-	}
 	var response GetMemberInVenderResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if response.Data.Result == nil {
-		return nil, nil
-	}
-
 	return response.Data.Result.CustomerInfoEs, nil
 }

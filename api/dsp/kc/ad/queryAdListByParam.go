@@ -1,8 +1,7 @@
 package ad
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/dsp"
@@ -22,8 +21,33 @@ type AdQueryAdListByParamResponse struct {
 	Data      *AdQueryAdListByParamData `json:"jingdong_dsp_kc_ad_queryAdListByParam_responce,omitempty" codec:"jingdong_dsp_kc_ad_queryAdListByParam_responce,omitempty"`
 }
 
+func (r AdQueryAdListByParamResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r AdQueryAdListByParamResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type AdQueryAdListByParamData struct {
 	Result *AdQueryAdListByParamResult `json:"querylistbyparam_result,omitempty" codec:"querylistbyparam_result,omitempty"`
+}
+
+func (r AdQueryAdListByParamData) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r AdQueryAdListByParamData) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type AdQueryAdListByParamResult struct {
@@ -33,18 +57,29 @@ type AdQueryAdListByParamResult struct {
 	Success    bool                        `json:"success,omitempty" codec:"success,omitempty"`
 }
 
+func (r AdQueryAdListByParamResult) IsError() bool {
+	return !r.Success || r.Value == nil
+}
+
+func (r AdQueryAdListByParamResult) Error() string {
+	if !r.Success {
+		return sdk.ErrorString(r.ResultCode, r.ErrorMsg)
+	}
+	return "no result data"
+}
+
 type AdQueryAdListByParamValues struct {
 	Paginator *dsp.Paginator `json:"paginator,omitempty" codec:"paginator,omitempty"`
-	Datas     []*DspADQuery  `json:"datas,omitempty" codec:"datas,omitempty"`
+	Datas     []DspADQuery   `json:"datas,omitempty" codec:"datas,omitempty"`
 }
 
 type DspADQuery struct {
-	ImgUrl        string       `json:"imgUrl,omitempty" codec:"imgUrl,omitempty"`               // 图片地址
-	Id            uint64       `json:"id,omitempty" codec:"id,omitempty"`                       // 创意id
-	Status        uint8        `json:"status,omitempty" codec:"status,omitempty"`               // 状态
-	Name          string       `json:"name,omitempty" codec:"name,omitempty"`                   // 创意名称
-	SkuId         string       `json:"skuId,omitempty" codec:"skuId,omitempty"`                 // SkuId
-	AuditInfoList []*AuditInfo `json:"auditInfoList,omitempty" codec:"auditInfoList,omitempty"` // 审核List
+	ImgUrl        string      `json:"imgUrl,omitempty" codec:"imgUrl,omitempty"`               // 图片地址
+	Id            uint64      `json:"id,omitempty" codec:"id,omitempty"`                       // 创意id
+	Status        uint8       `json:"status,omitempty" codec:"status,omitempty"`               // 状态
+	Name          string      `json:"name,omitempty" codec:"name,omitempty"`                   // 创意名称
+	SkuId         string      `json:"skuId,omitempty" codec:"skuId,omitempty"`                 // SkuId
+	AuditInfoList []AuditInfo `json:"auditInfoList,omitempty" codec:"auditInfoList,omitempty"` // 审核List
 }
 
 type AuditInfo struct {
@@ -52,7 +87,7 @@ type AuditInfo struct {
 }
 
 // 查询.快车.指定单元下创意基本信息
-func AdQueryAdListByParam(req *AdQueryAdListByParamRequest) ([]*DspADQuery, int, error) {
+func AdQueryAdListByParam(ctx context.Context, req *AdQueryAdListByParamRequest) ([]DspADQuery, int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := ad.NewAdQueryAdListByParamRequest()
@@ -61,26 +96,9 @@ func AdQueryAdListByParam(req *AdQueryAdListByParamRequest) ([]*DspADQuery, int,
 	r.SetPageSize(req.PageSize)
 	r.SetPageNum(req.PageNum)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, 0, err
-	}
-	if len(result) == 0 {
-		return nil, 0, errors.New("no result info")
-	}
 	var response AdQueryAdListByParamResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, 0, err
 	}
-	if response.ErrorResp != nil {
-		return nil, 0, response.ErrorResp
-	}
-
-	if !response.Data.Result.Success {
-		return nil, 0, errors.New(response.Data.Result.ErrorMsg)
-	}
-
 	return response.Data.Result.Value.Datas, response.Data.Result.Value.Paginator.Items, nil
-
 }

@@ -1,9 +1,7 @@
 package ware
 
 import (
-	"encoding/json"
-	"errors"
-	"fmt"
+	"context"
 	"strconv"
 
 	"github.com/XiBao/jos/api"
@@ -21,8 +19,19 @@ type PriceGetResponse struct {
 	Data      *PriceChangesData   `json:"jingdong_ware_price_get_responce,omitempty" codec:"jingdong_ware_price_get_responce,omitempty"`
 }
 
+func (r *PriceGetResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || len(r.Data.PriceChanges) == 0
+}
+
+func (r *PriceGetResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
+}
+
 type PriceChangesData struct {
-	PriceChanges []*PriceChangeOrig `json:"price_changes,omitempty" codec:"price_changes,omitempty"`
+	PriceChanges []PriceChangeOrig `json:"price_changes,omitempty" codec:"price_changes,omitempty"`
 }
 
 type PriceChangeOrig struct {
@@ -38,30 +47,18 @@ type PriceChange struct {
 }
 
 // 获取单个SKU
-func PriceGet(req *PriceGetRequest) (*PriceChange, error) {
+func PriceGet(ctx context.Context, req *PriceGetRequest) (*PriceChange, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := ware.NewWarePriceGetRequest()
-	r.SetSkuId(fmt.Sprintf("J_%d", req.SkuId))
+	r.SetSkuId(sdk.StringsJoin("J_", strconv.FormatUint(req.SkuId, 10)))
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No result.")
-	}
 	var response PriceGetResponse
-	err = json.Unmarshal(result, &response)
+	err := client.Execute(ctx, r.Request, req.Session, &response)
 	if err != nil {
 		return nil, err
 	}
-
-	if response.ErrorResp != nil || len(response.Data.PriceChanges) == 0 {
-		return nil, response.ErrorResp
-	}
-
-	priceChange := &PriceChange{}
+	priceChange := new(PriceChange)
 	priceChange.SkuId = req.SkuId
 	priceChange.Price, err = strconv.ParseFloat(response.Data.PriceChanges[0].Price, 64)
 	if err != nil {

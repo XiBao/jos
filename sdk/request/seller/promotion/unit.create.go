@@ -54,7 +54,7 @@ type PromotionUnitParam struct {
 	LimitWay         uint8                     `json:"limitWay,omitempty"` // 1、限ip、账号 2、限ip 3、限账号
 	BuyLimit         bool                      `json:"buyLimit"`           // 是否设置售空数量 true:表示设置售空数量 false:表示不设置售空数量
 	Slogan           string                    `json:"slogan,omitempty"`
-	UnitPromoSkuList []*PromotionUnitParamSku  `json:"unitPromoSkuList"`
+	UnitPromoSkuList []PromotionUnitParamSku   `json:"unitPromoSkuList"`
 	Member           *PromotionUnitParamMember `json:"member,omitempty"`
 }
 

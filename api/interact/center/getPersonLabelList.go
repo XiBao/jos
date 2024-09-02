@@ -1,11 +1,9 @@
 package center
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/interact/center"
 )
@@ -21,16 +19,52 @@ type GetPersonLabelListResponse struct {
 	Data      *GetPersonLabelListData `json:"jingdong_interact_center_api_service_read_getPersonLabelList_responce,omitempty" codec:"jingdong_interact_center_api_service_read_getPersonLabelList_responce,omitempty"`
 }
 
+func (r GetPersonLabelListResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r GetPersonLabelListResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type GetPersonLabelListData struct {
 	Code      string                    `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string                    `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    *GetPersonLabelListResult `json:"Results,omitempty" codec:"Results,omitempty"`
 }
 
+func (r GetPersonLabelListData) IsError() bool {
+	return r.Code != "0" || r.Result == nil || r.Result.IsError()
+}
+
+func (r GetPersonLabelListData) Error() string {
+	if r.Result != nil && r.Result.IsError() {
+		return r.Result.Error()
+	}
+	if r.Code != "0" {
+		return sdk.ErrorString(r.Code, r.ErrorDesc)
+	}
+	return "no result data"
+}
+
 type GetPersonLabelListResult struct {
 	Code     int                       `json:"code,omitempty" codec:"code,omitempty"`
 	Msg      string                    `json:"msg,omitempty" codec:"code,omitempty"`
 	DataList []GetPersonLabelListLabel `json:"dataList,omitempty" codec:"dataList,omitempty"`
+}
+
+func (r GetPersonLabelListResult) IsError() bool {
+	return r.Code != 200
+}
+
+func (r GetPersonLabelListResult) Error() string {
+	return sdk.ErrorString(r.Code, r.Msg)
 }
 
 type GetPersonLabelListLabel struct {
@@ -45,36 +79,16 @@ type GetPersonLabelListLabelVal struct {
 	Desc  string `json:"desc" codec:"desc"`
 }
 
-func GetPersonLabelList(req *GetPersonLabelListRequest) ([]GetPersonLabelListLabel, error) {
+func GetPersonLabelList(ctx context.Context, req *GetPersonLabelListRequest) ([]GetPersonLabelListLabel, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewGetPersonLabelListRequest()
 	r.SetAppName(req.AppName)
 	r.SetChannel(req.Channel)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response GetPersonLabelListResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return nil, errors.New("No find collect info result.")
-	}
-	if response.Data.Result.Code != 200 && response.Data.Result.Msg != "" {
-		return nil, errors.New(response.Data.Result.Msg)
-	}
-
 	return response.Data.Result.DataList, nil
 }

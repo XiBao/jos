@@ -1,13 +1,13 @@
 package sdk
 
 import (
+	"context"
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io"
 	"net/http"
-	"net/url"
 	"sort"
 	"strings"
 	"time"
@@ -16,18 +16,24 @@ import (
 )
 
 type Request struct {
-	MethodName string
 	Params     map[string]interface{}
+	MethodName string
 	IsLogGW    bool `json:"-"`
 	IsUnionGW  bool `json:"-"`
 }
 
+type IResponse interface {
+	error
+	IsError() bool
+}
+
 type Response struct {
-	MethodName string
 	Params     map[string]interface{}
+	MethodName string
 }
 
 type Client struct {
+	tracer    *Otel
 	AppKey    string
 	SecretKey string
 
@@ -36,15 +42,25 @@ type Client struct {
 }
 
 func GetOauthURL(appKey, rURI, state, scope string) string {
-	return fmt.Sprintf("https://open-oauth.jd.com/oauth2/to_login?app_key=%s&response_type=code&redirect_uri=%s&state=%s&scope=%s", appKey, url.QueryEscape(rURI), state, scope)
+	values := GetUrlValues()
+	values.Set("app_key", appKey)
+	values.Set("response_type", "code")
+	values.Set("redirect_uri", rURI)
+	values.Set("state", state)
+	values.Set("scope", scope)
+	enc := values.Encode()
+	PutUrlValues(values)
+	return StringsJoin("https://open-oauth.jd.com/oauth2/to_login?", enc)
 }
 
 // create new client
 func NewClient(appKey string, secretKey string) *Client {
-	return &Client{
+	clt := &Client{
 		AppKey:    appKey,
 		SecretKey: secretKey,
 	}
+	clt.WithTracer("")
+	return clt
 }
 
 func (c *Client) Logger() logger.Logger {
@@ -54,8 +70,19 @@ func (c *Client) Logger() logger.Logger {
 	return logger.Default
 }
 
+func (c *Client) WithTracer(namespace string) {
+	c.tracer = NewOtel(namespace, c.AppKey)
+}
+
 func (c *Client) GetAccessTokenNew(code string) (string, error) {
-	gatewayUrl := fmt.Sprintf("https://open-oauth.jd.com/oauth2/access_token?app_key=%s&app_secret=%s&grant_type=authorization_code&code=%s", c.AppKey, c.SecretKey, code)
+	values := GetUrlValues()
+	values.Set("app_key", c.AppKey)
+	values.Set("app_secret", c.SecretKey)
+	values.Set("grant_type", "authorization_code")
+	values.Set("code", code)
+	payload := values.Encode()
+	PutUrlValues(values)
+	gatewayUrl := StringsJoin("https://open-oauth.jd.com/oauth2/access_token?", payload)
 	debug := c.Logger()
 	debug.DebugPrintGetRequest(gatewayUrl)
 	response, err := http.DefaultClient.Get(gatewayUrl)
@@ -75,15 +102,16 @@ func (c *Client) GetAccessTokenNew(code string) (string, error) {
 }
 
 func (c *Client) GetAccessToken(code, state, redirectUri string) (string, error) {
-	values := url.Values{}
-	values.Add("grant_type", "authorization_code")
-	values.Add("client_id", c.AppKey)
-	values.Add("redirect_uri", redirectUri)
-	values.Add("code", code)
-	values.Add("state", state)
-	values.Add("client_secret", c.SecretKey)
-
-	gatewayUrl := fmt.Sprintf(`%s?%s`, `https://oauth.jd.com/oauth/token`, values.Encode())
+	values := GetUrlValues()
+	values.Set("grant_type", "authorization_code")
+	values.Set("client_id", c.AppKey)
+	values.Set("redirect_uri", redirectUri)
+	values.Set("code", code)
+	values.Set("state", state)
+	values.Set("client_secret", c.SecretKey)
+	payload := values.Encode()
+	PutUrlValues(values)
+	gatewayUrl := StringsJoin(`https://oauth.jd.com/oauth/token?`, payload)
 	debug := c.Logger()
 	debug.DebugPrintGetRequest(gatewayUrl)
 	response, err := http.DefaultClient.Get(gatewayUrl)
@@ -106,10 +134,10 @@ func (c *Client) SetDev(dev bool) {
 	c.Dev = dev
 }
 
-func (c *Client) Execute(req *Request, token string) (result []byte, err error) {
+func (c *Client) Execute(ctx context.Context, req *Request, token string, rep IResponse) error {
 	sysParams := make(map[string]string, 7)
-	if paramJson, e := json.Marshal(req.Params); e != nil {
-		return nil, e
+	if paramJson, err := json.Marshal(req.Params); err != nil {
+		return err
 	} else if req.IsUnionGW {
 		sysParams["360buy_param_json"] = string(paramJson)
 	} else {
@@ -129,10 +157,12 @@ func (c *Client) Execute(req *Request, token string) (result []byte, err error) 
 	}
 	rawSign := c.GenerateRawSign(sysParams)
 	sysParams["sign"] = c.GenerateSign(rawSign)
-	values := url.Values{}
+	values := GetUrlValues()
 	for k, v := range sysParams {
-		values.Add(k, v)
+		values.Set(k, v)
 	}
+	payload := values.Encode()
+	PutUrlValues(values)
 	gwURL := GATEWAY_URL
 	if c.Dev {
 		gwURL = GATEWAY_DEV_URL
@@ -143,40 +173,22 @@ func (c *Client) Execute(req *Request, token string) (result []byte, err error) 
 	}
 	debug := c.Logger()
 	debug.DebugPrintPostJSONRequest(gwURL, Json(sysParams))
-	gatewayUrl := fmt.Sprintf(`%s?%s`, gwURL, values.Encode())
+	gatewayUrl := StringsJoin(gwURL, "?", payload)
 	debug.DebugPrintGetRequest(gatewayUrl)
-	var (
-		response *http.Response
-		e        error
-	)
-	tryCnt := 3
-	for {
-		response, e = http.DefaultClient.Get(gatewayUrl)
-		if e != nil {
-			debug.DebugPrintError(e)
-			if tryCnt <= 0 {
-				return nil, Error{Code: 0, Msg: "HTTP Response Error"}
-			} else {
-				tryCnt--
-				continue
-			}
-		}
-		break
-	}
-	defer response.Body.Close()
-	res, e := io.ReadAll(response.Body)
-	if e != nil {
+
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodGet, gatewayUrl, nil)
+	if err != nil {
 		debug.DebugPrintError(err)
-		return nil, Error{Code: 0, Msg: fmt.Sprintf("ReadAll on response.Body: %v", e)}
+		return err
 	}
-	debug.DebugPrintStringResponse(string(res))
-	return res, nil
+	httpReq.Header.Set("content-type", "application/json")
+	return c.WithSpan(ctx, req.MethodName, httpReq, rep, nil, c.fetch)
 }
 
-func (c *Client) PostExecute(req *Request, token string) (result []byte, err error) {
+func (c *Client) PostExecute(ctx context.Context, req *Request, token string, rep IResponse) error {
 	sysParams := make(map[string]string, 7)
-	if paramJson, e := json.Marshal(req.Params); e != nil {
-		return nil, e
+	if paramJson, err := json.Marshal(req.Params); err != nil {
+		return err
 	} else if req.IsUnionGW {
 		sysParams["360buy_param_json"] = string(paramJson)
 	} else {
@@ -196,9 +208,10 @@ func (c *Client) PostExecute(req *Request, token string) (result []byte, err err
 	}
 	rawSign := c.GenerateRawSign(sysParams)
 	sysParams["sign"] = c.GenerateSign(rawSign)
-	values := url.Values{}
+	values := GetUrlValues()
+	defer PutUrlValues(values)
 	for k, v := range sysParams {
-		values.Add(k, v)
+		values.Set(k, v)
 	}
 	gwURL := GATEWAY_URL
 	if c.Dev {
@@ -210,20 +223,38 @@ func (c *Client) PostExecute(req *Request, token string) (result []byte, err err
 	}
 	debug := c.Logger()
 	debug.DebugPrintPostJSONRequest(gwURL, Json(sysParams))
-
-	response, e := http.PostForm(gwURL, values)
-	if e != nil {
+	payload := values.Encode()
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, gwURL, strings.NewReader(payload))
+	if err != nil {
 		debug.DebugPrintError(err)
-		return nil, Error{Code: 0, Msg: "HTTP Response Error"}
+		return err
+	}
+	httpReq.Header.Set("content-type", "application/x-www-form-urlencoded")
+	return c.WithSpan(ctx, req.MethodName, httpReq, rep, []byte(payload), c.fetch)
+}
+
+func (c *Client) fetch(httpReq *http.Request, rep IResponse) (*http.Response, error) {
+	debug := c.Logger()
+	response, err := http.DefaultClient.Do(httpReq)
+	if err != nil {
+		debug.DebugPrintError(err)
+		return response, err
 	}
 	defer response.Body.Close()
-	res, e := io.ReadAll(response.Body)
-	if e != nil {
+	if body, err := io.ReadAll(response.Body); err != nil {
 		debug.DebugPrintError(err)
-		return nil, Error{Code: 0, Msg: fmt.Sprintf("ReadAll on response.Body: %v", e)}
+		return response, err
+	} else if rep != nil {
+		if err := debug.DecodeJSON(body, rep); err != nil {
+			return response, errors.Join(Error{Code: 0, Msg: string(body)}, err)
+		}
+		if rep.IsError() {
+			return response, rep
+		}
+	} else {
+		debug.DebugPrintStringResponse(string(body))
 	}
-	debug.DebugPrintStringResponse(string(res))
-	return res, nil
+	return response, nil
 }
 
 func (c *Client) GenerateRawSign(params map[string]string) string {
@@ -244,4 +275,12 @@ func (c *Client) GenerateSign(stringToBeSigned string) string {
 	h := md5.New()
 	io.WriteString(h, stringToBeSigned)
 	return strings.ToUpper(hex.EncodeToString(h.Sum(nil)))
+}
+
+func (c *Client) WithSpan(ctx context.Context, methodName string, req *http.Request, resp IResponse, payload []byte, fn func(*http.Request, IResponse) (*http.Response, error)) error {
+	if c.tracer == nil {
+		_, err := fn(req, resp)
+		return err
+	}
+	return c.tracer.WithSpan(ctx, methodName, req, resp, payload, fn)
 }

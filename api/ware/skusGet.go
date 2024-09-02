@@ -1,8 +1,7 @@
 package ware
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 	"strings"
 
 	"github.com/XiBao/jos/api"
@@ -21,38 +20,45 @@ type SkusGetResponse struct {
 	Data      *SkusGetSubResponse `json:"ware_skus_get_response,omitempty" codec:"ware_skus_get_response,omitempty"`
 }
 
+func (r SkusGetResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r SkusGetResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data.IsError() {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type SkusGetSubResponse struct {
-	Code      string  `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string  `json:"error_description,omitempty" codec:"error_description,omitempty"`
-	Skus      []*Sku2 `json:"skus,omitempty" codec:"skus,omitempty"`
+	Code      string `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	Skus      []Sku2 `json:"skus,omitempty" codec:"skus,omitempty"`
+}
+
+func (r SkusGetSubResponse) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r SkusGetSubResponse) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 // 根据条件检索订单信息 （仅适用于SOP、LBP，SOPL类型，FBP类型请调取FBP订单检索 ）
-func SkusGet(req *SkusGetRequest) ([]*Sku2, error) {
+func SkusGet(ctx context.Context, req *SkusGetRequest) ([]Sku2, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := ware.NewWareSkusGetRequest()
 	r.SetWareIds(strings.Join(req.WareIds, ","))
 	r.SetFields(strings.Join(req.Fields, ","))
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No sku info.")
-	}
 
 	var response SkusGetResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-
 	return response.Data.Skus, nil
 }

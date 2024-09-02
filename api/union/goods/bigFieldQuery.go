@@ -1,9 +1,7 @@
 package goods
 
 import (
-	"encoding/json"
-	"errors"
-	"strconv"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -18,7 +16,18 @@ type BidFieldQueryRequest struct {
 
 type BidFieldQueryResponse struct {
 	ErrorResp *api.ErrorResponnse        `json:"error_response,omitempty"`
-	Data      *BidFieldQueryResponseData `json:"jd_union_open_goods_bigfield_query_response,omitempty"`
+	Data      *BidFieldQueryResponseData `json:"jd_union_open_goods_bigfield_query_responce,omitempty"`
+}
+
+func (r BidFieldQueryResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.Result == ""
+}
+
+func (r BidFieldQueryResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
 }
 
 type BidFieldQueryResponseData struct {
@@ -31,14 +40,28 @@ type BidFieldQueryResult struct {
 	Data    []BidFieldQueryResp `json:"data,omitempty"`
 }
 
+func (r BidFieldQueryResult) IsError() bool {
+	return r.Code != 200
+}
+
+func (r BidFieldQueryResult) Error() string {
+	return sdk.ErrorString(r.Code, r.Message)
+}
+
 type BidFieldQueryResp struct {
-	SkuId    int64              `json:"skuId,omitempty"`             // skuId
-	SkuName  string             `json:"skuName,omitempty"`           // 商品名称
-	Category *CategoryInfo      `json:"categoryInfo,omitempty"`      // 目录信息
-	Image    *ImageInfo         `json:"imageInfo,omitempty"`         // 图片信心
-	Base     *BaseBigFieldInfo  `json:"baseBigFieldInfo,omitempty"`  // 基础大字段信息
-	Book     *BookBigFieldInfo  `json:"bookBigFieldInfo,omitempty"`  // 图书大字段信息
-	Video    *VideoBigFieldInfo `json:"videoBigFieldInfo,omitempty"` // 影音大字段信息
+	SkuId        int64              `json:"skuId,omitempty"`             // skuId
+	SkuName      string             `json:"skuName,omitempty"`           // 商品名称
+	MainSkuId    int64              `json:"mainSkuId,omitempty"`         // 自营主skuId
+	ProductId    int64              `json:"productId,omitempty"`         // 非自营商品Id
+	SkuStatus    int                `json:"skuStatus"`                   // sku上下架状态 1：上架(可搜索，可购买)， 0：下架(可通过skuid搜索，不可购买)， 2：可上架（可通过skuid搜索，不可购买）， 10：pop 删除（不可搜索，不可购买））
+	Owner        string             `json:"owner"`                       // g=自营，p=pop
+	DetailImages string             `json:"detailImages,omitempty"`      // 商详图
+	ItemId       string             `json:"itemId,omitempty"`            // 联盟商品ID
+	Category     *CategoryInfo      `json:"categoryInfo,omitempty"`      // 目录信息
+	Image        *ImageInfo         `json:"imageInfo,omitempty"`         // 图片信心
+	Base         *BaseBigFieldInfo  `json:"baseBigFieldInfo,omitempty"`  // 基础大字段信息
+	Book         *BookBigFieldInfo  `json:"bookBigFieldInfo,omitempty"`  // 图书大字段信息
+	Video        *VideoBigFieldInfo `json:"videoBigFieldInfo,omitempty"` // 影音大字段信息
 }
 
 type CategoryInfo struct {
@@ -51,11 +74,7 @@ type CategoryInfo struct {
 }
 
 type ImageInfo struct {
-	List []UrlInfo `json:"imageList,omitempty"` // 图片合集
-}
-
-type UrlInfo struct {
-	Info Url `json:"urlInfo"`
+	List []Url `json:"imageList,omitempty"` // 图片合集
 }
 
 type Url struct {
@@ -63,9 +82,10 @@ type Url struct {
 }
 
 type BaseBigFieldInfo struct {
-	wdis     string  `json:"wdis,omitempty"`     // 商品介绍
-	PropCode string  `json:"propCode,omitempty"` // 规格参数
-	WareQD   float64 `json:"wareQD,omitempty"`   // 包装清单(仅自营商品)
+	Wdis       string `json:"wdis,omitempty"`       // 商品介绍
+	PropCode   string `json:"propCode,omitempty"`   // 规格参数
+	WareQD     string `json:"wareQD,omitempty"`     // 包装清单(仅自营商品)
+	PropGroups string `json:"propGroups,omitempty"` // 规格参数
 }
 
 type BookBigFieldInfo struct {
@@ -95,7 +115,7 @@ type VideoBigFieldInfo struct {
 }
 
 // 大字段商品查询接口
-func BidFieldQuery(req *BidFieldQueryRequest) ([]BidFieldQueryResp, error) {
+func BidFieldQuery(ctx context.Context, req *BidFieldQueryRequest) ([]BidFieldQueryResp, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := goods.NewBigFieldQueryRequest()
@@ -105,28 +125,16 @@ func BidFieldQuery(req *BidFieldQueryRequest) ([]BidFieldQueryResp, error) {
 	}
 	r.SetGoodsReq(goodsReq)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
 	var response BidFieldQueryResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.Data == nil {
-		return nil, errors.New("no result")
-	}
-
 	var ret BidFieldQueryResult
-	err = json.Unmarshal([]byte(response.Data.Result), &ret)
-	if err != nil {
+	if err := client.Logger().DecodeJSON([]byte(response.Data.Result), &ret); err != nil {
 		return nil, err
 	}
-
-	if ret.Code != 200 {
-		return nil, &api.ErrorResponnse{Code: strconv.FormatInt(ret.Code, 10), ZhDesc: ret.Message}
+	if ret.IsError() {
+		return nil, ret
 	}
-
 	return ret.Data, nil
 }

@@ -1,8 +1,7 @@
 package unionservice
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ware"
@@ -23,13 +22,24 @@ type QueryOrderListResponse struct {
 	Data      *QueryOrderListData `json:"jingdong_sku_read_findSkuById_responce,omitempty" codec:"jingdong_sku_read_findSkuById_responce,omitempty"`
 }
 
+func (r *QueryOrderListResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.Sku == nil
+}
+
+func (r *QueryOrderListResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
+}
+
 type QueryOrderListData struct {
 	Code string    `json:"code,omitempty" codec:"code,omitempty"`
 	Sku  *ware.Sku `json:"sku,omitempty" codec:"sku,omitempty"`
 }
 
 // 获取单个SKU
-func QueryOrderList(req *QueryOrderListRequest) (*ware.Sku, error) {
+func QueryOrderList(ctx context.Context, req *QueryOrderListRequest) (*ware.Sku, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := unionservice.NewUnionQueryOrderListRequest()
@@ -38,22 +48,9 @@ func QueryOrderList(req *QueryOrderListRequest) (*ware.Sku, error) {
 	r.SetPage(req.Page)
 	r.SetPageSize(req.PageSize)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No sku info.")
-	}
 	var response QueryOrderListResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
 	return response.Data.Sku, nil
 }

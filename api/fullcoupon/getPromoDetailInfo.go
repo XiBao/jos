@@ -1,8 +1,7 @@
 package fullcoupon
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -21,8 +20,33 @@ type FullCouponGetPromoDetailInfoResponse struct {
 	Data      *FullCouponGetPromoDetailInfoResponseResult `json:"jingdong_fullCoupon_getPromoDetailInfo_responce,omitempty" codec:"jingdong_fullCoupon_getPromoDetailInfo_responce,omitempty"`
 }
 
+func (r FullCouponGetPromoDetailInfoResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r FullCouponGetPromoDetailInfoResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type FullCouponGetPromoDetailInfoResponseResult struct {
 	Result *FullCouponGetPromoDetailInfoResponseData `json:"result,omitempty" codec:"result,omitempty"`
+}
+
+func (r FullCouponGetPromoDetailInfoResponseResult) IsError() bool {
+	return r.Result == nil || r.Result.IsError()
+}
+
+func (r FullCouponGetPromoDetailInfoResponseResult) Error() string {
+	if r.Result != nil {
+		return r.Result.Error()
+	}
+	return "no result data"
 }
 
 type FullCouponGetPromoDetailInfoResponseData struct {
@@ -32,32 +56,24 @@ type FullCouponGetPromoDetailInfoResponseData struct {
 	PromoDetails *PromoDetailsInfo `json:"data,omitempty" codec:"data,omitempty"`
 }
 
-func GetPromoDetailInfo(req *FullCouponGetPromoDetailInfoRequest) (*PromoDetailsInfo, error) {
+func (r FullCouponGetPromoDetailInfoResponseData) IsError() bool {
+	return r.PromoDetails == nil
+}
+
+func (r FullCouponGetPromoDetailInfoResponseData) Error() string {
+	return sdk.ErrorString(r.Code, r.Msg)
+}
+
+func GetPromoDetailInfo(ctx context.Context, req *FullCouponGetPromoDetailInfoRequest) (*PromoDetailsInfo, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := fullcoupon.NewFullCouponGetPromoDetailInfoRequest()
 	r.SetAppKey(req.AppKey)
 	r.SetPromoId(req.PromoId)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result.")
-	}
-
 	var response FullCouponGetPromoDetailInfoResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data == nil || response.Data.Result == nil || response.Data.Result.PromoDetails == nil {
-		return nil, errors.New("no promo details.")
-	}
-
 	return response.Data.Result.PromoDetails, nil
 }

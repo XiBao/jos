@@ -1,6 +1,8 @@
 package vender
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type GetMemberLevelRequest struct {
 	Request *sdk.Request

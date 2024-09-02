@@ -1,6 +1,8 @@
 package adkckeyword
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type KeywordDeleteRequest struct {
 	Request *sdk.Request

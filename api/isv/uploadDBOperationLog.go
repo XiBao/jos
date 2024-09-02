@@ -1,8 +1,7 @@
 package isv
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -27,12 +26,34 @@ type UploadDBOperationLogResponse struct {
 	Data      *UploadDBOperationLogResult `json:"jingdong_isv_uploadDBOperationLog_responce,omitempty" codec:"jingdong_isv_uploadDBOperationLog_responce,omitempty"`
 }
 
-type UploadDBOperationLogResult struct {
-	Code string `json:"code,omitempty" codec:"code,omitempty"`     //返回码
-	C    int    `json:"result,omitempty" codec:"result,omitempty"` //是否成功
+func (r UploadDBOperationLogResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
 }
 
-func UploadDBOperationLog(req *UploadDBOperationLogRequest) (int, error) {
+func (r UploadDBOperationLogResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
+type UploadDBOperationLogResult struct {
+	Code string `json:"code,omitempty" codec:"code,omitempty"`     // 返回码
+	C    int    `json:"result,omitempty" codec:"result,omitempty"` // 是否成功
+}
+
+func (r UploadDBOperationLogResult) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r UploadDBOperationLogResult) Error() string {
+	return r.Code
+}
+
+func UploadDBOperationLog(ctx context.Context, req *UploadDBOperationLogRequest) (int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := isv.NewIsvUploadDBOperationLogRequest()
@@ -48,26 +69,9 @@ func UploadDBOperationLog(req *UploadDBOperationLogRequest) (int, error) {
 	r.SetTimestamp(req.Timestamp)
 	r.Request.IsLogGW = true
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return -1, err
-	}
-	if len(result) == 0 {
-		return -1, errors.New("no result info")
-	}
 	var response UploadDBOperationLogResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return -1, err
 	}
-
-	if response.ErrorResp != nil {
-		return -1, response.ErrorResp
-	}
-
-	if response.Data.Code != "0" {
-		return -1, errors.New(response.Data.Code)
-	}
-
 	return response.Data.C, nil
 }

@@ -1,11 +1,9 @@
 package promotion
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
 )
@@ -24,14 +22,35 @@ type SuspendResponse struct {
 	Data      *SuspendData        `json:"jingdong_seller_promotion_v2_suspend_responce,omitempty" codec:"jingdong_seller_promotion_v2_suspend_responce,omitempty"`
 }
 
-type SuspendData struct {
-	Code      string `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
-
-	SuspendResult bool `json:"suspend_result,omitempty" codec:"suspend_result,omitempty"`
+func (r SuspendResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
 }
 
-func Suspend(req *SuspendRequest) (bool, error) {
+func (r SuspendResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
+type SuspendData struct {
+	Code          string `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc     string `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	SuspendResult bool   `json:"suspend_result,omitempty" codec:"suspend_result,omitempty"`
+}
+
+func (r SuspendData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r SuspendData) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
+}
+
+func Suspend(ctx context.Context, req *SuspendRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionSuspendRequest()
@@ -43,23 +62,9 @@ func Suspend(req *SuspendRequest) (bool, error) {
 		r.SetRequestId(req.RequestId)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response SuspendResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return false, errors.New(response.Data.ErrorDesc)
-	}
-
 	return response.Data.SuspendResult, nil
 }

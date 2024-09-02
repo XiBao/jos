@@ -1,7 +1,7 @@
 package order
 
 import (
-	"encoding/json"
+	"context"
 	"strconv"
 	"strings"
 
@@ -28,20 +28,55 @@ type PopOrderEnSearchResponse struct {
 	Data      *PopOrderEnSearchData `json:"jingdong_pop_order_enSearch_responce,omitempty" codec:"jingdong_pop_order_enSearch_responce,omitempty"`
 }
 
-type PopOrderEnSearchData struct {
-	Code string `json:"code,omitempty" codec:"code,omitempty"`
+func (r PopOrderEnSearchResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
 
+func (r PopOrderEnSearchResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
+type PopOrderEnSearchData struct {
+	Code            string           `json:"code,omitempty" codec:"code,omitempty"`
 	SearchOrderInfo *SearchOrderInfo `json:"searchorderinfo_result,omitempty" codec:"searchorderinfo_result,omitempty"`
 }
 
+func (r PopOrderEnSearchData) IsError() bool {
+	return r.SearchOrderInfo == nil || r.SearchOrderInfo.IsError()
+}
+
+func (r PopOrderEnSearchData) Error() string {
+	if r.SearchOrderInfo != nil {
+		return r.SearchOrderInfo.Error()
+	}
+	return "no result data"
+}
+
 type SearchOrderInfo struct {
-	OrderInfoList []*OrderInfo   `json:"orderInfoList,omitempty" codec:"orderInfoList,omitempty"`
+	OrderInfoList []OrderInfo    `json:"orderInfoList,omitempty" codec:"orderInfoList,omitempty"`
 	OrderTotal    int            `json:"orderTotal,omitempty" codec:"orderTotal,omitempty"`
 	ApiResult     *api.ApiResult `json:"apiResult,omitempty" codec:"apiResult,omitempty"`
 }
 
+func (r SearchOrderInfo) IsError() bool {
+	return r.ApiResult == nil || r.ApiResult.IsError()
+}
+
+func (r SearchOrderInfo) Error() string {
+	if r.ApiResult != nil {
+		return r.ApiResult.Error()
+	}
+	return "no result data"
+}
+
 // 根据条件检索订单信息 （仅适用于SOP、LBP，SOPL类型，FBP类型请调取FBP订单检索 ）
-func PopOrderEnSearch(req *PopOrderEnSearchRequest) ([]*OrderInfo, int, error) {
+func PopOrderEnSearch(ctx context.Context, req *PopOrderEnSearchRequest) ([]OrderInfo, int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := order.NewPopOrderEnSearchRequest()
@@ -58,21 +93,9 @@ func PopOrderEnSearch(req *PopOrderEnSearchRequest) ([]*OrderInfo, int, error) {
 	r.SetSortType(int(req.SortType))
 	r.SetDateType(int(req.DateType))
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, 0, err
-	}
 	var response PopOrderEnSearchResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, 0, err
 	}
-	if response.ErrorResp != nil {
-		return nil, 0, response.ErrorResp
-	}
-	if !response.Data.SearchOrderInfo.ApiResult.Success {
-		return nil, 0, response.Data.SearchOrderInfo.ApiResult
-	}
-
 	return response.Data.SearchOrderInfo.OrderInfoList, response.Data.SearchOrderInfo.OrderTotal, nil
 }

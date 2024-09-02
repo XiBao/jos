@@ -1,8 +1,7 @@
 package coupon
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -21,19 +20,42 @@ type SkuListRequest struct {
 	WareId       uint64 `json:"wareId,omitempty" codec:"wareId,omitempty"`
 	CouponId     uint64 `json:"couponId" codec:"couponId"`
 }
+
 type SkuListResponse struct {
 	ErrorResp *api.ErrorResponnse  `json:"error_response,omitempty" codec:"error_response,omitempty"`
 	Data      *SkuListResponseData `json:"jingdong_seller_coupon_read_getCouponSkuList_responce,omitempty" codec:"jingdong_seller_coupon_read_getCouponSkuList_responce,omitempty"`
 }
 
+func (r SkuListResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r SkuListResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type SkuListResponseData struct {
-	Code          string           `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc     string           `json:"error_description,omitempty" codec:"error_description,omitempty"`
-	CouponSkuList []*CouponSkuList `json:"couponSkuList,omitempty" codec:"couponSkuList,omitempty"`
+	Code          string          `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc     string          `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	CouponSkuList []CouponSkuList `json:"couponSkuList,omitempty" codec:"couponSkuList,omitempty"`
+}
+
+func (r SkuListResponseData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r SkuListResponseData) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 // 优惠券商品查询
-func SkuList(req *SkuListRequest) ([]*CouponSkuList, error) {
+func SkuList(ctx context.Context, req *SkuListRequest) ([]CouponSkuList, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := coupon.NewSellerCouponSkuListRequest()
@@ -65,26 +87,9 @@ func SkuList(req *SkuListRequest) ([]*CouponSkuList, error) {
 		r.SetPage(1)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result.")
-	}
-
 	var response SkuListResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-
 	return response.Data.CouponSkuList, nil
 }

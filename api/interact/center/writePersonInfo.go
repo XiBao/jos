@@ -1,9 +1,7 @@
 package center
 
 import (
-	"encoding/json"
-	"errors"
-	"fmt"
+	"context"
 
 	. "github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -18,12 +16,12 @@ type WritePersonInfoRequest struct {
 	OpenIdBuyer string `json:"open_id_buyer,omitempty" codec:"open_id_buyer,omitempty"` // 用户pin
 	XIdBuyer    string `json:"xid_buyer,omitempty" codec:"xid_buyer,omitempty"`         // 用户pin
 	ProfileUrl  string `json:"profileUrl,omitempty" codec:"profileUrl,omitempty"`       // 用户头像连接 非必填
-	ActivityId  string `json:"activityId,omitempty" codec:"activityId,omitempty"`       // 活动id
+	ActivityId  uint64 `json:"activityId,omitempty" codec:"activityId,omitempty"`       // 活动id
 	Created     string `json:"created,omitempty" codec:"created,omitempty"`             // 创建时间
 	StartTime   string `json:"startTime,omitempty" codec:"startTime,omitempty"`         // 活动开始时间
 	EndTime     string `json:"endTime,omitempty" codec:"endTime,omitempty"`             // 结束时间
 	Id          string `json:"id,omitempty" codec:"id,omitempty"`                       // id（isv自己的活动id） 非必填
-	Type        string `json:"type,omitempty" codec:"type,omitempty"`                   // 活动类型
+	Type        uint8  `json:"type,omitempty" codec:"type,omitempty"`                   // 活动类型
 	/*
 	   投票有礼 6：购物车红包 8: 盖楼有礼 11：拼购定向投放 19: 分享有礼
 	    20: 集卡有礼 23 锦鲤圈抽奖 25 抽奖 26 加购 27 签到 28 积分兑换 29 商品收藏 30 游戏 31 砍价拼团 32 专享价
@@ -39,17 +37,44 @@ type WritePersonInfoResponse struct {
 	Response  WritePersonInfoResponse1 `json:"jingdong_interact_center_api_service_write_writePersonInfo_responce,omitempty" codec:"jingdong_interact_center_api_service_write_writePersonInfo_responce,omitempty"`
 }
 
+func (r WritePersonInfoResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Response.IsError()
+}
+
+func (r WritePersonInfoResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return r.Response.Error()
+}
+
 type WritePersonInfoResponse1 struct {
 	Result WritePersonInfoResult `json:"giftActivityResults" codec:"giftActivityResults"`
 }
 
+func (r WritePersonInfoResponse1) IsError() bool {
+	return r.Result.IsError()
+}
+
+func (r WritePersonInfoResponse1) Error() string {
+	return r.Result.Error()
+}
+
 type WritePersonInfoResult struct {
-	Data bool   `json:"data" codec:"data"` //请求是否成功
-	Code uint   `json:"code" codec:"code"` //返回状态码
+	Data bool   `json:"data" codec:"data"` // 请求是否成功
+	Code int    `json:"code" codec:"code"` // 返回状态码
 	Msg  string `json:"msg" codec:"msg"`
 }
 
-func WritePersonInfo(req WritePersonInfoRequest) (bool, error) {
+func (r WritePersonInfoResult) IsError() bool {
+	return r.Code != 200 && r.Code != 0
+}
+
+func (r WritePersonInfoResult) Error() string {
+	return sdk.ErrorString(r.Code, r.Msg)
+}
+
+func WritePersonInfo(ctx context.Context, req *WritePersonInfoRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewWritePersonInfoRequest()
@@ -69,26 +94,10 @@ func WritePersonInfo(req WritePersonInfoRequest) (bool, error) {
 		r.SetProfileUrl(req.ProfileUrl)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-
 	var response WritePersonInfoResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
-	}
-
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-
-	if response.Response.Result.Code != 200 && response.Response.Result.Code != 0 || !response.Response.Result.Data {
-
-		return false, errors.New(fmt.Sprintf("%s", result))
 	}
 
 	return response.Response.Result.Data, nil
-
 }

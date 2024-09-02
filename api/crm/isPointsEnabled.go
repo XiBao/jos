@@ -1,8 +1,7 @@
 package crm
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -18,37 +17,42 @@ type IsPointsEnabledResponse struct {
 	Data      *IsPointsEnabledData `json:"jingdong_pop_crm_isPointsEnabled_responce,omitempty" codec:"jingdong_pop_crm_isPointsEnabled_responce,omitempty"`
 }
 
+func (r IsPointsEnabledResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r IsPointsEnabledResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type IsPointsEnabledData struct {
 	Result bool   `json:"ispointsenabled_result,omitempty" codec:"ispointsenabled_result,omitempty"`
 	Code   string `json:"code,omitempty" codec:"code,omitempty"`
 }
 
+func (r IsPointsEnabledData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r IsPointsEnabledData) Error() string {
+	return r.Code
+}
+
 // 是否开启店铺积分功能
-func IsPointsEnabled(req *IsPointsEnabledRequest) (bool, error) {
+func IsPointsEnabled(ctx context.Context, req *IsPointsEnabledRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewIsPointsEnabledRequest()
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("no result info")
-	}
 	var response IsPointsEnabledResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-
-	if response.Data.Code != "0" {
-		return false, errors.New(response.Data.Code)
-	}
-
 	return response.Data.Result, nil
-
 }

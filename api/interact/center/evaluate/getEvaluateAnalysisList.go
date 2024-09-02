@@ -1,10 +1,7 @@
 package center
 
 import (
-	"encoding/json"
-	"errors"
-
-	"github.com/XiBao/jos/api/util"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -23,10 +20,32 @@ type GetEvaluateAnalysisListResponse struct {
 	Data      *GetEvaluateAnalysisListData `json:"jingdong_com_jd_interact_center_api_service_read_EvaluateAnalysisReadService_getAnalysisList_responce,omitempty" codec:"jingdong_com_jd_interact_center_api_service_read_EvaluateAnalysisReadService_getAnalysisList_responce,omitempty"`
 }
 
+func (r GetEvaluateAnalysisListResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r GetEvaluateAnalysisListResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type GetEvaluateAnalysisListData struct {
-	Code      string              `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string              `json:"error_description,omitempty" codec:"error_description,omitempty"`
-	Result    []*EvaluateAnalysis `json:"result,omitempty" codec:"result,omitempty"`
+	Code      string             `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc string             `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	Result    []EvaluateAnalysis `json:"result,omitempty" codec:"result,omitempty"`
+}
+
+func (r GetEvaluateAnalysisListData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r GetEvaluateAnalysisListData) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type EvaluateAnalysis struct {
@@ -41,7 +60,7 @@ type EvaluateAnalysis struct {
 	PrizeCount    uint    `json:"prize_count"`    // 获奖评价的数量
 }
 
-func GetEvaluateAnalysisList(req *GetEvaluateAnalysisListRequest) ([]*EvaluateAnalysis, error) {
+func GetEvaluateAnalysisList(ctx context.Context, req *GetEvaluateAnalysisListRequest) ([]EvaluateAnalysis, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := center.NewGetEvaluateAnalysisListRequest()
@@ -49,26 +68,9 @@ func GetEvaluateAnalysisList(req *GetEvaluateAnalysisListRequest) ([]*EvaluateAn
 	r.SetChannel(req.Channel)
 	r.SetActivityId(req.ActivityId)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response GetEvaluateAnalysisListResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return nil, errors.New(response.Data.ErrorDesc)
-	}
-	if response.Data.Result == nil {
-		return nil, errors.New("No result.")
-	}
-
 	return response.Data.Result, nil
 }

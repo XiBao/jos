@@ -1,8 +1,7 @@
 package crm
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -26,7 +25,18 @@ type MemberScanRequest struct {
 
 type MemberScanResponse struct {
 	ErrorResp *api.ErrorResponnse `json:"error_response,omitempty" codec:"error_response,omitempty"`
-	Data      *MemberScanData     `json:"jingdong_crm_member_scan_responce",omitempty" codec:"jingdong_crm_member_scan_responce",omitempty"`
+	Data      *MemberScanData     `json:"jingdong_crm_member_scan_responce,omitempty" codec:"jingdong_crm_member_scan_responce,omitempty"`
+}
+
+func (r MemberScanResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.Result == nil
+}
+
+func (r MemberScanResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	return "no result data"
 }
 
 type MemberScanData struct {
@@ -35,12 +45,12 @@ type MemberScanData struct {
 }
 
 type MemberScanResult struct {
-	TotalResult int       `json:"total_result,omitempty" codec:"total_result,omitempty"`
-	Members     []*Member `json:"crm_members,omitempty" codec:"crm_members,omitempty"`
-	ScrollId    string    `json:"scroll_id,omitempty" codec:"scroll_id,omitempty"`
+	TotalResult int      `json:"total_result,omitempty" codec:"total_result,omitempty"`
+	Members     []Member `json:"crm_members,omitempty" codec:"crm_members,omitempty"`
+	ScrollId    string   `json:"scroll_id,omitempty" codec:"scroll_id,omitempty"`
 }
 
-func MemberScan(req *MemberScanRequest) (*MemberScanResult, error) {
+func MemberScan(ctx context.Context, req *MemberScanRequest) (*MemberScanResult, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := crm.NewMemberScanRequest()
@@ -75,26 +85,9 @@ func MemberScan(req *MemberScanRequest) (*MemberScanResult, error) {
 		r.SetMinTradeAmount(req.MinTradeAmount)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("No result info.")
-	}
 	var response MemberScanResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-
-	if response.ErrorResp != nil {
-		return nil, response.ErrorResp
-	}
-
-	if response.Data.Result == nil {
-		return nil, nil
-	}
-
 	return response.Data.Result, nil
 }

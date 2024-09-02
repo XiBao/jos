@@ -1,9 +1,7 @@
 package goods
 
 import (
-	"encoding/json"
-	"errors"
-	"strconv"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -21,6 +19,20 @@ type GoodsLinkQueryResponse struct {
 	Data      *GoodsLinkQueryResponseData `json:"jd_union_open_goods_link_query_response,omitempty"`
 }
 
+func (r GoodsLinkQueryResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.Result.IsError()
+}
+
+func (r GoodsLinkQueryResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Result.Error()
+	}
+	return "no result data"
+}
+
 type GoodsLinkQueryResponseData struct {
 	Result LinkQueryResult `json:"queryResult,omitempty"`
 }
@@ -29,6 +41,14 @@ type LinkQueryResult struct {
 	Code    int64           `json:"code,omitempty"`
 	Message string          `json:"message,omitempty"`
 	Data    []LinkGoodsResp `json:"data,omitempty"`
+}
+
+func (r LinkQueryResult) IsError() bool {
+	return r.Code != 200
+}
+
+func (r LinkQueryResult) Error() string {
+	return sdk.ErrorString(r.Code, r.Message)
 }
 
 type LinkGoodsResp struct {
@@ -46,7 +66,7 @@ type LinkGoodsResp struct {
 }
 
 // 链接商品查询接口
-func GoodsLinkQuery(req *GoodsLinkQueryRequest) ([]LinkGoodsResp, error) {
+func GoodsLinkQuery(ctx context.Context, req *GoodsLinkQueryRequest) ([]LinkGoodsResp, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := goods.NewGoodsLinkQueryRequest()
@@ -56,22 +76,9 @@ func GoodsLinkQuery(req *GoodsLinkQueryRequest) ([]LinkGoodsResp, error) {
 	}
 	r.SetGoodsReq(goodsReq)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
 	var response GoodsLinkQueryResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.Data == nil {
-		return nil, errors.New("no result")
-	}
-
-	if response.Data.Result.Code != 200 {
-		return nil, &api.ErrorResponnse{Code: strconv.FormatInt(response.Data.Result.Code, 10), ZhDesc: response.Data.Result.Message}
-	}
-
 	return response.Data.Result.Data, nil
 }

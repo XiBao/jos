@@ -1,8 +1,7 @@
 package delivery
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/api/ads/dsp"
@@ -23,9 +22,34 @@ type KuaicheDeliveryListV2Response struct {
 	ErrorResp *api.ErrorResponnse            `json:"error_response,omitempty" codec:"error_response,omitempty"`
 }
 
+func (r KuaicheDeliveryListV2Response) IsError() bool {
+	return r.ErrorResp != nil || r.Responce == nil || r.Responce.IsError()
+}
+
+func (r KuaicheDeliveryListV2Response) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Responce != nil {
+		return r.Responce.Error()
+	}
+	return "no result data"
+}
+
 type KuaicheDeliveryListV2Responce struct {
 	ReturnType *KuaicheDeliveryListV2ResponseReturnType `json:"returnType,omitempty" codec:"returnType,omitempty"`
 	Code       string                                   `json:"code,omitempty" codec:"code,omitempty"`
+}
+
+func (r KuaicheDeliveryListV2Responce) IsError() bool {
+	return r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r KuaicheDeliveryListV2Responce) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return "no result data"
 }
 
 type KuaicheDeliveryListV2ResponseReturnType struct {
@@ -38,7 +62,7 @@ type KuaicheDeliveryListV2ResponseDataData struct {
 	Paginator  *dsp.Paginator     `json:"paginator,omitempty" codec:"paginator,omitempty"`
 }
 
-func KuaicheDeliveryListV2(req *KuaicheDeliveryListV2Request) (*KuaicheDeliveryListV2ResponseDataData, error) {
+func KuaicheDeliveryListV2(ctx context.Context, req *KuaicheDeliveryListV2Request) (*KuaicheDeliveryListV2ResponseDataData, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := delivery.NewKuaicheDeliveryListV2Request()
@@ -47,28 +71,9 @@ func KuaicheDeliveryListV2(req *KuaicheDeliveryListV2Request) (*KuaicheDeliveryL
 		r.SetSystem(req.System)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, err
-	}
-	if len(result) == 0 {
-		return nil, errors.New("no result.")
-	}
-
 	var response KuaicheDeliveryListV2Response
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, err
 	}
-	if response.ErrorResp != nil {
-		return nil, errors.New(response.ErrorResp.ZhDesc)
-	}
-	if response.Responce == nil || response.Responce.ReturnType == nil {
-		return nil, errors.New("no result data.")
-	}
-	if !response.Responce.ReturnType.Success {
-		return nil, errors.New(response.Responce.ReturnType.Msg)
-	}
-
 	return response.Responce.ReturnType.Data, nil
 }

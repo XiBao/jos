@@ -1,11 +1,9 @@
 package promotion
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/seller/promotion"
 )
@@ -24,14 +22,35 @@ type ResumeResponse struct {
 	Data      *ResumeData         `json:"jingdong_seller_promotion_v2_resume_responce,omitempty" codec:"jingdong_seller_promotion_v2_resume_responce,omitempty"`
 }
 
-type ResumeData struct {
-	Code      string `json:"code,omitempty" codec:"code,omitempty"`
-	ErrorDesc string `json:"error_description,omitempty" codec:"error_description,omitempty"`
-
-	ResumeResult bool `json:"resume_result,omitempty" codec:"resume_result,omitempty"`
+func (r ResumeResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
 }
 
-func Resume(req *ResumeRequest) (bool, error) {
+func (r ResumeResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
+type ResumeData struct {
+	Code         string `json:"code,omitempty" codec:"code,omitempty"`
+	ErrorDesc    string `json:"error_description,omitempty" codec:"error_description,omitempty"`
+	ResumeResult bool   `json:"resume_result,omitempty" codec:"resume_result,omitempty"`
+}
+
+func (r ResumeData) IsError() bool {
+	return r.Code != "0"
+}
+
+func (r ResumeData) Error() string {
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
+}
+
+func Resume(ctx context.Context, req *ResumeRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := promotion.NewSellerPromotionResumeRequest()
@@ -43,23 +62,9 @@ func Resume(req *ResumeRequest) (bool, error) {
 		r.SetRequestId(req.RequestId)
 	}
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response ResumeResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-	if response.Data.Code != "0" {
-		return false, errors.New(response.Data.ErrorDesc)
-	}
-
 	return response.Data.ResumeResult, nil
 }

@@ -1,6 +1,8 @@
 package center
 
-import "github.com/XiBao/jos/sdk"
+import (
+	"github.com/XiBao/jos/sdk"
+)
 
 type GetEvaluateAnalysisListRequest struct {
 	Request *sdk.Request

@@ -1,8 +1,7 @@
 package coupon
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -22,10 +21,35 @@ type PromoCouponCheckDiscountAuthResponse struct {
 	Data      *PromoCouponCheckDiscountAuthData `json:"jingdong_pop_promo_coupon_checkDiscountAuth_responce,omitempty" codec:"jingdong_pop_promo_coupon_checkDiscountAuth_responce,omitempty"`
 }
 
+func (r PromoCouponCheckDiscountAuthResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
+
+func (r PromoCouponCheckDiscountAuthResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
 type PromoCouponCheckDiscountAuthData struct {
 	Code      string                              `json:"code,omitempty" codec:"code,omitempty"`
 	ErrorDesc string                              `json:"error_description,omitempty" codec:"error_description,omitempty"`
 	Result    *PromoCouponCheckDiscountAuthResult `json:"returnType,omitempty" codec:"AuthResult,omitempty"`
+}
+
+func (r PromoCouponCheckDiscountAuthData) IsError() bool {
+	return r.Code != "0" || r.Result == nil || r.Result.IsError()
+}
+
+func (r PromoCouponCheckDiscountAuthData) Error() string {
+	if r.Result != nil && r.Result.IsError() {
+		return r.Result.Error()
+	}
+	return sdk.ErrorString(r.Code, r.ErrorDesc)
 }
 
 type PromoCouponCheckDiscountAuthResult struct {
@@ -35,7 +59,15 @@ type PromoCouponCheckDiscountAuthResult struct {
 	Msg     string `json:"msg,omitempty" codec:"msg,omitempty"`
 }
 
-func PromoCouponCheckDiscountAuth(req *PromoCouponCheckDiscountAuthRequest) (bool, error) {
+func (r PromoCouponCheckDiscountAuthResult) IsError() bool {
+	return r.Code != "200" || !r.Success
+}
+
+func (r PromoCouponCheckDiscountAuthResult) Error() string {
+	return sdk.ErrorString(r.Code, r.Msg)
+}
+
+func PromoCouponCheckDiscountAuth(ctx context.Context, req *PromoCouponCheckDiscountAuthRequest) (bool, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := coupon.NewPromoCouponCheckDiscountAuthRequest()
@@ -49,32 +81,10 @@ func PromoCouponCheckDiscountAuth(req *PromoCouponCheckDiscountAuthRequest) (boo
 	if req.AppId != "" {
 		r.SetAppId(req.AppId)
 	}
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return false, err
-	}
-	if len(result) == 0 {
-		return false, errors.New("no result.")
-	}
+
 	var response PromoCouponCheckDiscountAuthResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return false, err
 	}
-	if response.ErrorResp != nil {
-		return false, response.ErrorResp
-	}
-	if response.Data.Result.Code != "200" || !response.Data.Result.Success {
-		if response.Data.Result.Msg == "" {
-			return false, errors.New("未知错误")
-		} else {
-			return false, errors.New(response.Data.Result.Msg)
-		}
-	}
-
-	if response.Data.Result == nil {
-		return false, errors.New("no result.")
-	}
-
 	return response.Data.Result.Data, nil
 }

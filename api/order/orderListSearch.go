@@ -1,8 +1,7 @@
 package order
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
 	"github.com/XiBao/jos/sdk"
@@ -23,10 +22,34 @@ type OrderListSearchResponse struct {
 	Data      *OrderListSearchData `json:"jingdong_shop_order_list_search_responce,omitempty" codec:"jingdong_shop_order_list_search_responce,omitempty"`
 }
 
-type OrderListSearchData struct {
-	Code string `json:"code,omitempty" codec:"code,omitempty"`
+func (r OrderListSearchResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Data == nil || r.Data.IsError()
+}
 
+func (r OrderListSearchResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Data != nil {
+		return r.Data.Error()
+	}
+	return "no result data"
+}
+
+type OrderListSearchData struct {
+	Code       string      `json:"code,omitempty" codec:"code,omitempty"`
 	ReturnType *ReturnType `json:"returnType,omitempty" codec:"returnType,omitempty"`
+}
+
+func (r OrderListSearchData) IsError() bool {
+	return r.ReturnType == nil || r.ReturnType.IsError()
+}
+
+func (r OrderListSearchData) Error() string {
+	if r.ReturnType != nil {
+		return r.ReturnType.Error()
+	}
+	return "no result data"
 }
 
 type ReturnType struct {
@@ -40,8 +63,16 @@ type ReturnType struct {
 	PageSize    int               `json:"pageSize,omitempty" codec:"pageSize,omitempty"`
 }
 
+func (r ReturnType) IsError() bool {
+	return !r.Success
+}
+
+func (r ReturnType) Error() string {
+	return sdk.ErrorString(r.Code, r.Message)
+}
+
 // 自营订单列表查询
-func OrderListSearch(req *OrderListSearchRequest) ([]uint64, int, error) {
+func OrderListSearch(ctx context.Context, req *OrderListSearchRequest) ([]uint64, int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := order.NewOrderListSearchRequest()
@@ -51,24 +82,9 @@ func OrderListSearch(req *OrderListSearchRequest) ([]uint64, int, error) {
 	r.SetPage(req.Page)
 	r.SetSize(req.Size)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return nil, 0, err
-	}
-	if len(result) == 0 {
-		return nil, 0, errors.New("No order info.")
-	}
-
 	var response OrderListSearchResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return nil, 0, err
-	}
-	if response.ErrorResp != nil {
-		return nil, 0, response.ErrorResp
-	}
-	if !response.Data.ReturnType.Success {
-		return nil, 0, errors.New(response.Data.ReturnType.Message)
 	}
 
 	return response.Data.ReturnType.Orders, response.Data.ReturnType.RecordCount, nil

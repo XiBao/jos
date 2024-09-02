@@ -1,11 +1,9 @@
 package asset
 
 import (
-	"encoding/json"
-	"errors"
+	"context"
 
 	"github.com/XiBao/jos/api"
-	"github.com/XiBao/jos/api/util"
 	"github.com/XiBao/jos/sdk"
 	"github.com/XiBao/jos/sdk/request/asset"
 )
@@ -29,9 +27,34 @@ type BenefitSendResponse struct {
 	Response  *BenefitSendRes     `json:"jingdong_asset_benefit_send_responce,omitempty" codec:"jingdong_asset_benefit_send_responce,omitempty"`
 }
 
+func (r BenefitSendResponse) IsError() bool {
+	return r.ErrorResp != nil || r.Response == nil || r.Response.IsError()
+}
+
+func (r BenefitSendResponse) Error() string {
+	if r.ErrorResp != nil {
+		return r.ErrorResp.Error()
+	}
+	if r.Response != nil {
+		return r.Response.Error()
+	}
+	return "no result data"
+}
+
 type BenefitSendRes struct {
 	Code string           `json:"code,omitempty" codec:"code,omitempty"`
 	Res  *BenefitSendData `json:"response,omitempty" codec:"response,omitempty"`
+}
+
+func (r BenefitSendRes) IsError() bool {
+	return r.Res != nil || r.Res.IsError()
+}
+
+func (r BenefitSendRes) Error() string {
+	if r.Res != nil {
+		return r.Res.Error()
+	}
+	return "no result data"
 }
 
 type BenefitSendData struct {
@@ -40,11 +63,19 @@ type BenefitSendData struct {
 	Data    *BenefitSendDataConsumptionId `json:"data,omitempty" codec:"data,omitempty"`
 }
 
+func (r BenefitSendData) IsError() bool {
+	return r.Code != "200"
+}
+
+func (r BenefitSendData) Error() string {
+	return sdk.ErrorString(r.Code, r.Message)
+}
+
 type BenefitSendDataConsumptionId struct {
 	ConsumptionId int `json:"consumption_id" codec:"consumption_id"`
 }
 
-func BenefitSend(req *BenefitSendRequest) (int, error) {
+func BenefitSend(ctx context.Context, req *BenefitSendRequest) (int, error) {
 	client := sdk.NewClient(req.AnApiKey.Key, req.AnApiKey.Secret)
 	client.Debug = req.Debug
 	r := asset.NewBenefitSendRequest()
@@ -58,29 +89,9 @@ func BenefitSend(req *BenefitSendRequest) (int, error) {
 	r.SetIp(req.Ip)
 	r.SetOpenIdBuyer(req.OpenIdBuyer)
 
-	result, err := client.Execute(r.Request, req.Session)
-	if err != nil {
-		return 0, err
-	}
-	result = util.RemoveJsonSpace(result)
-
 	var response BenefitSendResponse
-	err = json.Unmarshal(result, &response)
-	if err != nil {
+	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {
 		return 0, err
 	}
-	if response.ErrorResp != nil {
-		return 0, response.ErrorResp
-	}
-	if response.Response == nil || response.Response.Res == nil {
-		return 0, errors.New("No response.")
-	}
-	if response.Response.Res.Code != "200" && response.Response.Res.Message != "" {
-		return 0, errors.New(response.Response.Res.Message)
-	}
-	if response.Response.Res.Data == nil {
-		return 0, errors.New("No result.")
-	}
-
 	return response.Response.Res.Data.ConsumptionId, nil
 }
