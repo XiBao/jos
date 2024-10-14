@@ -10,10 +10,30 @@ import (
 	"net/http"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/XiBao/jos/sdk/internal/logger"
 )
+
+var (
+	onceInit   sync.Once
+	httpClient *http.Client
+)
+
+func defaultHttpClient() *http.Client {
+	onceInit.Do(func() {
+		transport := http.DefaultTransport.(*http.Transport).Clone()
+		transport.MaxIdleConns = 100
+		transport.MaxConnsPerHost = 100
+		transport.MaxIdleConnsPerHost = 100
+		httpClient = &http.Client{
+			Transport: transport,
+			Timeout:   time.Second * 60,
+		}
+	})
+	return httpClient
+}
 
 type Request struct {
 	Params     map[string]interface{}
@@ -33,6 +53,7 @@ type Response struct {
 }
 
 type Client struct {
+	client    *http.Client
 	tracer    *Otel
 	AppKey    string
 	SecretKey string
@@ -58,8 +79,8 @@ func NewClient(appKey string, secretKey string) *Client {
 	clt := &Client{
 		AppKey:    appKey,
 		SecretKey: secretKey,
+		client:    defaultHttpClient(),
 	}
-	clt.WithTracer("")
 	return clt
 }
 
@@ -68,6 +89,11 @@ func (c *Client) Logger() logger.Logger {
 		return logger.Debug
 	}
 	return logger.Default
+}
+
+// SetHttpClient 设置http.Client
+func (c *Client) SetHttpClient(client *http.Client) {
+	c.client = client
 }
 
 func (c *Client) WithTracer(namespace string) {
@@ -85,7 +111,7 @@ func (c *Client) GetAccessTokenNew(code string) (string, error) {
 	gatewayUrl := StringsJoin("https://open-oauth.jd.com/oauth2/access_token?", payload)
 	debug := c.Logger()
 	debug.DebugPrintGetRequest(gatewayUrl)
-	response, err := http.DefaultClient.Get(gatewayUrl)
+	response, err := c.client.Get(gatewayUrl)
 	if err != nil {
 		debug.DebugPrintError(err)
 		return "", err
@@ -114,7 +140,7 @@ func (c *Client) GetAccessToken(code, state, redirectUri string) (string, error)
 	gatewayUrl := StringsJoin(`https://oauth.jd.com/oauth/token?`, payload)
 	debug := c.Logger()
 	debug.DebugPrintGetRequest(gatewayUrl)
-	response, err := http.DefaultClient.Get(gatewayUrl)
+	response, err := c.client.Get(gatewayUrl)
 	if err != nil {
 		debug.DebugPrintError(err)
 		return "", err
@@ -235,7 +261,7 @@ func (c *Client) PostExecute(ctx context.Context, req *Request, token string, re
 
 func (c *Client) fetch(httpReq *http.Request, rep IResponse) (*http.Response, error) {
 	debug := c.Logger()
-	response, err := http.DefaultClient.Do(httpReq)
+	response, err := c.client.Do(httpReq)
 	if err != nil {
 		debug.DebugPrintError(err)
 		return response, err
