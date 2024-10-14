@@ -19,6 +19,7 @@ import (
 var (
 	onceInit   sync.Once
 	httpClient *http.Client
+	tracerMap  = new(sync.Map)
 )
 
 func defaultHttpClient() *http.Client {
@@ -54,7 +55,6 @@ type Response struct {
 
 type Client struct {
 	client    *http.Client
-	tracer    *Otel
 	AppKey    string
 	SecretKey string
 
@@ -81,6 +81,7 @@ func NewClient(appKey string, secretKey string) *Client {
 		SecretKey: secretKey,
 		client:    defaultHttpClient(),
 	}
+	clt.WithTracer("")
 	return clt
 }
 
@@ -97,7 +98,7 @@ func (c *Client) SetHttpClient(client *http.Client) {
 }
 
 func (c *Client) WithTracer(namespace string) {
-	c.tracer = NewOtel(namespace, c.AppKey)
+	tracerMap.LoadOrStore(c.AppKey, NewOtel(namespace, c.AppKey))
 }
 
 func (c *Client) GetAccessTokenNew(code string) (string, error) {
@@ -304,9 +305,10 @@ func (c *Client) GenerateSign(stringToBeSigned string) string {
 }
 
 func (c *Client) WithSpan(ctx context.Context, methodName string, req *http.Request, resp IResponse, payload []byte, fn func(*http.Request, IResponse) (*http.Response, error)) error {
-	if c.tracer == nil {
+	tracer, ok := tracerMap.Load(c.AppKey)
+	if !ok {
 		_, err := fn(req, resp)
 		return err
 	}
-	return c.tracer.WithSpan(ctx, methodName, req, resp, payload, fn)
+	return tracer.(*Otel).WithSpan(ctx, methodName, req, resp, payload, fn)
 }
