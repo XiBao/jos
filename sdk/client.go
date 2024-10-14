@@ -81,7 +81,6 @@ func NewClient(appKey string, secretKey string) *Client {
 		SecretKey: secretKey,
 		client:    defaultHttpClient(),
 	}
-	clt.WithTracer("")
 	return clt
 }
 
