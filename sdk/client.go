@@ -108,7 +108,7 @@ func (c *Client) SetHttpClient(client *http.Client) {
 }
 
 func (c *Client) WithTracer(namespace string) {
-	if enabled, _ := tracingEnabled.Load(); !enabled {
+	if !tracingEnabled.Load() {
 		return
 	}
 	tracerMap.LoadOrStore(c.AppKey, NewOtel(namespace, c.AppKey))
