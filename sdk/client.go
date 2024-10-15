@@ -14,12 +14,14 @@ import (
 	"time"
 
 	"github.com/XiBao/jos/sdk/internal/logger"
+	"go.uber.org/atomic"
 )
 
 var (
-	onceInit   sync.Once
-	httpClient *http.Client
-	tracerMap  = new(sync.Map)
+	onceInit       sync.Once
+	httpClient     *http.Client
+	tracingEnabled = atomic.NewBool(true)
+	tracerMap      = new(sync.Map)
 )
 
 func defaultHttpClient() *http.Client {
@@ -62,6 +64,14 @@ type Client struct {
 	Debug bool
 }
 
+func DisableTracing() {
+	tracingEnabled.Store(false)
+}
+
+func EnableTracing() {
+	tracingEnabled.Store(true)
+}
+
 func GetOauthURL(appKey, rURI, state, scope string) string {
 	values := GetUrlValues()
 	values.Set("app_key", appKey)
@@ -98,6 +108,9 @@ func (c *Client) SetHttpClient(client *http.Client) {
 }
 
 func (c *Client) WithTracer(namespace string) {
+	if enabled, _ := tracingEnabled.Load(); !enabled {
+		return
+	}
 	tracerMap.LoadOrStore(c.AppKey, NewOtel(namespace, c.AppKey))
 }
 
