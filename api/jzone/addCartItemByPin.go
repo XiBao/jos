@@ -72,8 +72,9 @@ func AddCartItemByPin(ctx context.Context, req *AddCartItemByPinRequest) (bool, 
 	r.SetItemId(req.ItemId)
 	if req.Num > 0 {
 		r.SetNum(req.Num)
+	} else {
+		r.SetNum(1)
 	}
-	r.SetNum(1)
 
 	var response AddCartItemByPinResponse
 	if err := client.Execute(ctx, r.Request, req.Session, &response); err != nil {

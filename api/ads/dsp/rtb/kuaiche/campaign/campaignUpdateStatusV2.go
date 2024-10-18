@@ -53,7 +53,7 @@ func (r KuaicheCampaignUpdateStatusV2Responce) Error() string {
 }
 
 type KuaicheCampaignUpdateStatusV2ResponseData struct {
-	Data bool `json:"data,omitempty" codec:"data,omitempty"`
+	Data int `json:"data,omitempty" codec:"data,omitempty"`
 	dsp.DataCommonResponse
 }
 
