@@ -232,3 +232,15 @@ func (req *CreateGiftActivityRequest) GetSourceName() string {
 	}
 	return ""
 }
+
+func (req *CreateGiftActivityRequest) SetExt(ext string) {
+	req.Request.Params["ext"] = ext
+}
+
+func (req *CreateGiftActivityRequest) GetExt() string {
+	ext, found := req.Request.Params["ext"]
+	if found {
+		return ext.(string)
+	}
+	return ""
+}

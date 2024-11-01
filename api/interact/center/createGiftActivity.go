@@ -25,9 +25,10 @@ type CreateGiftActivityRequest struct {
 	CouponId     uint64 `json:"couponId,omitempty" codec:"couponId,omitempty"`
 	Discount     string `json:"discount,omitempty" codec:"discount,omitempty"`
 	Quota        string `json:"quota,omitempty" codec:"quota,omitempty"`
-	SendCount    string `json:"send_count"`
-	PrizeEndTime string `json:"prize_end_time"`
-	ValidateDay  string `json:"validate_day"`
+	SendCount    string `json:"sendCount,omitempty" codec:"sendCount,omitempty"`
+	PrizeEndTime string `json:"prizeEndTime,omitempty" codec:"prizeEndTime,omitempty"`
+	ValidateDay  string `json:"validateDay,omitempty" codec:"validateDay,omitempty"`
+	Ext          string `json:"ext,omiempty" codec:"ext,omitempty"`
 }
 
 type CreateGiftActivityResponse struct {
@@ -107,6 +108,9 @@ func CreateGiftActivity(ctx context.Context, req *CreateGiftActivityRequest) (*C
 	}
 	if len(req.ValidateDay) > 0 {
 		r.SetValidateDay(req.ValidateDay)
+	}
+	if len(req.Ext) > 0 {
+		r.SetExt(req.Ext)
 	}
 
 	var response CreateGiftActivityResponse
