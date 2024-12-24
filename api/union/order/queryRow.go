@@ -104,6 +104,10 @@ type OrderRowResp struct {
 	Rid                 uint64    `json:"rid,omitempty"`            // 团长渠道ID，仅限招商团长管理渠道使用，团长开通权限后才可使用。
 	ExpressStatus       uint      `json:"expressStatus,omitempty"`  // 发货状态（10：待发货，20：已发货）
 	ChannelId           uint      `json:"channelId,omitempty"`      // 渠道关系ID
+	SkuTag              string    `json:"skuTag,omitempty"`         // 目前unionTag为32位，为支持更多标签标识能力，现新增64位标签字段，数据从右向左进行，64位新标签可以兼容32位unionTag，右32位参考 unionTag字段描述。第35位：广义新订单，第36位：虚拟商品订单，第40位：增量QAC订单
+	ItemId              string    `json:"itemId,omitempty"`         // 联盟商品ID
+	CallerItemId        string    `json:"callerItemId,omitempty"`   // 工具商联盟商品ID
+	OrderTag            string    `json:"orderTag,omitempty"`       // 订单标识，32位整型二进制字符串：00000000000000000000000000000001。数据从右向左进行，每一位为1表示符合特征，第9位：该商品为推广超市卡产生的订单，第12位：储值卡订单
 	GoodsInfo           *GoodInfo `json:"goodsInfo,omitempty"`      // 商品信息，入参传入fields，goodsInfo获取
 	CategoryInfo        *CatInfo  `json:"categoryInfo,omitempty"`   // 类目信息,入参传入fields，categoryInfo获取
 }
